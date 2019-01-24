@@ -69,3 +69,11 @@ Figure 7 - cell paper roc
 Figure 8 - cell paper fraction called
 
 ![Figure 8 - aml31 25 percent downsample fraction called](figures/cell_paper_fraction_called.png)
+
+Figure 9 - experiment 2 roc
+
+![Figure 7 - experiment 2 roc](figures/experiment2_roc.png)
+
+Figure 10 - experiment 2 fraction called
+
+![Figure 8 - aml31 experiment 2 fraction called](figures/experiment2_fraction_called.png)
