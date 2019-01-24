@@ -17,7 +17,7 @@ output:
     - Is it related to the uniform prior, and does it give a good explanation of the performance difference?
 
 ## Sensitivity in real data
-We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the authors "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
+We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
 
 Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
 
@@ -49,11 +49,15 @@ VScode is great for markdown
 # Figures
 Figure 1 - aml31 no downsample roc
 
-![Figure 1 - aml31 no downsample roc](figures/aml31_nodownsample_roc.png)
+![Figure 1 - aml31 no downsample roc](figures/aml31_no_downsample_roc.png)
 
 Figure 2 - aml31 no downsample fraction called
 
-![Figure 2 - aml31 no downsample fraction called](figures/aml31_nodownsample_fraction_called.png)
+![Figure 2 - aml31 no downsample fraction called](figures/aml31_no_downsample_fraction_called.png)
+
+Figure 2a - aml31 no downsample vaf
+
+![Figure 2 - aml31 no downsample vaf](figures/aml31_no_downsample_vaf.png)
 
 Figure 3 - aml31 50 percent downsample roc
 
@@ -63,6 +67,10 @@ Figure 4 - aml31 50 percent downsample fraction called
 
 ![Figure 4 - aml31 50 percent downsample fraction called](figures/aml31_downsampled_50_percent_fraction_called.png)
 
+Figure 4a - aml31 50 percent downsample vaf
+
+![Figure 4 - aml31 50 percent downsample vaf](figures/aml31_downsampled_50_percent_vaf.png)
+
 Figure 5 - aml31 25 percent downsample roc
 
 ![Figure 5 - aml31 25 percent downsample roc](figures/aml31_downsampled_25_percent_roc.png)
@@ -70,6 +78,10 @@ Figure 5 - aml31 25 percent downsample roc
 Figure 6 - aml31 25 percent downsample fraction called
 
 ![Figure 6 - aml31 25 percent downsample fraction called](figures/aml31_downsampled_25_percent_fraction_called.png)
+
+Figure 6a - aml31 25 percent downsample vaf
+
+![Figure 6 - aml31 25 percent downsample vaf](figures/aml31_downsampled_25_percent_vaf.png)
 
 Figure 7 - cell paper roc
 
@@ -86,6 +98,10 @@ Figure 9 - experiment 2 roc
 Figure 10 - experiment 2 fraction called
 
 ![Figure 8 - aml31 experiment 2 fraction called](figures/experiment2_fraction_called.png)
+
+Figure 10a - experiment 2 vaf
+
+![Figure 8 - aml31 experiment 2 vaf](figures/experiment2_vaf.png)
 
 Figure 11 - experiment 8 roc
 
