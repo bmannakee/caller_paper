@@ -90,11 +90,16 @@ Figure 6a - aml31 25 percent downsample vaf
 
 Figure 7 - cell paper roc
 
-![Figure 7 - aml31 25 percent downsample roc](figures/cell_paper_roc.png)
+![Figure 7 - cell paper roc](figures/cell_paper_roc.png)
 
 Figure 8 - cell paper fraction called
 
-![Figure 8 - aml31 25 percent downsample fraction called](figures/cell_paper_fraction_called.png)
+![Figure 8 - cell paper fraction called](figures/cell_paper_fraction_called.png)
+
+Figure 8a - cell paper vaf
+
+![Figure 8 - cell paper vaf](figures/cell_paper_vaf.png)
+
 
 Figure 9 - experiment 2 roc
 
@@ -108,10 +113,4 @@ Figure 10a - experiment 2 vaf
 
 ![Figure 8 - aml31 experiment 2 vaf](figures/experiment2_vaf.png)
 
-Figure 11 - experiment 8 roc
 
-![Figure 7 - experiment 8 roc](figures/experiment8_roc.png)
-
-Figure 12 - experiment 8 fraction called
-
-![Figure 8 - aml31 experiment 8 fraction called](figures/experiment8_fraction_called.png)
