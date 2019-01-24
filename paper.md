@@ -25,6 +25,11 @@ Experiment 8 is a 100X whole genome with the mutations from TCGA barcode TCGA-AA
 
 ***Going to need a table of AUROCs in the supplement for this***
 
+## Effect of odds threshold
+1. As threshold goes to infinity you get mutect.
+2. As threshold goes to zero you should also get mutect.
+3. Observe very little difference in the middle
+
 ## Effect of number of mutations
 
 1. How to approach this?
