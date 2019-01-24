@@ -3,6 +3,11 @@ output:
     pdf_document:
         fig_caption: yes
 ---
+# Introduction
+- almost all recent work has been on the heuristic aspects of variant calling.
+- very little attention to the statistical model, either in competition or development
+- there is useful biology.....
+
 # Results
 
 ## Sensitivity and specificity in simulated data
@@ -13,6 +18,10 @@ output:
 
 ## Sensitivity in real data
 We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the authors "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
+
+Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
+
+Experiment 8 is a 100X whole genome with the mutations from TCGA barcode TCGA-AA-3864-01A-01D-1981-10 spiked in. There are almost no variants below 5%, which results in perfect calling at 100X. I do not understand how the AUROC = 1 and we still get the fraction called we get.
 
 ***Going to need a table of AUROCs in the supplement for this***
 
@@ -77,3 +86,11 @@ Figure 9 - experiment 2 roc
 Figure 10 - experiment 2 fraction called
 
 ![Figure 8 - aml31 experiment 2 fraction called](figures/experiment2_fraction_called.png)
+
+Figure 11 - experiment 8 roc
+
+![Figure 7 - experiment 8 roc](figures/experiment8_roc.png)
+
+Figure 12 - experiment 8 fraction called
+
+![Figure 8 - aml31 experiment 8 fraction called](figures/experiment8_fraction_called.png)
