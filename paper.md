@@ -21,7 +21,10 @@ We examined two validation datasets from real tumors. An acute myeloid leukemia 
 
 Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
 
-Experiment 8 is a 100X whole genome with the mutations from TCGA barcode TCGA-AA-3864-01A-01D-1981-10 spiked in. There are almost no variants below 5%, which results in perfect calling at 100X. I do not understand how the AUROC = 1 and we still get the fraction called we get.
+%Experiment 8 is a 100X whole genome with the mutations from TCGA barcode TCGA-AA-3864-01A-01D-1981-10 spiked in. There are almost no variants below 5%, which results in perfect calling at 100X. I do not understand how the AUROC = 1 and we still get the fraction called we get. (remove)
+
+Experiment 10 is a 100X whole genome with the same variants as Experiment 2, but with a uniform vaf distribution. Prior method is still better, but in the uniform scenario there are only a small fraction of the total variants that are challenging to call.
+
 
 ***Going to need a table of AUROCs in the supplement for this***
 
@@ -114,3 +117,14 @@ Figure 10a - experiment 2 vaf
 ![Figure 8 - aml31 experiment 2 vaf](figures/experiment2_vaf.png)
 
 
+Figure 11 - experiment 10 (uniform vaf) roc
+
+![Figure 11 - experiment 10 (uniform vaf) roc](figures/experiment10_roc.png)
+
+Figure 12 - experiment 10 (uniform vaf) fraction called
+
+![Figure 12 - experiment 10 (uniform vaf) fraction called](figures/experiment10_fraction_called.png)
+
+Figure 12a - experiment 10 (uniform vaf) vaf
+
+![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png)
