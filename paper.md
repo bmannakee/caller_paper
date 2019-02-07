@@ -74,7 +74,7 @@ All vafs will be from the beta(1,6) which is a fat exponential
 ![ figure experiment 9](figures/WES_thresholds_exp9.png)
 
 ![roc curve figure experiment 9](figures/beta_1_6.png)
-<!-- Figure 1 - aml31 no downsample roc
+Figure 1 - aml31 no downsample roc
 
 ![Figure 1 - aml31 no downsample roc](figures/aml31_no_downsample_roc.png)
 
@@ -123,7 +123,7 @@ Figure 8a - cell paper vaf
 ![Figure 8 - cell paper vaf](figures/cell_paper_vaf.png)
 
 
-Figure 9 - experiment 2 roc
+<!-- Figure 9 - experiment 2 roc
 
 ![Figure 7 - experiment 2 roc](figures/experiment2_roc.png)
 
