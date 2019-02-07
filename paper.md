@@ -53,7 +53,13 @@ We examined two validation datasets from real tumors. An acute myeloid leukemia 
 
 
 # Methods
-TODO while the fixed experiments are running on HPC.
+100X whole genome and 500X whole exome for each of three signatures
+
+1,7,11 UV (Very concentrated at C>T)
+1,4,5 Tobacco (Slight concentation at C>A and C>T)
+1,3,5 Breast (diffuse)
+
+All vafs will be from the beta(1,6) which is a fat exponential
 
 
 # Figures
@@ -61,6 +67,8 @@ TODO while the fixed experiments are running on HPC.
 ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
 
 ![ figure experiment 9](figures/WES_thresholds_exp9.png)
+
+![roc curve figure experiment 9](figures/beta_1_6.png)
 <!-- Figure 1 - aml31 no downsample roc
 
 ![Figure 1 - aml31 no downsample roc](figures/aml31_no_downsample_roc.png)
