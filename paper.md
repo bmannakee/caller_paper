@@ -16,14 +16,16 @@ output:
     - What is the linear regime in the Mutect ROC curves about?
     - Is it related to the uniform prior, and does it give a good explanation of the performance difference?
 
+Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
+
+
+Experiment 10 is a 100X whole genome with the same variants as Experiment 2, but with a uniform vaf distribution. Prior method is still better, but in the uniform scenario there are only a small fraction of the total variants that are challenging to call.
+
+Experiment 9 is a whole exome that was supposed to have 1,7,11, but instead has a random set of signatures due to a bug
+
 ## Sensitivity in real data
 We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
 
-Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
-
-%Experiment 8 is a 100X whole genome with the mutations from TCGA barcode TCGA-AA-3864-01A-01D-1981-10 spiked in. There are almost no variants below 5%, which results in perfect calling at 100X. I do not understand how the AUROC = 1 and we still get the fraction called we get. (remove)
-
-Experiment 10 is a 100X whole genome with the same variants as Experiment 2, but with a uniform vaf distribution. Prior method is still better, but in the uniform scenario there are only a small fraction of the total variants that are challenging to call.
 
 
 ***Going to need a table of AUROCs in the supplement for this***
@@ -55,7 +57,11 @@ VScode is great for markdown
 
 
 # Figures
-Figure 1 - aml31 no downsample roc
+
+![roc curve figure experiment 9](figures/roc_and_called_curves.png)
+
+![ figure experiment 9](figures/WES_thresholds_exp9.png)
+<!-- Figure 1 - aml31 no downsample roc
 
 ![Figure 1 - aml31 no downsample roc](figures/aml31_no_downsample_roc.png)
 
@@ -127,4 +133,4 @@ Figure 12 - experiment 10 (uniform vaf) fraction called
 
 Figure 12a - experiment 10 (uniform vaf) vaf
 
-![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png)
+![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png) -->
