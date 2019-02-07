@@ -11,6 +11,8 @@ output:
 # Results
 
 ## Sensitivity and specificity in simulated data
+We can look at interactions now that we have settled on an experimental design.
+
 1. Brief description of simulations, see methods
 2. Words about the figure
     - What is the linear regime in the Mutect ROC curves about?
@@ -31,12 +33,14 @@ We examined two validation datasets from real tumors. An acute myeloid leukemia 
 ***Going to need a table of AUROCs in the supplement for this***
 
 ## Effect of odds threshold
+This has very little effect, even in an exome, as the figure inserted shows.
 1. As threshold goes to infinity you get mutect.
 2. As threshold goes to zero you should also get mutect.
 3. Observe very little difference in the middle
 
 ## Effect of number of mutations
-
+We will have this from the difference between exome and wgs on the same vaf distribution and signature.
+This is likely to have some signature dependence.
 1. How to approach this?
    - At what point does the empirical make more sense than the dirichlet.
    - I think never, they will converge
@@ -49,6 +53,7 @@ We examined two validation datasets from real tumors. An acute myeloid leukemia 
    - Hypermutators vs. not?
    - This should only be related to the number of mutations that are confident and contribute to the prior
    - If that is the case, is there an analytical way to better describe this?
+   THE ONLY EFFECT IS ON THE ROC. EASIER DISTRIBUTIONS SHRINK THE EFFECT BECAUSE SO FEW ARE NEAR THE CRITICAL POINT
 
 
 
