@@ -7,6 +7,8 @@ output:
 - almost all recent work has been on the heuristic aspects of variant calling.
 - very little attention to the statistical model, either in competition or development
 - there is useful biology.....
+- Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
+- Poisson models make similar assumptions about the probability of an allele at a site. Or do they, they are only looking at error rate(Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf)
 
 # Results
 
