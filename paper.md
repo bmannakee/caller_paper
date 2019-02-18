@@ -6,20 +6,21 @@ output:
 bibliography: caller_paper.bib
 ---
 # Targets
-Bioinformatics
-Plus Comp. Bio
-BMC bioinformatics
-and now
-Nature Scientific Reports.
-
+- Bioinformatics
+- Plus Comp. Bio
+- BMC bioinformatics
+- Nature Scientific Reports.
+- Genome Biology (published MuSE [@Fan2016])
 # Introduction
-- almost all recent work has been on the heuristic aspects of variant calling [@Alexandrov2013].
+- almost all recent work has been on the heuristic aspects of variant calling [@Cibulskis2013]. (I don't really have a good citation for this.)
 - very little attention to the statistical model, either in competition or development
 - there is useful biology.....
+    - [@Temko2018] links between mutational processes and driver mutations
+    - [@Fan2016] (MuSE), not here but somewhere
 - Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
-- Poisson models make similar assumptions about the probability of an allele at a site. Or do they, they are only looking at error rate(Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
+- Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
-    - if M(f) is proportional to 1/f, then an exponential distribution is implied (martincorena in mendeley). We choose a beta distribution to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
+    - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017,@Williams2017]. We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
 
 
 # Results
