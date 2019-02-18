@@ -2,13 +2,25 @@
 output:
     pdf_document:
         fig_caption: yes
+
+bibliography: caller_paper.bib
 ---
+# Targets
+Bioinformatics
+Plus Comp. Bio
+BMC bioinformatics
+and now
+Nature Scientific Reports.
+
 # Introduction
-- almost all recent work has been on the heuristic aspects of variant calling.
+- almost all recent work has been on the heuristic aspects of variant calling [@Alexandrov2013].
 - very little attention to the statistical model, either in competition or development
 - there is useful biology.....
 - Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
-- Poisson models make similar assumptions about the probability of an allele at a site. Or do they, they are only looking at error rate(Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf)
+- Poisson models make similar assumptions about the probability of an allele at a site. Or do they, they are only looking at error rate(Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
+- we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
+    - if M(f) is proportional to 1/f, then an exponential distribution is implied (martincorena in mendeley). We choose a beta distribution to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
+
 
 # Results
 
@@ -149,3 +161,5 @@ Figure 12 - experiment 10 (uniform vaf) fraction called
 Figure 12a - experiment 10 (uniform vaf) vaf
 
 ![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png) -->
+
+# References
