@@ -27,7 +27,7 @@ bibliography: caller_paper.bib
 - Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
-    - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017,@Williams2017]. We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
+    - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017,@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
 
 
 # Results
