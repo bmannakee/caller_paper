@@ -12,10 +12,17 @@ bibliography: caller_paper.bib
 - Nature Scientific Reports.
 - Genome Biology (published MuSE [@Fan2016])
 # Introduction
+
+- There are two main tracks in variant calling.
+    - Heuristic filters
+    - Statistical models of sequencing error
+- We focus here solely on a model of sequencing error.
 - almost all recent work has been on the heuristic aspects of variant calling [@Cibulskis2013]. (I don't really have a good citation for this.)
 - very little attention to the statistical model, either in competition or development
 - there is useful biology.....
     - [@Temko2018] links between mutational processes and driver mutations
+    - [@VandenEynden2017] mutational signature critical for estimating selection
+    - [@Kandoth2013,@Alexandrov2013a] Underlying mutational processes generate tumor and tumor type specific mutation signatures
     - [@Fan2016] (MuSE), not here but somewhere
 - Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
