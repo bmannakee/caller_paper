@@ -17,7 +17,11 @@ bibliography: caller_paper.bib
     - Heuristic filters
     - Statistical models of sequencing error
 - We focus here solely on a model of sequencing error.
-- almost all recent work has been on the heuristic aspects of variant calling [@Cibulskis2013]. (I don't really have a good citation for this.)
+- Many types of callers, all assume there is no biological preference for mutation at a given site. Any site specific estimates are site specific sequencing/alignment error models[@Xu2018]. 
+- Mutect2, FreeBayes and others are haplotype based callers
+- Callers with site specific variant probabilities generate them either from other samples or through deep sequencing (deepSNV,EBCall,LoLoPicker). They are essentially generating a site specific sequencing error model, not a site specific probability of mutation
+- Need to think about how the method applies to UMI (barcode) based sequencing, which are mostly deep targeted
+MuSE is continuous time markov evolutionary model, still assuming no biological difference in site specific mutation probability
 - very little attention to the statistical model, either in competition or development
 - there is useful biology.....
     - [@Temko2018] links between mutational processes and driver mutations
