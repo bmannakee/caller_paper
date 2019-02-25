@@ -16,7 +16,7 @@ bibliography: caller_paper.bib
 - There are two main tracks in variant calling.
     - Heuristic filters
     - Statistical models of sequencing error
-- We focus here solely on a model of sequencing error.
+- We focus here on a model of mutation probability, including but not limited to sequencing error.
 - Many types of callers, all assume there is no biological preference for mutation at a given site. Any site specific estimates are site specific sequencing/alignment error models[@Xu2018]. 
 - Mutect2, FreeBayes and others are haplotype based callers
 - Callers with site specific variant probabilities generate them either from other samples or through deep sequencing (deepSNV,EBCall,LoLoPicker). They are essentially generating a site specific sequencing error model, not a site specific probability of mutation
@@ -32,7 +32,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
     - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017,@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
-
+- Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
 
 # Results
 
