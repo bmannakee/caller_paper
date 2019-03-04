@@ -13,6 +13,15 @@ bibliography: caller_paper.bib
 - Genome Biology (published MuSE [@Fan2016])
 # Introduction
 
+The variant allele frequency distribution is an important variable in understanding tumor processes.
+It is important for understanding both tumor heterogeneity and evolutionary trajectories.
+Accurate measure of allele frequency are crucial.
+Allele frequency distributions are effected by the method used to call snps.
+More sensitive variant calling allows more 
+Tumor heterogeneity has been associated with prognosis (1-4 in chuang paper) and the evolutionary trajectory helps identify the number of tumor subclones and their selective advantage.
+
+The variant allele frequency spectrum that is currently used most often in cancer is truncated at a level above 5-10% because of difficulties in identifying low frequency variants.
+
 - There are two main tracks in variant calling.
     - Heuristic filters
     - Statistical models of sequencing error
@@ -83,6 +92,8 @@ This is likely to have some signature dependence.
 
 
 # Methods
+
+## 
 100X whole genome and 500X whole exome for each of three signatures
 
 1,7,11 UV (Very concentrated at C>T)
