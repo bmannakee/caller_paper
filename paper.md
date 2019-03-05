@@ -11,12 +11,19 @@ bibliography: caller_paper.bib
 - BMC bioinformatics
 - Nature Scientific Reports.
 - Genome Biology (published MuSE [@Fan2016])
+- Nucleic Acids Research published EBCall in 2013
+
 # Introduction
 
-Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
+
+
+<!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
 This allele frequency spectrum is constructed from 
 
+If tumors, as evidence suggests [@Williams2016;@Williams2018;@Bozic2016], evolve essentially neutrally, then even driver mutations can't be expected to rise to high frequency during tumor evolution.
+As a result, finding mutations important to progression, resistance, and metastasis requires finding lower frequency mutations. (not really)
+Finding 
 Tumor heterogeneity has been associated with prognosis (1-4 in chuang paper) and the evolutionary trajectory helps identify the number of tumor subclones and their selective advantage.
 
 The variant allele frequency spectrum that is currently used most often in cancer is truncated at a level above 5-10% because of difficulties in identifying low frequency variants.
@@ -34,13 +41,13 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - there is useful biology.....
     - [@Temko2018] links between mutational processes and driver mutations
     - [@VandenEynden2017] mutational signature critical for estimating selection
-    - [@Kandoth2013,@Alexandrov2013a] Underlying mutational processes generate tumor and tumor type specific mutation signatures
+    - [@Kandoth2013;@Alexandrov2013a] Underlying mutational processes generate tumor and tumor type specific mutation signatures
 - Rather than using a constant probability for mutation, as other variant callers do, we convert that to an average or expected mutation probability, and compute the probability conditional on context and genome composition
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
-    - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017,@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
+    - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017;@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
 - Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
-
+ -->
 # Results
 
 ## Sensitivity and specificity in simulated data
