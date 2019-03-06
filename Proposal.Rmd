@@ -1,0 +1,455 @@
+---
+title: "Statistical methods in cancer bioinformatics and tumor evolution"
+author: "Brian Mannakee"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+header-includes:
+  - \usepackage{ragged2e}\RaggedRight
+  - \usepackage{wrapfig}
+
+
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    fig_caption: true
+    keep_tex: yes
+    
+documentclass: article
+mainfont: Arial
+fontsize: 12pt
+geometry: margin=1in
+bibliography: variantcalling.bib
+---
+
+# Introduction
+
+
+Recent advances in sequencing technologies and increasing availability of sequenced tumors present an opportunity to expand our understanding of the characteristic processes acting in cancer [@Hu2017].
+Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
+Clonal evolutionary processes are well studied in cancer [@Bozic2010;@Bozic2016], and the theory leads to three potential models for tumor evolution.
+Tumors can evolve as a terminal expansion subject to little or no selective pressure, leading to a so-called *Big Bang* which is characterized by a large number of heterogeneous subclones[@Sottoriva2015].
+Tumors evolving under selective pressure can have one of two dynamics: either they evolve in such a way that advantageous mutations arise and compete with each other leading to multiple dominant subclones in the tumor (branched evolution) [@Yates2012;@Gerlinger2012;@Burrell2013;@Bozic2016]; or they evolve such that each new advantageous mutation out-competes all previous mutations leading to a single dominant clone (sequential evolution) [@Hu2017].
+These processes lead directly to the mutational profile of the tumor, i.e. mutations (variants), their genomic contexts, and their frequencies.
+
+Identification of the mutations present in a tumor can be critical in optimizing the treatment regime for an individual patients disease [@Ding2012;@Mardis2012;@Chen2013;@Borad2014;@Findlay2016].
+Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by NGS.
+@Griffith2015 demonstrate conclusively that identification of all major resistance mutations present in a tumor is essentially impossible with current sequencing practice.
+They find that rather than the current standard of sequencing a tumor exome at 75X-100X depth, sequencing of up to 400X is required to identify important subclonal mutations in a heterogeneous tumor.
+In addition, they find that to identify the mode and tempo of evolution in a tumor, whole genome sequences of 300X are required [@Griffith2015].
+Unfortunately, modern variant callers suffer from excessive false positive rates at extreme sequencing depths [@Cibulskis2013].
+@Griffith2015 found that in order to generate a reliable set of variant calls for a whole genome sequenced at 312X depth they needed to combine the calls from eight different variant callers and then resequence 200,000 individual variants.
+In this proposal I develop two methods; a novel variant calling algorithm with a significantly reduced false positive rate for deep sequencing data, and an algorithm that identifies the timing of one of the characteristic processes operating in tumor evolution.
+<!-- This assumption leads directly to the inference that tumors evolve through a process of branched evolution from a single clone[@Burrell2013;@Yates2012]. -->
+<!-- Branched evolutionary processes are well studied from a both a theoretical and experimental standpoint so that genetic information from the tumor, in particular distribution of observed variant allele frequencies, can be used to analyze the evolutionary trajectory of the tumor and test hypotheses regarding the mutation rate, mutational processes, and the strength of natural selection, operating in the tumor[@Somarelli2017]. -->
+<!-- Important applications of this include a better understanding of the drivers behind tumor initiation and progression, the prediction of treatment resistance mechanism, and treatment strategies for combatting the evolution of resistance. -->
+<!-- The quality and applicability of these predictions depends heavily on the sensitivity and specificity of the algorithms used to identify variants in tumor samples. -->
+
+<!-- For any given tumor, the key to discerning the evolutionary process, as well as identifying resistant clones at low frequency, is variant calling. -->
+<!-- Variant calling is the process of converting the output of next generation sequencing (NGS) to a set of mutations that are present in the tumor. -->
+
+<!-- The current statistical paradigm in variant calling is to assume that the data generating process for tumor mutations is uniform, i.e. the mutation rate, allele frequency, and probability of a mutation at a given site are all assumed to be uniform. -->
+<!-- These are known to be incorrect assumptions. -->
+<!-- Mutations are generated by mutational processes that have specific preferences for sites depending on their genomic context, and result in varying but identifiable mutation rates at those preferred sites [@Nik-Zainal2012a;@Alexandrov2013;@Alexandrov2013a;@Helleday2014]. -->
+<!-- Mutation allele frequencies are determined by the mode and tempo of evolution in the tumor. -->
+<!-- As a result, the data generating process that results in the collection of mutations present in a tumor is far from uniform, and this prior information can be of significant value in interpreting the results of NGS sequencing data. -->
+
+<!-- Here I propose to more fully integrate the idea of a *Generative Distribution* for observed mutations in tumors, and create a collection of methods that support the identification of the processes driving a tumor. -->
+<!-- These methods simultaneously reinforce each other, and will lead to better resolution of the generative distribution (Figure \ref{figmain}). -->
+<!-- \begin{wrapfigure}{r}{.6\textwidth}  --> 
+<!-- \includegraphics[width=.6\textwidth]{./proposal_main.png}  --> 
+<!-- \caption{Theory and method advances toward a generative model of tumor mutation.}  --> 
+<!-- \label{figmain}  --> 
+<!-- \end{wrapfigure}  --> 
+<!-- The first will be a variant caller that uses the empirical distribution of mutations with high allele frequency to generate an informative prior that can be used to increase the sensitivity of the variant caller for low frequency mutations. -->
+<!-- The second method will use these improved variant calls to investigate the evolution of the mutation spectrum over time in the tumor, allowing finer grained estimates of mutation rate and the effects of natural selection. -->
+<!-- The third method will recast the procedure for identifying mutational processes from a classification context ([@Lee2000;@Alexandrov2013]) to a topic modelling context (cite), generating sharper prior estimates for the probability of a mutation at a give site. -->
+<!-- Finally, the fourth method will combine the concepts of mutational processes and tumor evolution to create software to *Generate*, rather then *simulate*, tumor genomes. -->
+
+# Background
+
+## Sequencing
+Next generation sequencing technology combines three separate processes:
+
+1. DNA extraction and library preparation
+    - DNA is extracted from cells, fragmented, and 5' and 3' adapters are ligated to each fragment. DNA fragments prepared in this way are called the library.
+    - The library is washed onto a flow cell where fragments hybridize to the surface.
+    - Hybridized fragments are amplified into clusters of identical fragments on the flow cell surface.
+2. Sequencing
+    - Sequencing reagents and flourescent-tagged DNA bases are washed over the flow cell in cycles.
+    - In each cycle one DNA base is added to the hybridized *templates* and flourescence is measured for each cluster.
+    - Repeating this cycle results in a *read* of the DNA template at each cluster, and the number of cycles corresponds to the read length.
+3. Alignment and Data Analysis
+    - Following sequencing, reads are aligned to a reference genome.
+    - These alignments are then used for a variety of purposes, including somatic nucleotide and copy number variant calling 
+    
+Each of these steps is a source of error in the process.
+The errors in steps one and two are inherent to the sequencing technology used, and the manufacturers of each have done extensive testing to develop an error model for these two steps taken together.
+The sequencer computes the probability that each base in a read has been called in error, and reports a *base quality score* $q$, such that $q= -10*log_{10}(error\ probability)$.
+In step three uncertainty arises from the difficulty in aligning short reads (~100-150 base pairs) to the genomic sequence, due to the likelihood of highly similar sequences of this length occuring at more than one place in the genome.
+Each alignment algorithm generates a mapping quality score (MAPQ) for every read.
+The score ranges from 0-40 and is typically simply used as a heuristic filter, such that reads with a MAPQ score less than some value are ignored.
+An excellent overview of the NGS sequencing process is available on the [Illumina website](https://www.illumina.com/content/dam/illumina-marketing/documents/products/illumina_sequencing_introduction.pdf) and also in [@Escalona2016].
+
+## Mutation spectrum
+
+Cells that are functioning normally have mechanisms that monitor the DNA during replication and correct potential errors so that they are not transmitted to daughter cells.
+As a result the accumulation of mutations during somatic cell division is low in healthy cells.
+In addition cells have mechanisms that control their rate of division so that tumors do not arise.
+Oncogensesis is thought to involve the loss of both of these mechanisms, leading to a proliferation of cells that accumulate significant numbers of mutations [@Fearon1989].
+Failure of individual repair mechanisms, as well as carcinogen exposure, tend to be associated with specific patterns of mutation.
+
+Using the pyrimidine of each Watson-Crick base pair we can label all possible nucleotide substitutions, resulting in 6 subtypes: C>A,C>G,C>T,T>A,T>C,T>G.
+As many repair mechanisms and mutagens are also affected by the identify of the bases flanking the substituted nucleotide, we can further sub-divide mutations in terms of their 5' and 3' flanking bases, to create a total of 96 different mutation types (4 5' bases * 6 subtypes * 4 3' flanking bases).
+These mutation subtypes are often described as mutation *contexts*.
+The mutation spectrum of a particular tumor is represented by the proportion of mutations occuring in each of the 96 contexts.
+Signatures of specific mechanisms and mutagens can be extracted from large collections of variant calls taken from thousands of tumors [@Nik-Zainal2012a;@Alexandrov2013;@Alexandrov2013a;@Helleday2014].
+The complete set of mutational signatures collected by the COSMIC project is available at [http://cancer.sanger.ac.uk/cosmic/signatures](http://cancer.sanger.ac.uk/cosmic/signatures).
+An example of one of the signatures is shown in Figure \ref{fig1}.
+
+\begin{figure} 
+\includegraphics{./Signature1.png} 
+\caption{COSMIC mutational process signature number 1. This signature is found in nearly all tumors, and is generated by spontaneous deamination of 5-methylcytosine. The deamination turns a cytosine to uracil, and during the next replication cycle the uracil is read as a thymine and paired with an adenine, leading to C>T transitions in specific genomic contexts. This signature is strongly associated with age at diagnosis.} 
+\label{fig1} 
+\end{figure} 
+
+
+# Projects
+## Somatic single nucleotide variant calling 
+<!-- Variant callers show significant performance degradation as sequencing depth increases, so there are very few whole exome sequences at depths > ~150X. -->
+<!-- The goal of the variant calling project is to allow deeper sequencing with better control over the false positive rate, leading to better resolution of low frequency mutations.  -->
+<!-- As costs come down, it may become affordable, and thus desirable, to go much deeper. -->
+
+The data available to call variants are NGS reads from matched tumor/normal samples.
+Several statistical methods for estimating the probability that an apparent somatic variant in the tumor is truly present have been developed.
+One popular algorithm computes a simple one-sided Fisher's exact test comparing the read counts in the tumor and normal samples with those expected under a model where sequencing error is 0.01\% at every position, and calls the site variant if the P-value from the test is less than 0.10 [@Koboldt2012].
+Other models jointly compute Bayesian posterior probabilities for the tumor and normal genotype with models of varying complexity [@Larson2012;@Saunders2012;@Hansen2013;@Christoforides2013].
+
+Here I extend the model used by MuTect, developed by the Broad Institute, which balances complexity and simplicity while performing as well or better than other algorithms over a broad range of tumor types and sequencing depths [@Cibulskis2013].
+First I will describe the MuTect model, and then propose an extension using the mutation spectrum of the tumor to construct a prior for the probability of mutation at a given site.
+
+Notation:
+\[
+  \begin{aligned}
+   r &\in \{A,C,G,T\} &\quad \textrm{reference allele}\\
+   m &\in \{A,C,G,T\}, m \ne r &\quad \textrm{variant allele}\\
+   f &\in [0,1] &\quad \textrm{variant allele fraction}\\
+   b_i &\quad &\textrm{base called at read i}\\
+   e_{b_i} &= 10^{-\frac{q_{b_i}}{10}},  q \in [0,\infty] &\quad \textrm{the probability of error at base } b_i\\
+   i &= (1 \dots d) &\quad \textrm{index over d reads}.\\\\
+  \end{aligned}
+\]
+
+The probability that a given base is correctly called can be written as
+
+\[ 
+  P(b_i \mid e_i, r, m, f) = \left\{
+    \begin{array}{cr}
+      f \frac{e_{b_i}}{3} + (1-f)(1-e_{b_i}) & b_i = r\\
+      f(1-e_{b_i}) + (1-f) \frac{e_{b_i}}{3} & b_i = m\\
+      \frac{e_{b_i}}{3} & otherwise.
+    \end{array}
+    \right.
+\]
+
+Now consider two models for the data. Model $M_0$ in which there are no variants at a site, and $M^{m}_{f}$ where allele $m$ is present at allele fraction $f$.
+Assuming reads are independent the likelihood of the model given the data is
+
+\[
+  \mathcal{L}(M^{m}_{f}) = P(\{ b_i \} \mid \{ e_{b_i} \}, r, m, f) = 
+  \prod_{i=1}^{d} P(b_i \mid e_{b_i}, r, m, f)
+\]
+
+and the probability of $M^{m}_{f}$ can be written
+
+\[ 
+  P(m, f \mid \{ b_i \}, \{ e_{b_i} \}, r) = 
+      \mathcal{L}(M^{m}_{f}) \frac{P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
+\]
+
+Because we are ultimately going to evaluate the odds in favor of $M^{m}_{f}$ given the data, it is useful to note that we can write this probability in terms of the model $M_0$
+
+\[ 
+  1 - P(m, f \mid \{ b_i \}, \{ e_i \}, r) = 
+      \mathcal{L}(M_{0}) \frac{1 - P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
+\]
+
+Taking the log of the ratio of the two previous equations gives the log odds in favor of $M^{m}_{f}$, and some cancellation yields the following expression
+\[
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right).
+\]
+
+We can construct a classifier for variants by selecting an odds threshold $\delta_T$ and labeling variants satisfying the condition
+\[
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right)
+    \ge \textrm{log}_{10} \delta_T
+\]
+as true variants, and rejecting them otherwise.
+Note that the expression for $LOD_{T}(m,f)$ can be further factorized as the sum of the log-likelihood ratio of the two models and the log odds of the prior for $M^{m}_{f}$.
+Current variant callers calculate this prior by assuming the allele and its frequency are independent, and that $f \sim \textrm{U}(0,1)$, so that $P(f) = 1$.
+If all substitutions are equally likely, then $P(m) = \mu/3$ where $\mu = 3 \times 10^{-6}$, the estimated per-base mutation rate in tumors.
+Given these assumptions the log prior odds is a constant, and the classifier can be re-written as
+
+\[
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})}{\mathcal{L}(M^{m}_{0})} \right) \ge
+    \textrm{log}_{10} \delta_T - \textrm{log}_{10} \left(\frac{P(m)}{1 - P(m)} \right) \ge \theta_T.
+\]
+
+If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$. 
+
+\begin{figure} 
+\begin{center}
+\includegraphics[width=\textwidth]{./proposal_empirical} 
+\caption{Empirical mutation spectrum of a pancreatic ductal adenocarcinoma, whole exome sequenced to 50X mean depth.} 
+\label{fig2} 
+\end{center}
+\end{figure} 
+
+Figure \ref{fig2} shows the empirical mutation spectrum from a single tumor.
+It is clear that the assumption that the mutation probability $P(m)$ is the same at every base in the genome is not supported by the data.
+We can better describe the probability $P(m)$ as $P(m,M)$, the probability that there is a mutation $M$ and that the mutation is to allele $m$. 
+Further, Figure \ref{fig2} makes it clear that this probability $P(m,M)$ depends strongly on the genomic context in which we find the mutation.
+Thus, what we would like to use as a prior is $P(m,M \mid C)$, the probability of a mutation to a particular allele at a locus given the sequence context of that locus.
+By the laws of conditional probability we can rewrite $P(m,M \mid C)$ as 
+\[
+  P(m,M \mid C) = P(m \mid M,C)P(M \mid C).
+\]
+
+The conditional probability $P(m \mid M,C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
+Using Bayes rule we can rewrite$P(m,M \mid C)$ as
+
+\[
+  P(m,M \mid C) = P(m \mid M,C)P(C \mid M) \frac{P(M)}{P(C)}.
+\]
+
+Now $P(C \mid M)$ can also be computed from the data in Figure \ref{fig2}. 
+$P(C)$ can be estimated as $1/96$ where 96 is the total number of contexts, and $P(M)$ can be estimated as above as $\mu$.
+The new expression for the log odds is
+
+\[
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,M \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m,M \mid C))} \right).
+\]
+
+As a proof of concept, I have implemented an algorithm that computes $P(C \mid M)$ and $P(m \mid M,C)$ directly from the empirical distribution of the tumor represented by Figure \ref{fig2}.
+
+
+
+
+\begin{wrapfigure}{r}{.5\textwidth} 
+\includegraphics[width=.4\textwidth]{./mutect_prior_performance} 
+\caption{Comparing the level of evidence seen by MuTect against the corrected level of evidence from the algorithm including the empirical prior, binned by allele frequency. The horizontal line is the evidence threshold required to call a variant using my algorithm, and the vertical line is the threshold used by MuTect. Variants in quadrant I are called only by my algorithm, those in quadrant II are called by neither, those in quadrant III are called by both, and variants in quadrant IV are called by MuTect, but rejected by the new algorithm.} 
+\label{fig3} 
+\end{wrapfigure} 
+The performance of this method is summarized in Figure \ref{fig3}.
+For allele frequencies above 20\% the two algorithms return identical results.
+At allele frequencies below 20\% the algorithm with the empirical prior probability rejects a large number of variants called by MuTect (quadrant IV), and accepts a few variants that are rejected by MuTect (quadrant 1).
+<!-- These results suggest that the method has promise both in reducing the number of false positives, and increasing the evidence for some low frequency variants that are supported by the prior. -->
+Note the banding of points along the Y-axis, which is due to the implementation of the non-uniform prior.
+The empirical prior tends to reduce the level of evidence for most variants compared to the uniform prior, pushing a large number of points into quadrant IV, and potentially reducing the false positive rate.
+
+
+
+Using the observed mutation spectrum as a prior, while better than assuming a uniform prior, is far from ideal.
+Whole exome sequencing (WES) is the most common form of NGS in cancer sequencing both because it is cheaper than sequencing the whole genome and the genomic changes of interest to researchers and clinicians are those that actually change protein composition or expression patterns, and thus might be targetable by some therapy. 
+In a typical WES between 100 and 300 single nucleotide variants are identified, and both biological and measurement noise are high.
+This leads to a high probability that some mutation contexts will have zero observations in the data (300 observations spread over 96 bins with an expectation of high concentration in a subset of bins).
+Since the prior can't enforce zero probability of a mutation in a given context I have renormalized the observed spectrum so that every bin has at least $10^{-3}$ probability, which is somewhat arbitrary and probably not representative.
+Additionally, the prior here is in some sense intended to represent the underlying data generating process that leads to mutations, but the small amount of data available means the observed mutation spectrum a likely a poor estimate.
+
+The work of the COSMIC consortium cataloging mutation signatures provides another means of generating the mutation prior [@Rosenthal2016].
+The prior can be generated by identifying the linear combination of mutation signatures that most closely approximate the true data, and using this model to generate a mutation spectrum. 
+Let the vector $M (96 \times 1)$ contain the frequencies of each of the 96 mutation types (i.e. the data in Figure \ref{fig2}) in the tumor.
+Let $P (96 \times N)$ be the frequency profiles of $N$ pre-determined mutation signatures ($N$ = 30 if we use the COSMIC signatures).
+We wish to estimate the vector $E (N \times 1)$ of exposures to each mutational signature.
+The least squares estimate for $E$ is given by
+
+\[
+min_E(M - PE)^T(M-PE)
+\]
+
+subject to the constraint that the rows of E sum to one, i.e. the rows of $PE$ contain the linear combination of the K mutation types that most closely approximates $M$.
+When $P$ is full rank, as it is here, there is an exact solution to this constrained optimization using quadratic programming [@Huang2017].
+The optimization can also be accomplished via simulated annealing, which allows for investigation of a distribution of solutions that are within say 1\% of the optimum in order to estimate the stability of the solution.
+I will extend the current preliminary algorithm to compute the mutation prior either from the normalized empirical spectrum or the estimated spectrum, and determine if there is any performance difference between the two methods.
+The performance of these methods will be evaluated using simulations as well as gold standard variant call sets as described below.
+
+
+## Evolution of the mutation spectrum
+Cancer is an evolutionary process and modelling the mode and tempo of evolution in initiation and progression, as well as the role of evolution in the development of treatment resistance, are crucial to developing treatments [@Findlay2016].
+In particular, an understanding of the nature of tumor heterogeneity and selection on subclones is crucial for understanding the risk of mutation driven escape in drug treatment regimes[@Greaves2015].
+There is significant interest in using mutation spectra to catalogue the roles of particular mutational process exposures in initiation and progression of cancer [@Hollstein2017].
+
+\begin{figure} 
+\begin{center}
+\includegraphics[height=.3\textheight]{./proposal_sigs} 
+\caption{Changes in mutation signatures between the full collection of variants (Full), and only those with allele frequency below 20\% (Subclonal)} 
+\label{fig4} 
+\end{center}
+\end{figure} 
+
+<!-- One way to assess heterogeneity and look for signatures of clonal selection is simply to generate a set of high-confidence variant calls for the tumor sample and see if they can be clustered by allele frequency in such a way that the data is consistent with the emergence of defined sub-clones. -->
+<!-- The drawback to this method is that it requires measuring allele frequencies at a resolution that is out of reach at typical sequencing depth. -->
+<!-- In addition, in many tumors allele frequencies are confounded by amplifications and deletions in such a way that it can be difficult to determine the fraction of cells that carry a mutation from the NGS allele frequency estimates. -->
+
+Two recent studies in lung cancer found signatures of cigarette smoking and APOBEC3B hyper-activity at similar exposure intensities in multiple samples.
+On closer inspection however, they found that the APOBEC signature was absent in the early (clonal) mutations, and dominant in the later (subclonal) mutations [@DeBruin2014;@Zhang2014].
+The implication of this work is that smoking is the main source of mutational insult prior to initiation, but during progression APOBEC3B drives the accumulation of mutations.
+We have preliminary results, shown in Figure \ref{fig4}, suggesting that in pancreatic cancers we also see shifts in mutational process as we look at mutations of different frequency.
+In a recent preprint, @Rubanova2018 show similar results on a large dataset of tumor mutations in a variety of cancer types.
+All of these results were generated simply by using the matrix factorization method of @Rosenthal2016 described above, applied to variants subsetted according to their allele frequency.
+
+
+<!-- If tumors are evolving neutrally, with important drivers and mutational process present at initiation, we would expect to uncover the same mutation signatures whether we look at the entire set of mutations, or only the subset of low frequency mutations. -->
+<!-- We see both new signatures, and changes in the balance of signatures, arising at lower allele frequencies. -->
+<!-- This initial work provides evidence for the presence of selection pre-treatment, and against the Big Bang model, but suffers from serious data and methodological limitations. -->
+
+There are far more sophisticated methods available to look for changes in the mutational processes during the course of tumor evolution.
+As a first approximation it is reasonable to consider the allele frequency as a proxy for the time at which a mutation arose, such that mutations at low frequency occurred later in the tumors evolution.
+This opens up the possibility of applying time series methods, such as change point detection, to determine whether the underlying data generating (i.e. mutational) processes have changed over the course of the tumors growth [@Zou2014].
+Even more promising is to think of the problem in light of the document classification and multiple author identification literature.
+The tumor mutation spectrum is the result of one or more mutational processes, and thinking about those different processes combining as a mixture of multinomial distributions opens up a substantial body of literature on detection of change points in categorical data [@Wolfe1990;@Stoffer1993;@Giron2005;@Batsidis2013;@Wang2017].
+While the NMF procedure used by the COSMIC consortium to uncover the mutation signatures is nominally a document classification algorithm, I am unaware of any work in this field in which the mutation spectrum of the tumor is explicitly treated as sequential draws from a possibly changing mixture of multinomial distributions, and statistical methods developed for these processes applied.
+Work evaluating these methods in this context will be a contibution to cancer informatics, and be very useful in the effort to understand the evolutionary processes responsible for the heterogeneity we see in cancer.
+These statistical methods will be evaluated using simulations as well as published sequence and mutation spectrum heterogeneity data described below.
+
+
+
+
+
+<!-- ## Identification of mutation spectra -->
+<!-- The COSMIC mutation signatures we use to construct a prior for variant calling above were generated using non-negative matrix factorization (NMF)[@Lee2000;@Alexandrov2013]. -->
+<!-- Using NMF to identify mutational signatures casts the problem in the topic modelling context used to classify documents in a corpus by the similarity of the topics they include. -->
+<!-- It has been shown that NMF is mathematically approximately equivalent to a specific parameterization of Latent Dirichlet Analysis (LDA), the most common topic model[@Faleiros2016]. -->
+<!-- In particular, NMF algorithms which minimize KL divergence are an instance of LDA where the dirichlet priors on the distributions of both words over topics and topics over documents are uniform (symmetric with concentration parameters = 1). -->
+<!-- This construction imposes several drawbacks in the context of using these mutation signatures for inference in the variant calling context, that I propose to use more sophisticated statistical methods to alleviate. -->
+
+<!-- The mutation signatures in Figure~\ref{fig1} are thought to be indicative of the activity of various mutational process, as describe in the background section. -->
+<!-- While they are widely used these mutation signatures have several properties which may affect the quality of inferences using them. -->
+<!-- We would expect mutational signatures to be sparse in some sense, i.e. a real mutational "process" should be operating on specific contexts. -->
+<!-- While we see several signatures that have this sort of sparseness, many are not as specific as one would assume. -->
+<!-- For instance, signatures 3,4,5,8, and 9 are all signatures where nearly every context has positive weight, yet none has more than 5%. -->
+<!-- There is certainly an underlying random mutational process that occurs in all somatic cell divisions, and it appears that this random process is being distributed among many signatures. -->
+<!-- This is analagous to what have been called "Stop" words in the topic modelling literature. -->
+<!-- If we naively feed a corpus of documents into the LDA algorithm, every topic will include words such as "the" and "and", so the general practice is simply to remove these common words from the final topics. -->
+<!-- In the case of mutational signatures, this is not a reasonable thing to do because it is not possible to know a priori which contexts are truly extraneous to the signature. -->
+<!-- Wallach and colleagues have proposed a modification of the LDA algorithm that allows for the estimation of dirichlet priors that are both asymmetric and non-uniform [-@Wallach2009]. -->
+<!-- They show that this tends to alleviate the "Stop" word problem by concentrating commonly used words in one or two common topics. -->
+<!-- In the mutation signature context this would likely equate to confining the random mutation probabilities to Signature 1, the aging signature, while making the rest of the signatures more sparse. -->
+
+<!-- There must be some correlation structure between mutation signatures. -->
+<!-- Signatures 2 and 13 are signatures of the activity of the APOBEC family of cytidine deaminases involved in viral defense, and are often found together in cervical and bladder cancers. -->
+<!-- These two signatures are obviously strongly correlated. -->
+<!-- Conversely, Signature 4 (Tobacco smoking) and Signature 7 (UV radiation) should be anti-correlated to the point of mutual exclusion because UV radiation doesn't penetrate past the skin layer and tobacco smoke effects only the internal organs. -->
+<!-- The LDA framework can not estimate the correlation structure among signatures, and as a result they are not available for use when attempting to dissect the signature contributions of a single tumori -->
+<!-- Aitchison identified this problem in the compositional data literature long ago and suggested the logistic normal distribution as a method for modeling the correlation structure of mixed member models[@Aitchison1982].  -->
+<!-- Subsequently, @Paisley2012 built on Aitchison's work and conceived the Discrete Infinite Logistic Normal distribution, which for the estimation of correlation structure in mixed member models, including topic models. -->
+
+<!-- I propose to develop an algorithm that utilizes the @Paisley2012 DILN model with assymetric and non-uniform dirichlet process priors to estimate mutation spectra from the same TCGA data used by @Alexandrov2013. -->
+<!-- I am not aware of any literature considering this approach to mutation signature identification, and it will be useful in both evolutionary and variant calling methods described above. -->
+
+
+## Simulation method for validating variant calling and mutation signature evolution methods
+
+\begin{figure} 
+\begin{center}
+\includegraphics[height=.3\textheight]{./simulation} 
+\caption{Branching process simulation scheme, with examples of some of the scenarios it can create. 
+A: Every node divides at every time step with probability 1. $N$ mutations drawn from a mutational signature $M$ are added to each leaf, where $N$ is drawn from a Poission distibution with parameter $\lambda$ and $M$ is a combination of the COSMIC mutation signatures. 
+B: A new mutation signature arises at time step $T_3$ but there is no corresponding advantageous mutation, so the number of mutations and the probability of division at each time step remain the same. 
+C:  Two lineages gain the same reproductive advantage at time step $T_3$, and form a final population with two major clones. 
+D:  A  new mutational process arises alongside an advantageous mutation at time step $T_3$ and the mutation and mutational process sweep to fixation.} 
+\label{figsim} 
+\end{center}
+\end{figure} 
+Distinguishing low frequency resistance mutations requires sequencing tumors to high depth [@Griffith2015].
+Sequencing whole genomes to high depth, and/or sampling multiple tumor regions, is necessary to identify evolutionary processes [@Ding2012;@Sun2017;@Somarelli2017;@VandenEynden2017].
+Deep whole genome sequencing of tumors is rare because the cost can not typically be justified by clinicians and researchers, due to high false positive rates at high depth and the lack of actionable mutations in the non-exonic portions of the genome [@Griffith2015].
+Tumor simulations provide the opportunity to test variant calling and mutation signature inference methods at varying depths and genome coverages in a setting where the ground truth is known.
+Many tumor genome simulators exist, but none generates clonal structure in a realistic way, and none allow for changing mutation signatures during the course of tumor development.
+I will develop a tumor simulation method that generates mutation sets with clonal structure for both mutations and mutation signatures.
+<!-- Simulation of synthetic tumor/normal genome pairs will be necessary to characterize the performance and attributes of both the tumor variant calling and mutation signature evolution methods. -->
+
+Clonal evolution from a single cell can be simulated via a simple branching process [@Durrett2014].
+This branching process can then be represented as a graph where each node representing a cell carries various attributes, and leaves inherit attributes as they are added.
+Figure \ref{figsim} shows the way these graphs can generate various clonal architectures.
+Once the graph is generated, selecting a sample of adjacent leaves (representing the small fractions that are typically sequenced from bulk tumor samples) and traversing the graph back to the origin yields the full set of mutations and their frequencies in the sample.
+This set of mutations and frequencies can be used to simulate NGS reads at arbitrary mean coverage depth using WGSIM [@Li2009].
+Finally, these NGS reads can be aligned to a reference and variants called using a standard bioinformatics pipeline.
+<!-- In Figure A every node divides at every time step with probability 1, $N$ mutations drawn from a mutational signature $M$ and added to each leaf, where $N \dist Pois(\lambda)$ and $M$ is a combination of the COSMIC mutation signatures. -->
+<!-- This structure represents the *Big Bang* model of clonal evolution. -->
+<!-- In Figure B the mutation signature of a single node is modified at time step $T_3$, while the number of mutations and the probability of division at each time step remain the same. -->
+<!-- This construction facilitates testing the ability of our algorithm to detect changes in mutation signature across the evolution of the tumor. -->
+<!-- In Figure C two lineages gain the same reproductive advantage at time step $T_3$, and form a final population with two major clones. -->
+<!-- In Figure D a single lineage acquires a mutational process at time step $T_3$ that gives it a large reproductive advantage and its progeny sweep to fixation. -->
+<!-- This branching process, where multiple parameters can be changed at any time step in specific nodes, provides a flexible method of simulating sets of mutations arising from complex evolutionary trajectories. -->
+
+This simulation scheme is designed to test the effect of sequencing depth and breadth on the sensitivity and specificity of the methods developed here.
+However, it will be useful in variant calling and mutation signature identification methods development generally.
+It is important to note that these simulations will not be proper population genetics simulations.
+The changes in reproductive rate do not correspond to changes in *selection*, and because the population is allowed to expand infinitely there is no interference between clones.
+The method is narrowly focused on generating realistic NGS read data representing the outcome of interesting evolutionary scenarios, in order to determine the effect of sequencing depth and breadth on the methods devised here.
+
+## Validation
+
+Sensitivity and specificity as well as the effects of sequencing depth for both projects will be assessed using the simulation scheme described above.
+Publishing in this field requires real data comparisons in addition to simulations [@Alioto2015], and I have identified four data sets that provide high quality sequence data with curated variant call sets.
+
+1. The dataset published by @Griffith2015 is an acute myeloid leukemia (AML) sequenced pre-treatment as well as post-relapse to greater than 300X depth.
+They also called variants on these tumors with 8 different variant callers, and curated a set of 200,000 mutations by ultra-deep sequencing.
+This dataset provides very deep sequenced whole genomes, with a set of gold standard variant calls, to test the variant calling algorithm.
+2. @Alioto2015 sequenced a chronic lymphocytic leukemia whole genome to approximately 300X depth, with the specific intention of generating a gold standard set of variant calls to use in testing variant calling pipelines.
+As with the AML dataset, this will allow for testing of the variant calling algorithm against a gold standard variant call set, and comparing the performance to other variant callers.
+3. @Chen2013 acguired 42X whole genome sequence for 16 rhabdomyosarcoma tumors from 13 patients, and resequenced 22,123 variants for validation.
+This dataset is important because rhabdomyosarcomas are very rare tumors that occur in muscle tissue and are frequently diagnosed in children.
+Thus these tumors have very distinct mutational signatures that are quite different from other tumor types, and provide an excellent opportunity to test the variant calling algorithm on tumors with atypical mutational signatures.
+4. The dataset published by @DeBruin2014 consists of 25 spatially separated regions from seven non-small cell lung cancers sequenced to 107X.
+They validated almost 2000 mutations via ultra-deep sequencing, with the goal of investigating heterogeneity of mutational processes in these tumors.
+The dataset will be useful for validating the variant calling algorithm, as well as comparing the mutational process results against the more sophisticated statistical methods described above.
+This dataset from the Swanton lab at University College London has been the basis for a large number of publications and has been analyzed in a huge variety of contexts, making it perfect for validating new methods.
+
+All four sets are publicly available, although the sequence and variant data are restricted.
+We have begun the process of gaining access to the datasets.
+
+## Timeline
+
+- Variant caller (7 months beginning March 2018)
+    - Algorithm implementation (1 month)
+    - Algorithm evaluation and data analysis (4 months)
+    - Writing (2 months)
+- Mutation simulator (6 months beginning April 2018)
+    - Algorithm implementation (2 months)
+    - Algorithm evaluation and data generation (2 months)
+    - Writing (2 months)
+- Mutation spectrum evolution (8 months beginning October 2018)
+    - Algorithm implementation (2 months)
+    - Algorithm evaluation and data analysis (4 months)
+    - Writing (2 months)
+
+Development of the simulator coincides with the real data phase of the variant caller project and testing occurs while generating simulations to validate the variant caller under different scenarios.
+I expect the variant caller and simulator to be published together, although a small application note for the simulator might arise.
+During the writing phase of the first two projects I will begin developing the mutation spectrum evolution project.
+
+#References
+<!-- 1. Simultaneous development and characterization of the variant calling algorithm and simulator - 4 months. -->
+<!-- 2. Development and characterization of the method for identifying evolutionary trajectories of mutation signatures - 4 months. -->
+
+
+<!-- Determining whether my variant calling method reduces the false positive rate at high depths and low will require substantial simulation work. -->
+<!-- In addition we will want simulations for both methods that allow us to determine the balances associated with choosing whole genome or whole exome sequencing in terms of the strength of the mutation signature signals generated by both. -->
+<!-- Given a set of true mutations, there are sophisticated methods available for generating NGS sequencing reads (including sequencing errors) for whole genome or exome that include these mutations at user-specified allele frequencies[@Stephens2016]. -->
+<!-- Current methods for simulating tumor/normal genome pairs select mutations to simulate by two general methods. -->
+<!-- One method is to simply select a random base in the genome, mutate it to a random alternate base, and select an allele frequency for that mutation from $U(0,1)$. -->
+<!-- This method does not tend to generate very realistic tumors so an alternate method was devised. -->
+<!-- Large catalogs of mutations that have been found in various tumor types are available, and it is simple to sample at random from those mutations to generate a new set of mutations to synthesize reads for. -->
+<!-- By using only mutations found in a specific type of tumor, for instance melanoma, this method can be used to generate synthetic tumors with **typical** (average) mutation spectra and allele frequency distributions. -->
+<!-- Neither of these methods is suitable for the purposes here because both methods I want to test rely on the idea that the tumor is "generated" by some specific and unique combination of mutational processes. -->
+<!-- Thus, I will need to devise a simulation scheme that selects mutations as if they arose as sequential draws from some categorical distribution. -->
+<!-- I would also like to be able to simulate these genomes under different models of tumor evolution. -->
+<!-- I will develop an R package that can take as input a weight matrix describing the linear combination of mutation signatures the user would like to simulate, along with an evolutionary model, and generates a list of mutations with contexts and allele frequencies generated by that model. -->
+
+
+
+
+
+
+
+

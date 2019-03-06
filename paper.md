@@ -15,7 +15,23 @@ bibliography: caller_paper.bib
 
 # Introduction
 
+ Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
+Clonal evolutionary processes are well studied in cancer [@Bozic2010;@Bozic2016], and the theory leads to three potential models for tumor evolution.
+Tumors can evolve as a terminal expansion subject to little or no selective pressure, leading to a so-called *Big Bang* which is characterized by a large number of heterogeneous subclones[@Sottoriva2015].
+Tumors evolving under selective pressure can have one of two dynamics: either they evolve in such a way that advantageous mutations arise and compete with each other leading to multiple dominant subclones in the tumor (branched evolution) [@Yates2012;@Gerlinger2012;@Burrell2013;@Bozic2016]; or they evolve such that each new advantageous mutation out-competes all previous mutations leading to a single dominant clone (sequential evolution) [@Hu2017].
+These processes lead directly to the mutational profile of the tumor, i.e. mutations (variants), their genomic contexts, and their frequencies.
 
+Identification of the mutations present in a tumor can be critical in optimizing the treatment regime for an individual patients disease [@Ding2012;@Mardis2012;@Chen2013;@Borad2014;@Findlay2016].
+Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by NGS.
+@Griffith2015 demonstrate conclusively that identification of all major resistance mutations present in a tumor is essentially impossible with current sequencing practice.
+They find that rather than the current standard of sequencing a tumor exome at 75X-100X depth, sequencing of up to 400X is required to identify important subclonal mutations in a heterogeneous tumor.
+In addition, they find that to identify the mode and tempo of evolution in a tumor, whole genome sequences of 300X are required [@Griffith2015].
+Unfortunately, modern variant callers suffer from excessive false positive rates at extreme sequencing depths [@Cibulskis2013].
+@Griffith2015 found that in order to generate a reliable set of variant calls for a whole genome sequenced at 312X depth they needed to combine the calls from eight different variant callers and then resequence 200,000 individual variants.
+In this proposal I develop two methods; a novel variant calling algorithm with a significantly reduced false positive rate for deep sequencing data, and an algorithm that identifies the timing of one of the characteristic processes operating in tumor evolution.
+
+We analyzed data from 2 real tumor studies and 6 simulations.
+I am completely stuck for intro so I just copied in from the proposal and moved on.
 
 <!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
@@ -51,19 +67,11 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 # Results
 
 ## Sensitivity and specificity in simulated data
-We can look at interactions now that we have settled on an experimental design.
+In order to describe the operating characteristics of the classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
 
-1. Brief description of simulations, see methods
-2. Words about the figure
-    - What is the linear regime in the Mutect ROC curves about?
-    - Is it related to the uniform prior, and does it give a good explanation of the performance difference?
+Regardless of depth, number of mutations, or input mutation signature our score is both more sensitive and a better classifier (auroc) than Mutect at any relevant threshold (.3-2 posterior odds)
 
-Experiment 2 is a 100X whole genome with ~29000 spiked variants, most of which are under 2% because of the way the simulation works.
-
-
-Experiment 10 is a 100X whole genome with the same variants as Experiment 2, but with a uniform vaf distribution. Prior method is still better, but in the uniform scenario there are only a small fraction of the total variants that are challenging to call.
-
-Experiment 9 is a whole exome that was supposed to have 1,7,11, but instead has a random set of signatures due to a bug
+In Experiment 13, a 100X whole genome with 1,7,11 of 1184 spiked variants 269 have TLOD < 6.3 and of those 48 have lower odds and 221 have higher odds. At TLOD < 5.3 it is 241 and 200 with higher odds.
 
 ## Sensitivity in real data
 We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
