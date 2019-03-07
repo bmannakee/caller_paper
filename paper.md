@@ -69,19 +69,25 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 # Results
 
 ## Sensitivity in real data
-We examined two real tumor datasets in which variants had been validated by deep targeted resequencing (methods). 
-Because this data only contains information about true and false positives, we are concerned only with the relative sensitivities of our method and MuTect1.
-We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. 
-In both tumors we find that our method is more senstive than MuTect at any score threshold.
-**Sensitivity Figure**
+We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
+@Griffith2015 performed whole genome sequencing of an acute myeloid leukemia to a depth of ~312X, called variants with seven different variant callers and validated over 200,000 variants by targeted re-sequencing to a depth of ~1000X. This led to a platinum set of variant calls containg 1,343 SNVs. 
+We obtained BAM files from this experiment and called variants using MuTect 1.1.7, then compared the sensitivity of the calls between MuTect and our method (Figure 1A). 
+At any relevant threshold our method is slightly more sensitive than MuTect. MuTect is unable to recover 100% of the calls due to hueristic filtering and other differences between MuTect and the other variant callers used.
+
+@Shi2015 performed multi-region sequencing of 6 breast tumors to evaluate the effects of variant calling and sequencing depth on estimates of tumor heterogeneity, validating 1,385 somatic SNVs.
+As with the leukemia we obtained BAM files for this experiment and compared our method to raw MuTect calls (Figure 1B).
+We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
+
+![Sensitivity in real tumors](figures/real_tumor_sensitivity.png)
+***A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].***
 
 ## Sensitivity and specificity in simulated data
-In order to describe the operating characteristics of the classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
+In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
 
-Regardless of depth, number of mutations, or input mutation signature our score is both more sensitive and a better classifier (auroc) than Mutect at any relevant threshold (.3-2 posterior odds)
 
-**ROC and Sentivity figure** 
-***Going to need a table of AUROCs in the supplement for this***
+![Sensitivity in real tumors](figures/results_experiments_13wgs_and_14wes.png)
+
+***A-C) Whole exome simulation. D-F) Whole genome simulation.***
 
 ## Effect of number of mutations
 We will have this from the difference between exome and wgs on the same vaf distribution and signature.
