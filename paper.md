@@ -39,7 +39,7 @@ One of the major tools in the evolutionary theory toolbox is the allele frequenc
 This allele frequency spectrum is constructed from single nucleotide variant calls in the tumor.
 
 If tumors, as evidence suggests [@Williams2016;@Williams2018;@Bozic2016], evolve essentially neutrally, then even driver mutations can't be expected to rise to high frequency during tumor evolution.
-As a result, finding mutations important to progression, resistance, and metastasis requires finding lower frequency mutations. (not really)
+As a result, finding mutations important to progression, resistance, and metastasis requires finding lower frequency mutations.
 Tumor heterogeneity has been associated with prognosis (1-4 in chuang paper) and the evolutionary trajectory helps identify the number of tumor subclones and their selective advantage.
 
 The variant allele frequency spectrum that is currently used most often in cancer is truncated at a level above 5-10% because of difficulties in identifying low frequency variants.
@@ -72,7 +72,7 @@ We examined two real tumor datasets in which variants had been validated by deep
 We obtained BAM files from this experiment and called variants using MuTect 1.1.7, then compared the sensitivity of the calls between MuTect and our method (Figure 1A). 
 At any relevant threshold our method is slightly more sensitive than MuTect. MuTect is unable to recover 100% of the calls due to hueristic filtering and other differences between MuTect and the other variant callers used.
 
-@Shi2015 performed multi-region sequencing of 6 breast tumors to evaluate the effects of variant calling and sequencing depth on estimates of tumor heterogeneity, validating 1,385 somatic SNVs.
+@Shi2018 performed multi-region sequencing of 6 breast tumors to evaluate the effects of variant calling and sequencing depth on estimates of tumor heterogeneity, validating 1,385 somatic SNVs.
 As with the leukemia we obtained BAM files for this experiment and compared our method to raw MuTect calls (Figure 1B).
 We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
 
