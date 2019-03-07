@@ -36,11 +36,10 @@ MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior od
 
 Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
-This allele frequency spectrum is constructed from 
+This allele frequency spectrum is constructed from single nucleotide variant calls in the tumor.
 
 If tumors, as evidence suggests [@Williams2016;@Williams2018;@Bozic2016], evolve essentially neutrally, then even driver mutations can't be expected to rise to high frequency during tumor evolution.
 As a result, finding mutations important to progression, resistance, and metastasis requires finding lower frequency mutations. (not really)
-Finding 
 Tumor heterogeneity has been associated with prognosis (1-4 in chuang paper) and the evolutionary trajectory helps identify the number of tumor subclones and their selective advantage.
 
 The variant allele frequency spectrum that is currently used most often in cancer is truncated at a level above 5-10% because of difficulties in identifying low frequency variants.
@@ -78,6 +77,7 @@ As with the leukemia we obtained BAM files for this experiment and compared our 
 We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
 
 ![Sensitivity in real tumors](figures/real_tumor_sensitivity.png)
+
 ***A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].***
 
 ## Sensitivity and specificity in simulated data
@@ -88,12 +88,15 @@ The portion of the ROC curve for our method is substantially higher than the cur
 The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
 
 ![Sensitivity in simulated tumors](figures/results_experiments_13wgs_and_14wes.png)
+
 ***A-C) Whole exome simulation. D-F) Whole genome simulation.***
 
 ## Convergence of the prior to simulated target distributions.
 In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
-The conditional probability of mutation at a given site averaged over all sites is 3e-6(the mu used by MuTect), but our method overweights some contexts and underweights others in line with the data generating distribution.
+The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
 (I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
+ Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
+ We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
 
 ![Sensitivity in simulated tumors](figures/exp13_prior_figure.png)
 
@@ -114,7 +117,7 @@ LOL
 
 All vafs will be from the beta(1,6) which is a fat exponential
 
-
+Notice that the average in Figure 3 (3e-6) is hard to rationalize. Has to do with the full probability including the global proportion of each context in the genome. So some of the wierdness is due to GC content and so forth.
 # Figures
 
 <!-- ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
@@ -195,5 +198,5 @@ Figure 12 - experiment 10 (uniform vaf) fraction called
 Figure 12a - experiment 10 (uniform vaf) vaf
 
 ![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png) -->
- -->
+
 # References
