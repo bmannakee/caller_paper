@@ -66,18 +66,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 # Results
 
-Notation:
-$$
-  \begin{aligned}
-   r &\in \{A,C,G,T\} &\quad \textrm{reference allele}\\
-   m &\in \{A,C,G,T\}, m \ne r &\quad \textrm{variant allele}\\
-   f &\in [0,1] &\quad \textrm{variant allele fraction}\\
-   b_i &\quad &\textrm{base called at read i}\\
-   e_{b_i} &= 10^{-\frac{q_{b_i}}{10}},  q \in [0,\infty] &\quad \textrm{the probability of error at base } b_i\\
-   i &= (1 \dots d) &\quad \textrm{index over d reads}.\\\\
-  \end{aligned}
-$$
-
+MuTect computes the probability of a mutation from reference allele $r$ to base $m$ as a function of base calls $b$, estimated allele frequencies $f$, and per base error probabilities $e$.
 The probability that a given base is correctly called can be written as
 
 $$
@@ -89,8 +78,6 @@ $$
     \end{array}
     \right.
 $$
-
-
 
 Now consider two models for the data. Model $M_0$ in which there are no variants at a site, and $M^{m}_{f}$ where allele $m$ is present at allele fraction $f$.
 Assuming reads are independent the likelihood of the model given the data is
@@ -107,19 +94,21 @@ $$
       \mathcal{L}(M^{m}_{f}) \frac{P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
 $$
 
-Because we are ultimately going to evaluate the odds in favor of $M^{m}_{f}$ given the data, it is useful to note that we can write this probability in terms of the model $M_0$
+We can also express this probability in terms of the model $M_0$
 
 $$ 
   1 - P(m, f \mid \{ b_i \}, \{ e_i \}, r) = 
       \mathcal{L}(M_{0}) \frac{1 - P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
 $$
 
-Taking the log of the ratio of the two previous equations gives the log odds in favor of $M^{m}_{f}$, and some cancellation yields the following expression
+Taking the log of the ratio of the two previous equations gives the log odds in favor of $M^{m}_{f}$, and some cancellation yields
+
 $$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right).
 $$
 
-We can construct a classifier for variants by selecting an odds threshold $\delta_T$ and labeling variants satisfying the condition
+A classifier for variants is constructed by selecting an odds threshold $\delta_T$ and labeling variants satisfying the condition
+
 $$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right)
     \ge \textrm{log}_{10} \delta_T
@@ -135,7 +124,7 @@ $$
     \textrm{log}_{10} \delta_T - \textrm{log}_{10} \left(\frac{P(m)}{1 - P(m)} \right) \ge \theta_T.
 $$
 
-If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$. 
+If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$, and this is the threshold implemented in MuTect 1. 
 
 
 The conditional probability that a mutation to allele $m$ will occur given a specific genomic context $C$, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
