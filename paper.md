@@ -90,6 +90,8 @@ $$
     \right.
 $$
 
+
+
 Now consider two models for the data. Model $M_0$ in which there are no variants at a site, and $M^{m}_{f}$ where allele $m$ is present at allele fraction $f$.
 Assuming reads are independent the likelihood of the model given the data is
 
@@ -135,6 +137,21 @@ $$
 
 If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$. 
 
+
+The conditional probability that a mutation will occur given a specific genomic context, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
+Using Bayes rule we can rewrite$P(m,M \mid C)$ as
+
+$$
+  P(m \mid C) = P(C \mid m) \frac{P(M)}{P(C)}.
+$$
+
+Now $P(C \mid M)$ can also be computed from the data in Figure \ref{fig2}. 
+$P(C)$ can be estimated as $1/96$ where 96 is the total number of contexts, and $P(M)$ can be estimated as above as $\mu$.
+The new expression for the log odds is
+
+$$
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,M \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m,M \mid C))} \right).
+$$
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
 @Griffith2015 performed whole genome sequencing of an acute myeloid leukemia to a depth of ~312X, called variants with seven different variant callers and validated over 200,000 variants by targeted re-sequencing to a depth of ~1000X. This led to a platinum set of variant calls containg 1,343 SNVs. 
