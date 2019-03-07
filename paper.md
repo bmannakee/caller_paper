@@ -67,7 +67,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 # Results
 
 Notation:
-\[
+$$
   \begin{aligned}
    r &\in \{A,C,G,T\} &\quad \textrm{reference allele}\\
    m &\in \{A,C,G,T\}, m \ne r &\quad \textrm{variant allele}\\
@@ -76,11 +76,11 @@ Notation:
    e_{b_i} &= 10^{-\frac{q_{b_i}}{10}},  q \in [0,\infty] &\quad \textrm{the probability of error at base } b_i\\
    i &= (1 \dots d) &\quad \textrm{index over d reads}.\\\\
   \end{aligned}
-\]
+$$
 
 The probability that a given base is correctly called can be written as
 
-\[ 
+$$
   P(b_i \mid e_i, r, m, f) = \left\{
     \begin{array}{cr}
       f \frac{e_{b_i}}{3} + (1-f)(1-e_{b_i}) & b_i = r\\
@@ -88,50 +88,50 @@ The probability that a given base is correctly called can be written as
       \frac{e_{b_i}}{3} & otherwise.
     \end{array}
     \right.
-\]
+$$
 
 Now consider two models for the data. Model $M_0$ in which there are no variants at a site, and $M^{m}_{f}$ where allele $m$ is present at allele fraction $f$.
 Assuming reads are independent the likelihood of the model given the data is
 
-\[
+$$
   \mathcal{L}(M^{m}_{f}) = P(\{ b_i \} \mid \{ e_{b_i} \}, r, m, f) = 
   \prod_{i=1}^{d} P(b_i \mid e_{b_i}, r, m, f)
-\]
+$$
 
 and the probability of $M^{m}_{f}$ can be written
 
-\[ 
+$$ 
   P(m, f \mid \{ b_i \}, \{ e_{b_i} \}, r) = 
       \mathcal{L}(M^{m}_{f}) \frac{P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
-\]
+$$
 
 Because we are ultimately going to evaluate the odds in favor of $M^{m}_{f}$ given the data, it is useful to note that we can write this probability in terms of the model $M_0$
 
-\[ 
+$$ 
   1 - P(m, f \mid \{ b_i \}, \{ e_i \}, r) = 
       \mathcal{L}(M_{0}) \frac{1 - P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
-\]
+$$
 
 Taking the log of the ratio of the two previous equations gives the log odds in favor of $M^{m}_{f}$, and some cancellation yields the following expression
-\[
+$$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right).
-\]
+$$
 
 We can construct a classifier for variants by selecting an odds threshold $\delta_T$ and labeling variants satisfying the condition
-\[
+$$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right)
     \ge \textrm{log}_{10} \delta_T
-\]
+$$
 as true variants, and rejecting them otherwise.
 Note that the expression for $LOD_{T}(m,f)$ can be further factorized as the sum of the log-likelihood ratio of the two models and the log odds of the prior for $M^{m}_{f}$.
 Current variant callers calculate this prior by assuming the allele and its frequency are independent, and that $f \sim \textrm{U}(0,1)$, so that $P(f) = 1$.
 If all substitutions are equally likely, then $P(m) = \mu/3$ where $\mu = 3 \times 10^{-6}$, the estimated per-base mutation rate in tumors.
 Given these assumptions the log prior odds is a constant, and the classifier can be re-written as
 
-\[
+$$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})}{\mathcal{L}(M^{m}_{0})} \right) \ge
     \textrm{log}_{10} \delta_T - \textrm{log}_{10} \left(\frac{P(m)}{1 - P(m)} \right) \ge \theta_T.
-\]
+$$
 
 If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$. 
 
