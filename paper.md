@@ -15,7 +15,7 @@ bibliography: caller_paper.bib
 
 # Introduction
 
- Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
+ <!-- Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
 Clonal evolutionary processes are well studied in cancer [@Bozic2010;@Bozic2016], and the theory leads to three potential models for tumor evolution.
 Tumors can evolve as a terminal expansion subject to little or no selective pressure, leading to a so-called *Big Bang* which is characterized by a large number of heterogeneous subclones[@Sottoriva2015].
 Tumors evolving under selective pressure can have one of two dynamics: either they evolve in such a way that advantageous mutations arise and compete with each other leading to multiple dominant subclones in the tumor (branched evolution) [@Yates2012;@Gerlinger2012;@Burrell2013;@Bozic2016]; or they evolve such that each new advantageous mutation out-competes all previous mutations leading to a single dominant clone (sequential evolution) [@Hu2017].
@@ -28,14 +28,13 @@ They find that rather than the current standard of sequencing a tumor exome at 7
 In addition, they find that to identify the mode and tempo of evolution in a tumor, whole genome sequences of 300X are required [@Griffith2015].
 Unfortunately, modern variant callers suffer from excessive false positive rates at extreme sequencing depths [@Cibulskis2013].
 @Griffith2015 found that in order to generate a reliable set of variant calls for a whole genome sequenced at 312X depth they needed to combine the calls from eight different variant callers and then resequence 200,000 individual variants.
-In this proposal I develop two methods; a novel variant calling algorithm with a significantly reduced false positive rate for deep sequencing data, and an algorithm that identifies the timing of one of the characteristic processes operating in tumor evolution.
 
 We analyzed data from 2 real tumor studies and 6 simulations.
 I am completely stuck for intro so I just copied in from the proposal and moved on.
 One of the important things to get across here is that we are really generating a score, not a true odds.
-MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior odds of .3 which is much less than one.
+MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior odds of .3 which is much less than one. -->
 
-<!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
+Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
 This allele frequency spectrum is constructed from 
 
@@ -65,7 +64,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
     - if M(f) is proportional to 1/f, then an exponential distribution is implied [@tarabichi2017;@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
 - Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
- -->
+
 # Results
 
 ## Sensitivity in real data
@@ -83,30 +82,26 @@ We again find that our method is more sensitive than MuTect across the full rang
 
 ## Sensitivity and specificity in simulated data
 In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
+In WES simulations the relatively smaller number of variants, and consequent lower number of very low frequency variants, causes the methods to perform similarly, but our method is slightly more sensitive and has slightly higher AUROC than raw MuTect scores.
+The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
+The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
+The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
 
-
-![Sensitivity in real tumors](figures/results_experiments_13wgs_and_14wes.png)
-
+![Sensitivity in simulated tumors](figures/results_experiments_13wgs_and_14wes.png)
 ***A-C) Whole exome simulation. D-F) Whole genome simulation.***
 
-## Effect of number of mutations
-We will have this from the difference between exome and wgs on the same vaf distribution and signature.
-This is likely to have some signature dependence.
-1. How to approach this?
-   - At what point does the empirical make more sense than the dirichlet.
-   - I think never, they will converge
-   - What is the stopping point with a low number of high confidence mutations
-   - Implementation of the dirichlet should let us create an estimation of total error between the final empirical at a given threshold and the dirichlet at every point in the process. Maybe a plot of this?
+## Convergence of the prior to simulated target distributions.
+In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
+The conditional probability of mutation at a given site averaged over all sites is 3e-6(the mu used by MuTect), but our method overweights some contexts and underweights others in line with the data generating distribution.
+(I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
 
-## Effect of variant allele frequency distribution
-1. TCGA data for different distributions.
-   - Different cancer types?
-   - Hypermutators vs. not?
-   - This should only be related to the number of mutations that are confident and contribute to the prior
-   - If that is the case, is there an analytical way to better describe this?
-   THE ONLY EFFECT IS ON THE ROC. EASIER DISTRIBUTIONS SHRINK THE EFFECT BECAUSE SO FEW ARE NEAR THE CRITICAL POINT
+![Sensitivity in simulated tumors](figures/exp13_prior_figure.png)
+
+***Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)***
 
 
+# Discussion
+LOL
 
 # Methods
 
@@ -122,7 +117,7 @@ All vafs will be from the beta(1,6) which is a fat exponential
 
 # Figures
 
-![roc curve figure experiment 9](figures/roc_and_called_curves.png)
+<!-- ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
 
 ![ figure experiment 9](figures/WES_thresholds_exp9.png)
 
@@ -181,8 +176,8 @@ Figure 8a - cell paper vaf
 ![Figure 7 - experiment 2 roc](figures/experiment2_roc.png)
 
 Figure 10 - experiment 2 fraction called
-
-![Figure 8 - aml31 experiment 2 fraction called](figures/experiment2_fraction_called.png)
+ -->
+<!-- ![Figure 8 - aml31 experiment 2 fraction called](figures/experiment2_fraction_called.png)
 
 Figure 10a - experiment 2 vaf
 
@@ -200,5 +195,5 @@ Figure 12 - experiment 10 (uniform vaf) fraction called
 Figure 12a - experiment 10 (uniform vaf) vaf
 
 ![Figure 12a - experiment 10 (uniform vaf) vaf](figures/experiment10_vaf.png) -->
-
+ -->
 # References
