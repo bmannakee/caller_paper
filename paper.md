@@ -138,19 +138,18 @@ $$
 If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$. 
 
 
-The conditional probability that a mutation will occur given a specific genomic context, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
-Using Bayes rule we can rewrite$P(m,M \mid C)$ as
+The conditional probability that a mutation to allele $m$ will occur given a specific genomic context $C$, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
+Using Bayes rule we can rewrite$P(m \mid C)$ as
 
 $$
-  P(m \mid C) = P(C \mid m) \frac{P(M)}{P(C)}.
+  P(m \mid C) = P(C \mid m) \frac{P(m)}{P(C)}.
 $$
 
-Now $P(C \mid M)$ can also be computed from the data in Figure \ref{fig2}. 
-$P(C)$ can be estimated as $1/96$ where 96 is the total number of contexts, and $P(M)$ can be estimated as above as $\mu$.
+Now $P(C \mid m)$ is the mutation spectrum of the tumor.
 The new expression for the log odds is
 
 $$
-  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,M \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m,M \mid C))} \right).
+  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m \mid C))} \right).
 $$
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
