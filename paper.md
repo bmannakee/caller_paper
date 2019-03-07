@@ -32,6 +32,8 @@ In this proposal I develop two methods; a novel variant calling algorithm with a
 
 We analyzed data from 2 real tumor studies and 6 simulations.
 I am completely stuck for intro so I just copied in from the proposal and moved on.
+One of the important things to get across here is that we are really generating a score, not a true odds.
+MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior odds of .3 which is much less than one.
 
 <!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
@@ -66,25 +68,20 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
  -->
 # Results
 
+## Sensitivity in real data
+We examined two real tumor datasets in which variants had been validated by deep targeted resequencing (methods). 
+Because this data only contains information about true and false positives, we are concerned only with the relative sensitivities of our method and MuTect1.
+We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. 
+In both tumors we find that our method is more senstive than MuTect at any score threshold.
+**Sensitivity Figure**
+
 ## Sensitivity and specificity in simulated data
 In order to describe the operating characteristics of the classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
 
 Regardless of depth, number of mutations, or input mutation signature our score is both more sensitive and a better classifier (auroc) than Mutect at any relevant threshold (.3-2 posterior odds)
 
-In Experiment 13, a 100X whole genome with 1,7,11 of 1184 spiked variants 269 have TLOD < 6.3 and of those 48 have lower odds and 221 have higher odds. At TLOD < 5.3 it is 241 and 200 with higher odds.
-
-## Sensitivity in real data
-We examined two validation datasets from real tumors. An acute myeloid leukemia whole genome was sequenced to average coverage of 365X, and over 200,000 mutations validated by deep sequencing, generating a set of "platinum" consensus calls for the tumor. In addition to the full dataset we also called mutations on two downsample datasets, one retaining 50% of the original reads and one retaining 25%. ROC curves were generated using the "platinum" calls as cases, and sites where validation sequencing depth was greater than 100X and no variant reads were found as controls. Both algorithms perform similarly and nowhere along the curve is the {what is the name of this thing} method below raw mutect calls. The {method} calls a higher fraction of platinum calls at every odds threshold, and is especially effective at the common threshold of 2:1 odds in favor of the mutation.
-
-
-
+**ROC and Sentivity figure** 
 ***Going to need a table of AUROCs in the supplement for this***
-
-## Effect of odds threshold
-This has very little effect, even in an exome, as the figure inserted shows.
-1. As threshold goes to infinity you get mutect.
-2. As threshold goes to zero you should also get mutect.
-3. Observe very little difference in the middle
 
 ## Effect of number of mutations
 We will have this from the difference between exome and wgs on the same vaf distribution and signature.
