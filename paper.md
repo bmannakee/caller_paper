@@ -174,14 +174,24 @@ The conditional probability of mutation at a given site averaged over all sites 
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
  We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
 
-![Sensitivity in simulated tumors](figures/exp13_prior_figure.png)
+![Prior distribution for simulation 1,7,11 signatures](figures/exp13_prior_figure.png)
 
 ***Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)***
 
+- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
+
+![Effect of spectrum concentration on results. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/wgs_with_signatures_inset.png)
+
+***Effect of spectrum concentration on results. A) 1,7,11 B) 1,3,5 C) 1,4,5***
 
 # Discussion
-LOL
 
+- Must include a strong argument for better real tumor validation sets. Focus on false negatives as well as false positives.
+The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
+- Why are false negative rates important?
+  - heterogeneity
+  - selection inference
+  - rare but druggable variant identification
 # Methods
 
 ## 
