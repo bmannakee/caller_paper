@@ -126,6 +126,8 @@ $$
 
 If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$, and this is the threshold implemented in MuTect 1. 
 
+*Mutect 2 was released with a threshold of 5.3, implying odds much less than 1.(I have this calculation somewhere)*
+
 
 The conditional probability that a mutation to allele $m$ will occur given a specific genomic context $C$, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
 Using Bayes rule we can rewrite$P(m \mid C)$ as
