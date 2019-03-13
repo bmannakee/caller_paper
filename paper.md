@@ -227,7 +227,7 @@ java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_p
         --out $out_path/$chr.txt \
         --coverage_file $out_path/$chr.cov
 ```
-
+- Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters **other** than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`
 
 # Figures
 
