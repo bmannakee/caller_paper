@@ -134,12 +134,14 @@ $$
   P(m \mid C) = P(C \mid m) \frac{P(m)}{P(C)}.
 $$
 
-Now $P(C \mid m)$ is the mutation spectrum of the tumor.
+Now $P(C \mid m)$ is the mutation spectrum of the tumor, $P(m) = \mu$, and $P(C)$ can be estimated as the frequency of context $C$ in the genome.
 The new expression for the log odds is
 
 $$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m \mid C))} \right).
 $$
+
+
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
 @Griffith2015 performed whole genome sequencing of an acute myeloid leukemia to a depth of ~312X, called variants with seven different variant callers and validated over 200,000 variants by targeted re-sequencing to a depth of ~1000X. This led to a platinum set of variant calls containg 1,343 SNVs. 
@@ -150,11 +152,11 @@ At any relevant threshold our method is slightly more sensitive than MuTect. MuT
 As with the leukemia we obtained BAM files for this experiment and compared our method to raw MuTect calls (Figure 1B).
 We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
 
-*What does one star do?*
 
-![Sensitivity in real tumors](figures/real_tumor_sensitivity.png)
 
-***A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].***
+![Sensitivity in real tumors. A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].](figures/real_tumor_sensitivity.png)
+
+
 
 ## Sensitivity and specificity in simulated data
 In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated six tumors (see methods), three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra(methods).
@@ -163,9 +165,9 @@ The large number of mutations present and at low frequency in whole genome simul
 The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
 The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
 
-![Sensitivity in simulated tumors](figures/results_experiments_13wgs_and_14wes.png)
+![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
 
-***A-C) Whole exome simulation. D-F) Whole genome simulation.***
+
 
 ## Convergence of the prior to simulated target distributions.
 In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
@@ -174,15 +176,15 @@ The conditional probability of mutation at a given site averaged over all sites 
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
  We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
 
-![Prior distribution for simulation 1,7,11 signatures](figures/exp13_prior_figure.png)
+![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
 
-***Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)***
+
 
 - The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
 
 ![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/wgs_with_signatures_inset.png)
 
-***Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5***
+
 
 # Discussion
 
@@ -192,18 +194,41 @@ The aml31 paper gets alot of them, but if they had for instance just used mutect
   - heterogeneity
   - selection inference
   - rare but druggable variant identification
+
 # Methods
 
-## 
-100X whole genome and 500X whole exome for each of three signatures
+## Variant allele frequency distribution
+- The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
+- The theoretical neutral distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
+- We chose a Beta(1,6) distribution to simulate a roughly neutral evolutionary trajectory while providing a significant fraction of variants in the 1% - 5% range where discrimination is most difficult.
+- 20% of variants have frequency between .017 and .057. 50% are less than .1
 
-1,7,11 UV (Very concentrated at C>T)
-1,4,5 Tobacco (Slight concentation at C>A and C>T)
-1,3,5 Breast (diffuse)
+## Simulated tumors spectra
+- 100X whole genome and 500X whole exome for each of three signatures
+- Real mutations from TCGA and PCAWG
+- 1,7,11 UV (Very concentrated at C>T)
+- 1,4,5 Tobacco (Slight concentation at C>A and C>T)
+- 1,3,5 Breast (diffuse)
 
-All vafs will be from the beta(1,6) which is a fat exponential
+# Simulated bam files
+- 100X normal and 500X exome reads simulated with VarSim/art [@Mu2015] (default parameters?) and aligned with BWA [@Li2009a].(default parameters)
+- Variants spiked with Bamsurgeon with default parameters [@Ewing2015a].
+- Variants called with MuTect 1.1.7 with specific parameters [@Cibulskis2013]. (list them, just copy in as code is what I would prefer to see if I was reading the paper).
+```
+java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
+        --dbsnp $db_snp \
+        --enable_extended_output \
+        --fraction_contamination 0.00 \
+        --tumor_f_pretest 0.00 \
+        --initial_tumor_lod -10.00 \
+        --required_maximum_alt_allele_mapping_quality_score 1 \
+        --input_file:normal $tmp_normal \
+        --input_file:tumor $tmp_tumor \
+        --out $out_path/$chr.txt \
+        --coverage_file $out_path/$chr.cov
+```
 
-Notice that the average in Figure 3 (3e-6) is hard to rationalize. Has to do with the full probability including the global proportion of each context in the genome. So some of the wierdness is due to GC content and so forth.
+
 # Figures
 
 <!-- ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
