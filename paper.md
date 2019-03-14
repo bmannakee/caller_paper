@@ -66,6 +66,14 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 # Results
 
+## Implementation
+
+- Justification for using MuTect 1
+  - Other callers probability model less accessible
+  - MuTect 2 realignment step made RoC generation tough
+
+- Algorithm complexity and speed
+
 MuTect computes the probability of a mutation from reference allele $r$ to base $m$ as a function of base calls $b$, estimated allele frequencies $f$, and per base error probabilities $e$.
 The probability that a given base is correctly called can be written as
 
@@ -194,6 +202,12 @@ The aml31 paper gets alot of them, but if they had for instance just used mutect
   - heterogeneity
   - selection inference
   - rare but druggable variant identification
+- Relevance to germline mutations
+- Standalone package, but approach really should be integrated into callers
+- Computational efficiency if integrated
+- Applicability to other algorithms for somatic variant calling
+- Caveat: evolution of mutational spectrum (cite TrackSigs)
+
 
 # Methods
 
