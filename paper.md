@@ -176,7 +176,7 @@ The conditional probability of mutation at a given site averaged over all sites 
 
 - The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
 
-![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/wgs_with_signatures_inset.png)
+![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
 
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
