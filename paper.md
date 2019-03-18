@@ -71,8 +71,73 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Justification for using MuTect 1
   - Other callers probability model less accessible
   - MuTect 2 realignment step made RoC generation tough
-
+- Mutect reports log likelihood ratio, which we convert to log odds
+- You can see the reduction in MuTect2 threshold as a lowering of the delta_t or as an order of magnitude increase in the mutation rate.
+- The same adjustment can be applied to our method (These might be discussion items)
 - Algorithm complexity and speed
+
+
+
+## Sensitivity and specificity in simulated data
+In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
+In WES simulations the relatively smaller number of variants, and consequent lower number of very low frequency variants, causes the methods to perform similarly, but our method is slightly more sensitive and has slightly higher AUROC than raw MuTect scores.
+The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
+The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
+The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
+
+![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
+
+
+
+## Convergence of the prior to simulated target distributions.
+In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
+The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
+(I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
+ Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
+ We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
+
+![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
+
+
+
+- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
+
+![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
+
+## Sensitivity in real data
+We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
+@Griffith2015 performed whole genome sequencing of an acute myeloid leukemia to a depth of ~312X, called variants with seven different variant callers and validated over 200,000 variants by targeted re-sequencing to a depth of ~1000X. This led to a platinum set of variant calls containg 1,343 SNVs. 
+We obtained BAM files from this experiment and called variants using MuTect 1.1.7, then compared the sensitivity of the calls between MuTect and our method (Figure 1A). 
+At any relevant threshold our method is slightly more sensitive than MuTect. MuTect is unable to recover 100% of the calls due to hueristic filtering and other differences between MuTect and the other variant callers used.
+
+@Shi2018 performed multi-region sequencing of 6 breast tumors to evaluate the effects of variant calling and sequencing depth on estimates of tumor heterogeneity, validating 1,385 somatic SNVs.
+As with the leukemia we obtained BAM files for this experiment and compared our method to raw MuTect calls (Figure 1B).
+We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
+
+
+
+![Sensitivity in real tumors. A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].](figures/real_tumor_sensitivity.png)
+
+
+
+# Discussion
+
+- Must include a strong argument for better real tumor validation sets. Focus on false negatives as well as false positives.
+The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
+- Why are false negative rates important?
+  - heterogeneity
+  - selection inference
+  - rare but druggable variant identification
+- Relevance to germline mutations, stratton citation in Things
+- Standalone package, but approach really should be integrated into callers
+- Computational efficiency if integrated
+- Applicability to other algorithms for somatic variant calling
+- Caveat: evolution of mutational spectrum (cite TrackSigs)
+
+
+# Methods
+
+## Algorithm
 
 MuTect computes the probability of a mutation from reference allele $r$ to base $m$ as a function of base calls $b$, estimated allele frequencies $f$, and per base error probabilities $e$.
 The probability that a given base is correctly called can be written as
@@ -151,65 +216,6 @@ $$
   LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m \mid C))} \right).
 $$
 
-
-## Sensitivity and specificity in simulated data
-In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
-In WES simulations the relatively smaller number of variants, and consequent lower number of very low frequency variants, causes the methods to perform similarly, but our method is slightly more sensitive and has slightly higher AUROC than raw MuTect scores.
-The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
-The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
-The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
-
-![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
-
-
-
-## Convergence of the prior to simulated target distributions.
-In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
-The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
-(I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
- Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
- We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
-
-![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
-
-
-
-- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
-
-![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
-
-## Sensitivity in real data
-We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
-@Griffith2015 performed whole genome sequencing of an acute myeloid leukemia to a depth of ~312X, called variants with seven different variant callers and validated over 200,000 variants by targeted re-sequencing to a depth of ~1000X. This led to a platinum set of variant calls containg 1,343 SNVs. 
-We obtained BAM files from this experiment and called variants using MuTect 1.1.7, then compared the sensitivity of the calls between MuTect and our method (Figure 1A). 
-At any relevant threshold our method is slightly more sensitive than MuTect. MuTect is unable to recover 100% of the calls due to hueristic filtering and other differences between MuTect and the other variant callers used.
-
-@Shi2018 performed multi-region sequencing of 6 breast tumors to evaluate the effects of variant calling and sequencing depth on estimates of tumor heterogeneity, validating 1,385 somatic SNVs.
-As with the leukemia we obtained BAM files for this experiment and compared our method to raw MuTect calls (Figure 1B).
-We again find that our method is more sensitive than MuTect across the full range of relevant thresholds.
-
-
-
-![Sensitivity in real tumors. A) AML31 platinum SNV calls [@Griffith2015]. B) Validated SNV in 6 breast cancers[@Shi2018].](figures/real_tumor_sensitivity.png)
-
-
-
-# Discussion
-
-- Must include a strong argument for better real tumor validation sets. Focus on false negatives as well as false positives.
-The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
-- Why are false negative rates important?
-  - heterogeneity
-  - selection inference
-  - rare but druggable variant identification
-- Relevance to germline mutations
-- Standalone package, but approach really should be integrated into callers
-- Computational efficiency if integrated
-- Applicability to other algorithms for somatic variant calling
-- Caveat: evolution of mutational spectrum (cite TrackSigs)
-
-
-# Methods
 
 ## Variant allele frequency distribution
 - The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
