@@ -15,6 +15,10 @@ bibliography: caller_paper.bib
 
 # Introduction
 
+Single nucleotide substitions, i.e. simple mutations, arise in tumors at a rate and at genomic locations driven by two main processes. The first and simplest process is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context [@Nik-Zainal2012a;@Alexandrov2015;@Lee-Six2018]. The second, and far more complex, process is the accumulation of mutations through exposure to mutagens or degradation/loss of function of cellular machinery responsible for the identification and repair of damage or replication errors. This second process also leaves a signature on the mutation spectrum observed in a tumor, and these signatures are highly specific to the underlying biological or mutagenic process generating mutations [@Alexandrov2013a;@Helleday2014a;@Nik-Zainal2016;@Alexandrov2016].
+
+
+
  <!-- Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
 Clonal evolutionary processes are well studied in cancer [@Bozic2010;@Bozic2016], and the theory leads to three potential models for tumor evolution.
 Tumors can evolve as a terminal expansion subject to little or no selective pressure, leading to a so-called *Big Bang* which is characterized by a large number of heterogeneous subclones[@Sottoriva2015].
@@ -68,6 +72,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 ## Precision - Recall
 - Slightly worse in 100X WGS, and slightly better in 500X whole exomes
 - Working on Data to see how the signature effects this
+
 ## Implementation
 
 - Justification for using MuTect 1
@@ -124,17 +129,17 @@ We again find that our method is more sensitive than MuTect across the full rang
 
 # Discussion
 
-- Must include a strong argument for better real tumor validation sets. Focus on false negatives as well as false positives.
-The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
-- Why are false negative rates important?
-  - heterogeneity
-  - selection inference
-  - rare but druggable variant identification
-- Relevance to germline mutations, stratton citation in Things
+- Relevance to germline mutations [@Rahbari2016], and somatic mutation in healthy tissue [@Lee-Six2018]
 - Standalone package, but approach really should be integrated into callers
 - Computational efficiency if integrated
 - Applicability to other algorithms for somatic variant calling
-- Caveat: evolution of mutational spectrum (cite TrackSigs)
+- Why are false negative rates important?
+   - heterogeneity
+   - selection inference
+   - rare but druggable variant identification
+- Caveat: Need for better real tumor validation sets. Focus on false negatives as well as false positives.
+The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
+- Caveat: evolution of mutational spectrum [Rubanova2018a]
 
 
 # Methods
