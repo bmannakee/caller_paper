@@ -65,7 +65,9 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
 
 # Results
-
+## Precision - Recall
+- Slightly worse in 100X WGS, and slightly better in 500X whole exomes
+- Working on Data to see how the signature effects this
 ## Implementation
 
 - Justification for using MuTect 1
