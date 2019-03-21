@@ -89,7 +89,8 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 ## Precision - Recall
 - Slightly worse in 100X WGS, and slightly better in 500X whole exomes
-- Working on Data to see how the signature effects this
+- Signature has small effect, similar to the way it does in ROC
+- Is there an analytic argument for why this trend will continue. At 1000X will we do even better?
 
 ## Origin of sensitivity and specificity differences
 - Everything comes down to the number of variants with low alternate read count.
