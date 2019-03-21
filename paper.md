@@ -18,7 +18,7 @@ bibliography: caller_paper.bib
 Cancer develops as the result of the accumulation of somatic mutations and clonal selection of cells with mutations that confer a selective advantage on the cell.
 Understanding the forces that shaped the evolutionary history of a tumor, the mutations that are responsible for its growth, the rate at which mutations are occurring, or how much genetic diversity is likely present in the tumor, requires accurate variant calling, particularly at low variant allele frequency [@Williams2016;@Bozic2016;@Williams2018].
 Accurate variant identification is also critical in optimizing the treatment regime for an individual patients disease [@Ding2012;@Mardis2012;@Chen2013;@Borad2014;@Findlay2016].
-Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by Next Generation Sequencing (NGS).
+Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by Next Generation Sequencing (NGS), and this problem increases as sequencing depth increases.
 
 Methods for identifying true somatic mutations - i.e. variant calling -  from NGS data are an active area of research in bioinformatics.
 The earliest widely used somatic variant callers aimed specifically at tumors, Mutect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants, setting a threshold for that score designed to balance sensitivity and specificity [@Koboldt2012;@Cibulskis2013].
@@ -86,12 +86,20 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment). -->
 
 # Results
+
 ## Precision - Recall
 - Slightly worse in 100X WGS, and slightly better in 500X whole exomes
 - Working on Data to see how the signature effects this
 
+## Origin of sensitivity and specificity differences
+- Everything comes down to the number of variants with low alternate read count.
+- This is a complicated function of sequencing depth, evolutionary history, mutation rate.
+
 ## Implementation
 
+We implement our model on top of the MuTect 1.1.7 output.
+MuTect1 and MuTect2 both report the log likelihood ratio of two models, one with the variant and one without, which we can directly convert to posterior odds in favor of a mutation.
+We use MuTect 1.1.7 rather than MuTect2 because MuTect2 also does haplotype calling and realignment, making it difficult to use with simulated data (i.e. MuTect2 does local realignment after mutations are spiked and sometimes loses true mutations as a result).
 - Justification for using MuTect 1
   - Other callers probability model less accessible
   - MuTect 2 realignment step made RoC generation tough
