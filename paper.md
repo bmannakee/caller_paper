@@ -128,6 +128,8 @@ The conditional probability of mutation at a given site averaged over all sites 
 (I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
  We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
+ - This is dependent on the number of mutations above the threshold in exactly the same way any other dirichlet multinomial distribution is (find a description of how fast this is!).
+ - Every data point improves the estimate, and the concentration of the data generating process effects that rate at which that improvement happens.
 
 ![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
 
