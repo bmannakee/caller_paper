@@ -32,6 +32,8 @@ The first is the spontaneous accumulation of mutations that occurs in all dividi
 The second, and far more complex, process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor [@Alexandrov2013a;@Helleday2014a;@Nik-Zainal2016;@Kandoth2013;@Alexandrov2016].
 
+Here we present our method ....
+
 
 
  <!-- Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
@@ -53,7 +55,7 @@ I am completely stuck for intro so I just copied in from the proposal and moved 
 One of the important things to get across here is that we are really generating a score, not a true odds.
 MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior odds of .3 which is much less than one. -->
 
-Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
+<!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
 This allele frequency spectrum is constructed from single nucleotide variant calls in the tumor.
 
@@ -81,7 +83,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
     - if M(f) is proportional to 1/f, then an exponential distribution is implied [@Tarabichi2018;@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
-- Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
+- Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment). -->
 
 # Results
 ## Precision - Recall
