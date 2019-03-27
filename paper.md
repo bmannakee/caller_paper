@@ -123,15 +123,18 @@ The prior is lowering scores of false positive mutations and raising the scores 
 
 
 ## Convergence of the prior to simulated target distributions.
-In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
-The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
+In both whole genome whole exome simulations, the estimated mutation spectrum is very close to the simulated spectrum (Supplementary Figure1 and Figure 3).
+We ranked all mutations called by MuTect by their TLOD score from highest to lowest, and computed the Kullback-Leibler divergence between the prior as each new mutation was observed and the target distribution (Figure 3).
+In our simulations, which have high read depth, the prior converges to the target well before all mutations passed by MuTect are evaluated. 
+The quality of the estimate increases with the number of mutations and will likely be suboptimal for low depth sequence with a small number of high confidence mutations.
+<!-- The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
 (I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
  We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
  - This is dependent on the number of mutations above the threshold in exactly the same way any other dirichlet multinomial distribution is (find a description of how fast this is!).
- - Every data point improves the estimate, and the concentration of the data generating process effects that rate at which that improvement happens.
+ - Every data point improves the estimate, and the concentration of the data generating process effects that rate at which that improvement happens. -->
 
-![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
+![Convergence of the prior to simulated target mutation signatures. The prior distribution converges quickly to the target distribution, and after 200-300 mutations is as close as it will get in both A) WGS simulations and B) Whole exome simulations](figures/kl_figure.png)
 
 
 
@@ -158,6 +161,7 @@ We again find that our method is more sensitive than MuTect across the full rang
 # Discussion
 
 - Relevance to germline mutations [@Rahbari2016], and somatic mutation in healthy tissue [@Lee-Six2018]
+- Relevance to deep learning, should at least be a feature.
 - Standalone package, but approach really should be integrated into callers
 - Computational efficiency if integrated
 - Applicability to other algorithms for somatic variant calling
@@ -284,7 +288,10 @@ java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_p
 ```
 - Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`. Variants that pass all filters or fail only `tlod_f_star` are then passed to {method} for prior estimation and rescoring.
 
-# Figures
+# Supplementary Figures
+
+![The signatures used to simulate both whole genome and whole exomes A) Equal combination of COSMIC signatures 1, 7, and 11 representing a highly concentrated signature of the type that might be observed in a melanoma. B) Equal combination of COSMIC signatures 1, 3, and 5 representing an intermediate level of concentration typical of a breast tumor. C) Equal combination of COSMIC signatures 1, 4, and 5 representing a diffuse signature typical of a lung tumor.](figures/input_signatures.png)
+
 
 <!-- ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
 
