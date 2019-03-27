@@ -117,6 +117,7 @@ In WES simulations the relatively smaller number of variants, and consequent low
 The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
 The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
 The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
+- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
 
 ![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
 
@@ -124,7 +125,7 @@ The prior is lowering scores of false positive mutations and raising the scores 
 
 ## Convergence of the prior to simulated target distributions.
 In both whole genome whole exome simulations, the estimated mutation spectrum is very close to the simulated spectrum (Supplementary Figure1 and Figure 3).
-We ranked all mutations called by MuTect by their TLOD score from highest to lowest, and computed the Kullback-Leibler divergence between the prior as each new mutation was observed and the target distribution (Figure 3).
+We ranked all mutations called by MuTect by their TLOD score from highest to lowest, and computed the Kullback-Leibler divergence between the prior and the target distribution as each new mutation was observed  (Figure 2).
 In our simulations, which have high read depth, the prior converges to the target well before all mutations passed by MuTect are evaluated. 
 The quality of the estimate increases with the number of mutations and will likely be suboptimal for low depth sequence with a small number of high confidence mutations.
 <!-- The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
@@ -138,7 +139,7 @@ The quality of the estimate increases with the number of mutations and will like
 
 
 
-- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
+
 
 ![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
 
