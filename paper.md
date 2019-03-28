@@ -106,7 +106,10 @@ We use MuTect 1.1.7 rather than MuTect2 because MuTect2 also does haplotype call
 We chose to run MuTect with an initial probability sufficiently low to ensure that nearly every potential variant was evaluated and assigned a log likelihood ratio in order to have the largest possible range of true and false positive/negative variants to evaluate the performance of our algorithm.
 However, no sensible analysis would include exceptionally low likelihood variants, so in our results we show result ony for those potential variants which have a log likelihood ratio (TLOD) > 4, which implies log posterior odds of -2.3, i.e. very small.
 This adjustment does not change the results, it just makes the analysis easier and more meaningful.
-- Algorithm complexity and speed
+The algorithm processes a whole genome simulation consisting of 53 million potential variants in 2400 seconds, of which 1600 seconds are consumed reading the data into R, and 800 seconds collecting genomic contexts from the reference genome.
+For a whole exome with 2.3M potential variants the run time is 142 seconds, with 56 seconds to read the data and 33 seconds to collect the contexts.
+The portion of the algorithm that actually computes the prior is a trivial fraction of the whole process.
+If integrated into an already existing variant caller which is already walking the reference genome it should add no significant processing time.
 
 
 
