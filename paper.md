@@ -84,12 +84,12 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 # Results
 
 ## Precision - Recall
-- Slightly worse in 100X WGS, and slightly better in 500X whole exomes
-- Signature has small effect, similar to the way it does in ROC
-- Is there an analytic argument for why this trend will continue. At 1000X will we do even better?
-- this may go away as I am currently frustrated by trying to compute/understand this.
+- Slightly worse on wgs, basically equivalent on WES.
+- Effect of concentration is obvious
+- difference is 1-2% for wgs and 1-3%(in favor of prior) for wes
 
 ![WGS precision-recall plot](figures/wgs_pr_plot.png)
+![WGS precision-recall plot](figures/wes_pr_plot.png)
 
 ## Origin of sensitivity and specificity differences
 - Everything comes down to the number of variants with low alternate read count.
