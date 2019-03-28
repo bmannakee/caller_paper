@@ -6,12 +6,8 @@ output:
 bibliography: caller_paper.bib
 ---
 # Targets
-- Bioinformatics
-- Plus Comp. Bio
-- BMC bioinformatics
-- Nature Scientific Reports.
-- Genome Biology (published MuSE [@Fan2016])
 - Nucleic Acids Research published EBCall in 2013
+- Bioinformatics
 
 # Introduction
 
