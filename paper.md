@@ -100,27 +100,25 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 We implement our model on top of the MuTect 1.1.7 output.
 MuTect1 and MuTect2 both report the log likelihood ratio of two models, one with the variant and one without, which we can directly convert to posterior odds in favor of a mutation.
+Other variant callers have probability models that could be converted to use the mutation signature prior, but MuTect's is most directly accessible.
 We use MuTect 1.1.7 rather than MuTect2 because MuTect2 also does haplotype calling and realignment, making it difficult to use with simulated data (i.e. MuTect2 does local realignment after mutations are spiked and sometimes loses true mutations as a result).
-- Justification for using MuTect 1
-  - Other callers probability model less accessible
-  - MuTect 2 realignment step made RoC generation tough
-- Mutect reports log likelihood ratio, which we convert to log odds
-- You can see the reduction in MuTect2 threshold as a lowering of the delta_t or as an order of magnitude increase in the mutation rate.
-- The same adjustment can be applied to our method (These might be discussion items)
+We chose to run MuTect with an initial probability sufficiently low to ensure that nearly every potential variant was evaluated and assigned a log likelihood ratio in order to have the largest possible range of true and false positive/negative variants to evaluate the performance of our algorithm.
+However, no sensible analysis would include exceptionally low likelihood variants, so in our results we have analyzed only those variants which have a posterior odds ratio (TLOD) > 4, which implies a log likelihood ratio of -2.3, i.e. very small.
+This adjustment does not change the results, it just makes the analysis easier and more meaningful.
 - Algorithm complexity and speed
 
 
 
 ## Sensitivity and specificity in simulated data
-In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
-In WES simulations the relatively smaller number of variants, and consequent lower number of very low frequency variants, causes the methods to perform similarly, but our method is slightly more sensitive and has slightly higher AUROC than raw MuTect scores.
-The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
-The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
-The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
-- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
+In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. 
+We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
+Differences in performance between our method and MuTect are driven by two main factors; the concentration of the data generating mutation signature, and the fraction of the total mutations in the tumor that are at low frequency and thus near the threshold for calling.
+
 
 ![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
 
+The fraction of positive calls that are false positives grows as the threshold used to call variants goes down.
+In such cases precision-recall curves give a better sense of the risk/reward tradeoff between the methods in an actual variant calling situation.
 
 
 ## Convergence of the prior to simulated target distributions.
