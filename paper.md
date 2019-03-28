@@ -104,7 +104,7 @@ MuTect1 and MuTect2 both report the log likelihood ratio of two models, one with
 Other variant callers have probability models that could be converted to use the mutation signature prior, but MuTect's is most directly accessible.
 We use MuTect 1.1.7 rather than MuTect2 because MuTect2 also does haplotype calling and realignment, making it difficult to use with simulated data (i.e. MuTect2 does local realignment after mutations are spiked and sometimes loses true mutations as a result).
 We chose to run MuTect with an initial probability sufficiently low to ensure that nearly every potential variant was evaluated and assigned a log likelihood ratio in order to have the largest possible range of true and false positive/negative variants to evaluate the performance of our algorithm.
-However, no sensible analysis would include exceptionally low likelihood variants, so in our results we have analyzed only those variants which have a posterior odds ratio (TLOD) > 4, which implies a log likelihood ratio of -2.3, i.e. very small.
+However, no sensible analysis would include exceptionally low likelihood variants, so in our results we show result ony for those potential variants which have a log likelihood ratio (TLOD) > 4, which implies log posterior odds of -2.3, i.e. very small.
 This adjustment does not change the results, it just makes the analysis easier and more meaningful.
 - Algorithm complexity and speed
 
