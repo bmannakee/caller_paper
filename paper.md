@@ -130,6 +130,8 @@ In both whole genome whole exome simulations, the estimated mutation spectrum is
 We ranked all mutations called by MuTect by their TLOD score from highest to lowest, and computed the Kullback-Leibler divergence between the prior and the target distribution as each new mutation was observed  (Figure 2).
 In our simulations, which have high read depth, the prior converges to the target well before all mutations passed by MuTect are evaluated. 
 The quality of the estimate increases with the number of mutations and will likely be suboptimal for low depth sequence with a small number of high confidence mutations.
+Convergence is faster and the prior moves closer to the target distribution the more concentrated the simulated signature is. 
+- this is what we would expect.
 <!-- The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
 (I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
@@ -143,7 +145,7 @@ The quality of the estimate increases with the number of mutations and will like
 
 
 
-![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
+
 
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
