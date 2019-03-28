@@ -271,9 +271,9 @@ We used mutation signatures 1, 7, and 11 to represent a highly concentrated muta
 
 
 # Simulated bam files
-- 100X normal and 500X exome reads simulated with VarSim/art [@Mu2015] (default parameters?) and aligned with BWA [@Li2009a].(default parameters)
-- Variants spiked with Bamsurgeon with default parameters [@Ewing2015a].
-- Variants called with MuTect 1.1.7 with specific parameters [@Cibulskis2013]. (list them, just copy in as code is what I would prefer to see if I was reading the paper).
+We simulated 100X whole genome and 500X exome normal reads from the GRCH38 reference genome with VarSim/art [@Mu2015], and aligned them to GRch38 with BWA [@Li2009a], both with default parameters.
+Variants were spiked to create tumors with Bamsurgeon with default parameters [@Ewing2015a],
+and called with MuTect 1.1.7 [@Cibulskis2013] with the following parameters:
 ```
 java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
         --dbsnp $db_snp \
@@ -287,7 +287,8 @@ java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_p
         --out $out_path/$chr.txt \
         --coverage_file $out_path/$chr.cov
 ```
-- Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`. Variants that pass all filters or fail only `tlod_f_star` are then passed to {method} for prior estimation and rescoring.
+.
+Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`. Variants that pass all filters or fail only `tlod_f_star` are then passed to {method} for prior estimation and rescoring.
 
 # Supplementary Figures
 
