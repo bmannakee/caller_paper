@@ -91,6 +91,7 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Slightly worse in 100X WGS, and slightly better in 500X whole exomes
 - Signature has small effect, similar to the way it does in ROC
 - Is there an analytic argument for why this trend will continue. At 1000X will we do even better?
+- this may go away as I am currently frustrated by trying to compute/understand this.
 
 ## Origin of sensitivity and specificity differences
 - Everything comes down to the number of variants with low alternate read count.
@@ -256,10 +257,11 @@ $$
 
 
 ## Variant allele frequency distribution
-- The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
-- The theoretical neutral distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
-- We chose a Beta(1,6) distribution to simulate a roughly neutral evolutionary trajectory while providing a significant fraction of variants in the 1% - 5% range where discrimination is most difficult.
-- 20% of variants have frequency between .017 and .057. 50% are less than .1
+The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
+In a neutrally evolving tumor the allele frequency distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
+In this case we are interested in a distribution that has a realistic shape, while also providing a sufficient number of low frequency variants to challenge the algorithm.
+We chose a Beta(1,6) distribution for WGS simulations at 100X depth, where 20% of variants have frequency between .017 and .057 and 50% are less than .1.
+For WES simulations at 500X we chose a Beta(2,40) distribution where 20% of variants have frequency between .01 and .025 and 50% are less than .05.
 
 ## Simulated tumors spectra
 - 100X whole genome and 500X whole exome for each of three signatures
