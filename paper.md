@@ -264,11 +264,11 @@ We chose a Beta(1,6) distribution for WGS simulations at 100X depth, where 20% o
 For WES simulations at 500X we chose a Beta(2,40) distribution where 20% of variants have frequency between .01 and .025 and 50% are less than .05.
 
 ## Simulated tumors spectra
-- 100X whole genome and 500X whole exome for each of three signatures
-- Real mutations from TCGA and PCAWG
-- 1,7,11 UV (Very concentrated at C>T)
-- 1,4,5 Tobacco (Slight concentation at C>A and C>T)
-- 1,3,5 Breast (diffuse)
+We simulated tumors with three different mutation spectra.
+Each is an equal mixture of three COSMIC signatures as described in @Alexandrov2015 and downloaded from [https://cancer.sanger.ac.uk/cosmic/signatures](The COSMIC website).
+We used mutation signatures 1, 7, and 11 to represent a highly concentrated mutation signature, signatures 1, 4, and 5 to represent intermediate concentration, and 1,3, and 5 to represent a diffuse mutation signature.
+- We selected mutations according to these signatures from a set of previously reported cancer mutations derived from the combined TCGA and PCAWG databases.
+
 
 # Simulated bam files
 - 100X normal and 500X exome reads simulated with VarSim/art [@Mu2015] (default parameters?) and aligned with BWA [@Li2009a].(default parameters)
