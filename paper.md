@@ -89,6 +89,8 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Is there an analytic argument for why this trend will continue. At 1000X will we do even better?
 - this may go away as I am currently frustrated by trying to compute/understand this.
 
+![WGS precision-recall plot](figures/wgs_pr_plot.png)
+
 ## Origin of sensitivity and specificity differences
 - Everything comes down to the number of variants with low alternate read count.
 - This is a complicated function of sequencing depth, evolutionary history, mutation rate.
