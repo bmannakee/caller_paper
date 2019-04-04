@@ -83,13 +83,8 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 # Results
 
-## Precision - Recall
-- Slightly worse on wgs, basically equivalent on WES.
-- Effect of concentration is obvious
-- difference is 1-2% for wgs and 1-3%(in favor of prior) for wes
 
-![WGS precision-recall plot](figures/wgs_pr_plot.png)
-![WGS precision-recall plot](figures/wes_pr_plot.png)
+
 
 ## Origin of sensitivity and specificity differences
 - Everything comes down to the number of variants with low alternate read count.
@@ -119,9 +114,28 @@ Differences in performance between our method and MuTect are driven by two main 
 
 ![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
 
+
+
+## Precision - Recall in simulated data
+
 The fraction of positive calls that are false positives grows as the threshold used to call variants goes down.
 In such cases precision-recall curves give a better sense of the risk/reward tradeoff between the methods in an actual variant calling situation.
+We computed precision-recall curves for each our six tumor simulations (Figures 2 and 3).
+We find that for 100X depth whole genomes, MuTect has a slight advantage (1-2% area under the curve), driven by a sharp dropoff in precision which occurs at lower recall for our method than for MuTect, while our method has a slight advantage at 500X depth (1-3% area under the curve).
+The differences are driven by the allele frequency distributions we simulated, the concentration in the mutation signature, and the discrete nature of the distribution of TLOD values.
+Figure 4 shows the distribution of TLOD scores for 1, 2, 3, 4, 5, and six alterate reads as a function of total sequencing depth.
+At 100X, the mutect threshold falls exactly between 2 and 3 alternate reads, representing variant allele frequencies of 2 and 3%.
+The allele frequency distribution of the whole genome simulations has less that 5% of variants at or below 2%, so that nearly all positive findings below 2% are false positives.
+When our algorithm elevates the probability of variants at below 2% they are nearly all false positives, and as a result precision suffers.
+At 500X sequencing depth, combined with the allele frequency distribution used in the simulations, there is a broader range of recall values for which the precision of our algorithm is better than MuTect, and as shown in figure 4 the alternate read count at which MuTect begins to perform better than our method is now between 4 and 5 reads, or variant allele frequencies of 1%.
+As depth increases the allele frequency at which our method performs better than MuTect continues to decrease.
+Thresholding on vaf remains necessary, but as as sequencing depth increases that advantage of our method increases.
 
+![WGS precision-recall plot](figures/prc_wgs_plots.png)
+
+![WES precision-recall plot](figures/prc_wes_plots.png)
+
+![Plot of dependence of TLOD on sequencing depth](figures/odds_draft_plot.png)
 
 ## Convergence of the prior to simulated target distributions.
 In both whole genome whole exome simulations, the estimated mutation spectrum is very close to the simulated spectrum (Supplementary Figure1 and Figure 3).
