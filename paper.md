@@ -151,7 +151,7 @@ Convergence is faster and the prior moves closer to the target distribution the 
  - This is dependent on the number of mutations above the threshold in exactly the same way any other dirichlet multinomial distribution is (find a description of how fast this is!).
  - Every data point improves the estimate, and the concentration of the data generating process effects that rate at which that improvement happens. -->
 
-![Convergence of the prior to simulated target mutation signatures. The prior distribution converges quickly to the target distribution, and after 200-300 mutations is as close as it will get in both A) WGS simulations and B) Whole exome simulations](figures/kl_figure.png)
+![Convergence of the prior to simulated target mutation signatures. The prior distribution converges quickly to the target distribution, and after 200-300 mutations is as close as it will get in both A) WGS simulations and B) Whole exome simulations](figures/kl_test.png)
 
 
 
