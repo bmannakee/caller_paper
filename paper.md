@@ -6,14 +6,31 @@ output:
 bibliography: caller_paper.bib
 ---
 # Targets
-- Bioinformatics
-- Plus Comp. Bio
-- BMC bioinformatics
-- Nature Scientific Reports.
-- Genome Biology (published MuSE [@Fan2016])
 - Nucleic Acids Research published EBCall in 2013
+- Bioinformatics
 
 # Introduction
+
+Cancer develops as the result of the accumulation of somatic mutations and clonal selection of cells with mutations that confer a selective advantage on the cell.
+Understanding the forces that shaped the evolutionary history of a tumor, the mutations that are responsible for its growth, the rate at which mutations are occurring, or how much genetic diversity is likely present in the tumor, requires accurate variant calling, particularly at low variant allele frequency [@Williams2016;@Bozic2016;@Williams2018].
+Accurate variant identification is also critical in optimizing the treatment regime for an individual patients disease [@Ding2012;@Mardis2012;@Chen2013;@Borad2014;@Findlay2016].
+Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by Next Generation Sequencing (NGS), and this problem increases as sequencing depth increases.
+
+Methods for identifying true somatic mutations - i.e. variant calling -  from NGS data are an active area of research in bioinformatics.
+The earliest widely used somatic variant callers aimed specifically at tumors, Mutect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants, setting a threshold for that score designed to balance sensitivity and specificity [@Koboldt2012;@Cibulskis2013].
+Subsequent research gave rise to a number of alternate variant calling strategies including haplotype based callers [@Garrison2012],
+joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone)[@Larson2012;Roth2012a;@Christoforides2013;@Jones2016;@Dorri2019], allele frequency based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE)[@Saunders2012;@Wilm2012;Shiraishi2013b;Gerstung2012;@Carrot-Zhang2017;@Fan2016], and a mixture of ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC).
+All of these methods have varying levels of complexity, and some are focused on specific types of data.
+The one thing they all have in common is that they either implicitly or explicitly assume that the probability of a mutation occuring at a give site is proportional to the overall mutation rate, and the same at every site in the genome.
+
+Single nucleotide substitions, i.e. simple mutations, arise in tumors at a rate and at genomic locations driven by two main processes. 
+The first is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context [@Nik-Zainal2012a;@Alexandrov2015;@Lee-Six2018]. 
+The second, and far more complex, process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
+Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor [@Alexandrov2013a;@Helleday2014a;@Nik-Zainal2016;@Kandoth2013;@Alexandrov2016].
+
+Here we present our method ....
+
+
 
  <!-- Tumors are generally considered to arise from a single cell which acquires metastatic potential and is the ancestor of all cells in the tumor [@Nowell1976;@Fearon1989].
 Clonal evolutionary processes are well studied in cancer [@Bozic2010;@Bozic2016], and the theory leads to three potential models for tumor evolution.
@@ -34,7 +51,7 @@ I am completely stuck for intro so I just copied in from the proposal and moved 
 One of the important things to get across here is that we are really generating a score, not a true odds.
 MuTect2 was released with a TLOD threshold of 5.3, corresponding to posterior odds of .3 which is much less than one. -->
 
-Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
+<!-- Cancer is an evolutionary process, and understanding initiation, progression, and metastasis will require applications of evolutionary theory.
 One of the major tools in the evolutionary theory toolbox is the allele frequency spectrum.
 This allele frequency spectrum is constructed from single nucleotide variant calls in the tumor.
 
@@ -62,47 +79,85 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 - Poisson models make similar assumptions about the probability of an allele at a site. (Illumina technical note https://www.illumina.com/Documents/products/technotes/technote_somatic_variant_caller.pdf).
 - we simulate neutral tumor evolution, and assign vafs using a Beta(1,6) distribution
     - if M(f) is proportional to 1/f, then an exponential distribution is implied [@Tarabichi2018;@Williams2017](and the answering note by De, which also has a strong argument about why we need lower frequencies to do evolutionary inference). We choose a beta distribution to draw vafs and tuned to achieve a slightly fatter distribution in the 2-5% range in which we are most interested.
-- Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment).
+- Need a list of why evolutionary inference on tumors is important. Resistance, virulence(heterogeneity), biology (mutation rate/signature/micro-environment). -->
 
 # Results
 
+
+
+
+## Origin of sensitivity and specificity differences
+- Everything comes down to the number of variants with low alternate read count.
+- This is a complicated function of sequencing depth, evolutionary history, mutation rate.
+
 ## Implementation
 
-- Justification for using MuTect 1
-  - Other callers probability model less accessible
-  - MuTect 2 realignment step made RoC generation tough
-- Mutect reports log likelihood ratio, which we convert to log odds
-- You can see the reduction in MuTect2 threshold as a lowering of the delta_t or as an order of magnitude increase in the mutation rate.
-- The same adjustment can be applied to our method (These might be discussion items)
-- Algorithm complexity and speed
+We implement our model on top of the MuTect 1.1.7 output.
+MuTect1 and MuTect2 both report the log likelihood ratio of two models, one with the variant and one without, which we can directly convert to posterior odds in favor of a mutation.
+Other variant callers have probability models that could be converted to use the mutation signature prior, but MuTect's is most directly accessible.
+We use MuTect 1.1.7 rather than MuTect2 because MuTect2 also does haplotype calling and realignment, making it difficult to use with simulated data (i.e. MuTect2 does local realignment after mutations are spiked and sometimes loses true mutations as a result).
+We chose to run MuTect with an initial probability sufficiently low to ensure that nearly every potential variant was evaluated and assigned a log likelihood ratio in order to have the largest possible range of true and false positive/negative variants to evaluate the performance of our algorithm.
+However, no sensible analysis would include exceptionally low likelihood variants, so in our results we show result ony for those potential variants which have a log likelihood ratio (TLOD) > 4, which implies log posterior odds of -2.3, i.e. very small.
+This adjustment does not change the results, it just makes the analysis easier and more meaningful.
+The algorithm processes a whole genome simulation consisting of 53 million potential variants in 2400 seconds, of which 1600 seconds are consumed reading the data into R, and 800 seconds collecting genomic contexts from the reference genome.
+For a whole exome with 2.3M potential variants the run time is 142 seconds, with 56 seconds to read the data and 33 seconds to collect the contexts.
+The portion of the algorithm that actually computes the prior is a trivial fraction of the whole process.
+If integrated into an already existing variant caller which is already walking the reference genome it should add no significant processing time.
 
 
 
 ## Sensitivity and specificity in simulated data
-In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
-In WES simulations the relatively smaller number of variants, and consequent lower number of very low frequency variants, causes the methods to perform similarly, but our method is slightly more sensitive and has slightly higher AUROC than raw MuTect scores.
-The large number of mutations present and at low frequency in whole genome simulations provide a clearer demonstration of the benefits of the method.
-The portion of the ROC curve for our method is substantially higher than the curve for MuTect, and the MuTect curve is essentially linear, is due to the effect of the prior.
-The prior is lowering scores of false positive mutations and raising the scores of true positives in this region. (This is super inelegant{bkm}).
+In order to describe the operating characteristics of our score as a classifier compared to MuTect, we simulated NGS reads and called variants six tumor-normal pairs as described in Methods. 
+We made three 100X whole genomes and three 500X whole exomes, with three differnent mutation spectra.
+Differences in performance between our method and MuTect are driven by two main factors; the concentration of the data generating mutation signature, and the fraction of the total mutations in the tumor that are at low frequency and thus near the threshold for calling.
+
 
 ![Sensitivity in simulated tumors. A-C) Whole exome simulation. D-F) Whole genome simulation](figures/results_experiments_13wgs_and_14wes.png)
 
 
 
+## Precision - Recall in simulated data
+
+The fraction of positive calls that are false positives grows as the threshold used to call variants goes down.
+In such cases precision-recall curves give a better sense of the risk/reward tradeoff between the methods in an actual variant calling situation.
+We computed precision-recall curves for each our six tumor simulations (Figures 2 and 3).
+We find that for 100X depth whole genomes, MuTect has a slight advantage (1-2% area under the curve), driven by a sharp dropoff in precision which occurs at lower recall for our method than for MuTect, while our method has a slight advantage at 500X depth (1-3% area under the curve).
+The differences are driven by the allele frequency distributions we simulated, the concentration in the mutation signature, and the discrete nature of the distribution of TLOD values.
+Figure 4 shows the distribution of TLOD scores for 1, 2, 3, 4, 5, and six alterate reads as a function of total sequencing depth.
+At 100X, the mutect threshold falls exactly between 2 and 3 alternate reads, representing variant allele frequencies of 2 and 3%.
+The allele frequency distribution of the whole genome simulations has less that 5% of variants at or below 2%, so that nearly all positive findings below 2% are false positives.
+When our algorithm elevates the probability of variants at below 2% they are nearly all false positives, and as a result precision suffers.
+At 500X sequencing depth, combined with the allele frequency distribution used in the simulations, there is a broader range of recall values for which the precision of our algorithm is better than MuTect, and as shown in figure 4 the alternate read count at which MuTect begins to perform better than our method is now between 4 and 5 reads, or variant allele frequencies of 1%.
+As depth increases the allele frequency at which our method performs better than MuTect continues to decrease.
+Thresholding on vaf remains necessary, but as as sequencing depth increases that advantage of our method increases.
+
+![WGS precision-recall plot](figures/prc_wgs_plots.png)
+
+![WES precision-recall plot](figures/prc_wes_plots.png)
+
+![Plot of dependence of TLOD on sequencing depth](figures/odds_draft_plot.png)
+
 ## Convergence of the prior to simulated target distributions.
-In both whole genome (Figure 3) and whole exome (supplement) simulations, the estimated mutation spectrum is very close to the simulated spectrum. 
-The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
+In both whole genome whole exome simulations, the estimated mutation spectrum is very close to the simulated spectrum (Supplementary Figure1 and Figure 3).
+We ranked all mutations called by MuTect by their TLOD score from highest to lowest, and computed the Kullback-Leibler divergence between the prior and the target distribution as each new mutation was observed  (Figure 2).
+In our simulations, which have high read depth, the prior converges to the target well before all mutations passed by MuTect are evaluated. 
+The quality of the estimate increases with the number of mutations and will likely be suboptimal for low depth sequence with a small number of high confidence mutations.
+Convergence is faster and the prior moves closer to the target distribution the more concentrated the simulated signature is. 
+- this is what we would expect.
+<!-- The conditional probability of mutation at a given site averaged over all sites is 3e-6 (the $P(m) = \mu$ used by MuTect; important that this is averaged over every site in the genome. The probability here includes estimates of the context content of the genome $P(m \mid C) = P(C \mid m)*P(m)/P(C)$), but our method overweights some contexts and underweights others in line with the data generating distribution.
 (I think I need an exome too. I have the B figure, but need to generate the C figure{bkm})
  Supplementary figures for other target distributions? Or a different type of figure than we have here? Or something else?
  We get what we would expect with other simulated spectra. The prior is as sharp or diffuse as the data generating process.
+ - This is dependent on the number of mutations above the threshold in exactly the same way any other dirichlet multinomial distribution is (find a description of how fast this is!).
+ - Every data point improves the estimate, and the concentration of the data generating process effects that rate at which that improvement happens. -->
 
-![Prior probability of mutation estimated from high confidence calls. A) The simulated mutation spectrum (1,7,11). B) The maximum likelihood estimate of the data generating distribution (Dirichlet). C) The conditional probability of mutation at a site given its genomic context (bar at 3e-6, the global estimate of mutation rate)](figures/exp13_prior_figure.png)
+![Convergence of the prior to simulated target mutation signatures. The prior distribution converges quickly to the target distribution, and after 200-300 mutations is as close as it will get in both A) WGS simulations and B) Whole exome simulations](figures/kl_test.png)
 
 
 
-- The performance of the method is always better, but the amount of benefit is directly tied to the concentration of the spectrum
 
-![Effect of spectrum concentration on results in WGS. A) 1,7,11 B) 1,3,5 C) 1,4,5](figures/signature_and_mutation_count_effects.png)
+
+
 
 ## Sensitivity in real data
 We examined two real tumor datasets in which variants had been validated by deep targeted resequencing [@Griffith2015;@Shi2018]. 
@@ -122,17 +177,18 @@ We again find that our method is more sensitive than MuTect across the full rang
 
 # Discussion
 
-- Must include a strong argument for better real tumor validation sets. Focus on false negatives as well as false positives.
-The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
-- Why are false negative rates important?
-  - heterogeneity
-  - selection inference
-  - rare but druggable variant identification
-- Relevance to germline mutations, stratton citation in Things
+- Relevance to germline mutations [@Rahbari2016], and somatic mutation in healthy tissue [@Lee-Six2018]
+- Relevance to deep learning, should at least be a feature.
 - Standalone package, but approach really should be integrated into callers
 - Computational efficiency if integrated
 - Applicability to other algorithms for somatic variant calling
-- Caveat: evolution of mutational spectrum (cite TrackSigs)
+- Why are false negative rates important?
+   - heterogeneity
+   - selection inference
+   - rare but druggable variant identification
+- Caveat: Need for better real tumor validation sets. Focus on false negatives as well as false positives.
+The aml31 paper gets alot of them, but if they had for instance just used mutect to identify any potential variant that passed all other heuristic filters they would have a better sense of false negative rates.
+- Caveat: evolution of mutational spectrum [Rubanova2018a]
 
 
 # Methods
@@ -218,22 +274,23 @@ $$
 
 
 ## Variant allele frequency distribution
-- The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
-- The theoretical neutral distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
-- We chose a Beta(1,6) distribution to simulate a roughly neutral evolutionary trajectory while providing a significant fraction of variants in the 1% - 5% range where discrimination is most difficult.
-- 20% of variants have frequency between .017 and .057. 50% are less than .1
+The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
+In a neutrally evolving tumor the allele frequency distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
+In this case we are interested in a distribution that has a realistic shape, while also providing a sufficient number of low frequency variants to challenge the algorithm.
+We chose a Beta(1,6) distribution for WGS simulations at 100X depth, where 20% of variants have frequency between .017 and .057 and 50% are less than .1.
+For WES simulations at 500X we chose a Beta(2,40) distribution where 20% of variants have frequency between .01 and .025 and 50% are less than .05.
 
 ## Simulated tumors spectra
-- 100X whole genome and 500X whole exome for each of three signatures
-- Real mutations from TCGA and PCAWG
-- 1,7,11 UV (Very concentrated at C>T)
-- 1,4,5 Tobacco (Slight concentation at C>A and C>T)
-- 1,3,5 Breast (diffuse)
+We simulated tumors with three different mutation spectra.
+Each is an equal mixture of three COSMIC signatures as described in @Alexandrov2015 and downloaded from [https://cancer.sanger.ac.uk/cosmic/signatures](The COSMIC website).
+We used mutation signatures 1, 7, and 11 to represent a highly concentrated mutation signature, signatures 1, 4, and 5 to represent intermediate concentration, and 1,3, and 5 to represent a diffuse mutation signature.
+- We selected mutations according to these signatures from a set of previously reported cancer mutations derived from the combined TCGA and PCAWG databases.
+
 
 # Simulated bam files
-- 100X normal and 500X exome reads simulated with VarSim/art [@Mu2015] (default parameters?) and aligned with BWA [@Li2009a].(default parameters)
-- Variants spiked with Bamsurgeon with default parameters [@Ewing2015a].
-- Variants called with MuTect 1.1.7 with specific parameters [@Cibulskis2013]. (list them, just copy in as code is what I would prefer to see if I was reading the paper).
+We simulated 100X whole genome and 500X exome normal reads from the GRCH38 reference genome with VarSim/art [@Mu2015], and aligned them to GRch38 with BWA [@Li2009a], both with default parameters.
+Variants were spiked to create tumors with Bamsurgeon with default parameters [@Ewing2015a],
+and called with MuTect 1.1.7 [@Cibulskis2013] with the following parameters:
 ```
 java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
         --dbsnp $db_snp \
@@ -247,9 +304,13 @@ java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_p
         --out $out_path/$chr.txt \
         --coverage_file $out_path/$chr.cov
 ```
-- Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`. Variants that pass all filters or fail only `tlod_f_star` are then passed to {method} for prior estimation and rescoring.
+.
+Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold `tlod_f_star`, or fail to pass any filter other than `tlod_f_star`. Variants that pass all filters or fail only `tlod_f_star` are then passed to {method} for prior estimation and rescoring.
 
-# Figures
+# Supplementary Figures
+
+![The signatures used to simulate both whole genome and whole exomes A) Equal combination of COSMIC signatures 1, 7, and 11 representing a highly concentrated signature of the type that might be observed in a melanoma. B) Equal combination of COSMIC signatures 1, 3, and 5 representing an intermediate level of concentration typical of a breast tumor. C) Equal combination of COSMIC signatures 1, 4, and 5 representing a diffuse signature typical of a lung tumor.](figures/input_signatures.png)
+
 
 <!-- ![roc curve figure experiment 9](figures/roc_and_called_curves.png)
 
