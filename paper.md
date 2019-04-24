@@ -7,7 +7,8 @@ bibliography: caller_paper.bib
 ---
 # Targets
 - Nucleic Acids Research published EBCall in 2013
-- Bioinformatics
+- BioinformaticEmprical Bayes estimate of the posterior probability of mutation
+- NAR has a brand new genomics and bioinformatics journal
 
 # Introduction
 

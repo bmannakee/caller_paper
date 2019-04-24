@@ -16,7 +16,7 @@ Here we describe an empirical Bayes method which uses very high confidence varia
 We use realistic tumor simulations to show that this method is superior to MuTect as a classifier based on AUROC, while equal or inferior to MuTect based on AUPRC except in situations where the distribution of allele frequencies is extreme and unrealistic.
 We then implement a method of false discovery rate control that recovers the superiority of the classifier in the decision context.
 
-# Emprical Bayes estimate of the posterior probability of mutation
+# Somatic variant calling base statistical model
 
 At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots D$ of base calls and their associated quality scores, where $D$ is total read depth.
 The goal is to use $\mathbf{x}$ to select between competing hypotheses;
@@ -27,7 +27,7 @@ $$
 \end{array}
 $$
 where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternative non-reference bases.
-For a given read with base $b_i$ and q-score $q_i$, the density function under a hypothesis is $\textrm{f}_{\nu,m}(b_i,q_i)$ is defined as
+For a given read with base $b_i$ and q-score $q_i$, the density function under a particular hypothesis is defined as
 
 $$
   \textrm{f}_{\nu,m}(b_i,q_i) = \left\{
@@ -41,5 +41,30 @@ $$
 
 The likelihood under the hypothesis is then $\mathcal{L}_{\nu,m}(\mathbf{x}) = \prod_{i=1}^{D} \textrm{f}_{\nu,m}(x_i)$.
 MuTect reports the log likelihood ratio $log(\mathcal{L}_{\nu=\hat{f},m}(\mathbf{x})/\mathcal{L}_{\nu=0,m}(\mathbf{x}))$ as either TLOD or t_lod_fstar depending on the version.
-By fixing the threshold posterior odds at two, and the prior probability of mutation a constant $\mu = 1\mathrm{e}{-6}$, they derive a TLOD threshold of 6.3.
+By fixing the threshold posterior odds at two, the site-specific mutation probability a constant $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$, and $\mathrm{p}(m \mid M)$ the prior probability of mutation to specific allele $m$ constant $\mathrm{p}(m \mid M) = \mu/3 = 1\mathrm{e}{-6}$, they derive a TLOD threshold of 6.3 for classifying a site as a somatic variant.
 Here we examine the effect of the assumption of a constant prior probability of mutation.
+
+# Site-specific prior probability of mutation
+
+While variant calling algorithms typically assume a constant probability of mutation at every site in the genome, work by Alexandrov and others show that the random mutation generating process actually varies from site to site in a nucleotide context specific manner.
+We develop a model of the prior probability of mutation to allele $m$ conditional on the observed genomic context $\mathrm{p}(m,M \mid C)$, and demonstrate an empirical Bayes method for computing this probability from MuTect output.
+The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
+$$
+\mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}
+$$
+since the probability of a mutation at a site and the probability that it is to allele $m$ are independent conditional on the context.
+Here $\mathrm{p}(M) = \mu$ as above, and the empirical distribution of contexts $\mathrm{p}(C)$ is the fraction of the genome made up of each context.
+We model $\mathrm{p}(C \mid M)$ as a multinomial distribution with parameter $\boldsymbol{\pi} = \{\pi_i\}, i = 1\dots96$.
+Mutations are drawn from this multinomial distribution such that $\mathrm{p}(C = i \mid M) = \pi_i$.
+The final quantity $\mathrm{p}(m \mid C)$, the probability of mutation to $m$ given a particular three letter context, is a function of $\boldsymbol{\pi}$. 
+We are left to estimate only the vector of probabilities $\boldsymbol{\pi}$.
+
+
+\[
+\begin{aligned}
+C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi})  \\
+\boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}).
+\end{aligned}
+\]
+
+The posterior distribution of $\boldsymbol{\pi}$ is $\boldsymbol{\pi} \mid C,\boldsymbol{\alpha} \sim \textrm{Dirichlet}(\mathbf{C} + \boldsymbol{\alpha})$, where $\mathbf{C} = (C_1,\dots,C_{96})$ are the counts of mutations present in the tumor for each of the 96 contexts.
