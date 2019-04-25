@@ -83,3 +83,8 @@ and the posterior odds ratio in favor of $\mathbf{H_1}$ as
 \]
 
 We show via extensive simulation that under the assumption that the mutation signature describes the biological process generating mutations in a tumor, our posterior odds ratio is a better classifier than MuTect at any threshold.
+Unfortunately, this increased classification performance comes at a cost in terms of decision-making.
+As measured by AUPRC, performance is a complex function of sequencing depth, mutation signature concentration, and the allele frequency distribution.
+In our simulations there is always a point on the PRC curve where MuTect outperforms our method.
+This is a result of the fact that for a given there is an allele frequency at which the ratio of expect true positives to expected false positives from being greater than 1 to less than 1.
+There is also an asymmetry in that around any particular threshold, the gradient of the ratio is fairly steep (good lord, this is awful).
