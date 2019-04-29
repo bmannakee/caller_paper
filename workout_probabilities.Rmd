@@ -88,3 +88,31 @@ As measured by AUPRC, performance is a complex function of sequencing depth, mut
 In our simulations there is always a point on the PRC curve where MuTect outperforms our method.
 This is a result of the fact that for a given there is an allele frequency at which the ratio of expect true positives to expected false positives from being greater than 1 to less than 1.
 There is also an asymmetry in that around any particular threshold, the gradient of the ratio is fairly steep (good lord, this is awful).
+
+# False positive rate control.
+
+
+We develop a method, following Efron(2008), for controlling the false positive rate.
+Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either *null* (non-variant with $\nu = 0$) or *nonnull* (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
+
+$$
+\begin{array}{ll}
+p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
+p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
+\end{array}
+$$
+
+In this application we can a compute an estimate of $p_0$ as the ratio of the expected number of false positive sites and the number of expected true positive sites with variant allele frequency $\nu = \hat{f}$.
+At a given site, with read depth $D$, the probability of seeing $n$ reads in error is binomial
+$$
+p_e \sim \textrm{Bin}(n,D,p=\bar{q})
+$$
+where $\bar{q}$ is the average quality score of the alternate reads.
+(This is an estimate, they are have different q-scores)
+The expected number of false positives with probability $p_e$ is then $N*p_e$, where $N$ is the number of sites sequenced.
+In order to compute the expected nubmer of true positives with a given vaf, we need to make an assumption about the allele frequency distribution. 
+In a neutrally evolving tumor, the count of variants with a given allele frequency is(bozic et al)
+$$
+N(f) = \frac{N\mu}{f}.
+$$
+
