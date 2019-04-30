@@ -102,17 +102,15 @@ p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \t
 \end{array}
 $$
 
-In this application we can a compute an estimate of $p_0$ as the ratio of the expected number of false positive sites and the number of expected true positive sites with variant allele frequency $\nu = \hat{f}$.
-At a given site, with read depth $D$, the probability of seeing $n$ reads in error is binomial
-$$
-p_e \sim \textrm{Bin}(n,D,p=\bar{q})
-$$
-where $\bar{q}$ is the average quality score of the alternate reads.
-(This is an estimate, they are have different q-scores)
-The expected number of false positives with probability $p_e$ is then $N*p_e$, where $N$ is the number of sites sequenced.
-In order to compute the expected nubmer of true positives with a given vaf, we need to make an assumption about the allele frequency distribution. 
+The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
 In a neutrally evolving tumor, the count of variants with a given allele frequency is(bozic et al)
 $$
-N(f) = \frac{N\mu}{f}.
+N(f) = \frac{N\mu}{f},
 $$
-
+Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
+This results in the estimated local nonnull probability
+$$
+\hat{p}_1 = \frac{N(f)}{N} = \frac{\mu}{f}
+$$
+and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
+the rest just copies Efron. Time to implement and try to find out how it performs.
