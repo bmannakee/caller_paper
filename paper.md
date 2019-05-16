@@ -196,81 +196,103 @@ The aml31 paper gets alot of them, but if they had for instance just used mutect
 
 ## Algorithm
 
-MuTect computes the probability of a mutation from reference allele $r$ to base $m$ as a function of base calls $b$, estimated allele frequencies $f$, and per base error probabilities $e$.
-The probability that a given base is correctly called can be written as
+At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots D$ of base calls and their associated quality scores, where $D$ is total read depth.
+The goal is to use $\mathbf{x}$ to select between competing hypotheses;
+$$
+\begin{array}{l}
+\mathbf{H_0}:\quad \textrm{Alt allele} = m;\quad\nu = 0\\
+\mathbf{H_1}:\quad \textrm{Alt allele} = m;\quad\nu = \hat{f},
+\end{array}
+$$
+
+where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternative non-reference bases.
+For a given read with base $b_i$ and q-score $q_i$, the density function under a particular hypothesis is defined as
 
 $$
-  P(b_i \mid e_i, r, m, f) = \left\{
+  \textrm{f}_{\nu,m}(b_i,q_i) = \left\{
     \begin{array}{cr}
-      f \frac{e_{b_i}}{3} + (1-f)(1-e_{b_i}) & b_i = r\\
-      f(1-e_{b_i}) + (1-f) \frac{e_{b_i}}{3} & b_i = m\\
-      \frac{e_{b_i}}{3} & otherwise.
+      \nu \frac{10^{-q_i/10}}{3} + (1-\nu)(1-10^{-q_i/10}) & b_i = \textrm{reference}\\
+      \nu(1-10^{-q_i/10}) + (1-\nu) \frac{10^{-q_i/10}}{3} & b_i = m\\
+      \frac{10^{-q_i/10}}{3} & otherwise.
     \end{array}
     \right.
 $$
 
-Now consider two models for the data. Model $M_0$ in which there are no variants at a site, and $M^{m}_{f}$ where allele $m$ is present at allele fraction $f$.
-Assuming reads are independent the likelihood of the model given the data is
+The likelihood under the hypothesis is then $\mathcal{L}_{\nu,m}(\mathbf{x}) = \prod_{i=1}^{D} \textrm{f}_{\nu,m}(x_i)$.
+MuTect reports the log likelihood ratio $\mathrm{log}(\mathcal{L}_{\nu=\hat{f},m}(\mathbf{x})/\mathcal{L}_{\nu=0,m}(\mathbf{x}))$ as either TLOD or t_lod_fstar depending on the version.
+By fixing the threshold posterior odds at two, the site-specific mutation probability a constant $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$, and $\mathrm{p}(m \mid M)$ the prior probability of mutation to specific allele $m$ constant $\mathrm{p}(m \mid M) = \mu/3 = 1\mathrm{e}{-6}$, they derive a TLOD threshold of 6.3 for classifying a site as a somatic variant.
+Here we examine the effect of the assumption of a constant prior probability of mutation.
+
+# Site-specific prior probability of mutation
+
+While variant calling algorithms typically assume a constant probability of mutation at every site in the genome, work by Alexandrov and others show that the random mutation generating process actually varies from site to site in a nucleotide context specific manner.
+We develop a model of the prior probability of mutation to allele $m$ conditional on the observed genomic context $\mathrm{p}(m,M \mid C)$, and demonstrate an empirical Bayes method for computing this probability from MuTect output.
+The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
+$$
+\mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}
+$$
+since the probability of a mutation at a site and the probability that it is to allele $m$ are independent conditional on the context.
+Here $\mathrm{p}(M) = \mu$ as above, and the empirical distribution of contexts $\mathrm{p}(C)$ is the fraction of the genome made up of each context.
+We model $\mathrm{p}(C \mid M)$ as a multinomial distribution with parameter $\boldsymbol{\pi} = \{\pi_i\}, i = 1\dots96$.
+Mutations are drawn from this multinomial distribution such that $\mathrm{p}(C = i \mid M) = \pi_i$.
+The final quantity $\mathrm{p}(m \mid C)$, the probability of mutation to $m$ given a particular three letter context, is a function of $\boldsymbol{\pi}$. 
+We are left to estimate only the vector of probabilities $\boldsymbol{\pi}$.
+
+
+\[
+\begin{aligned}
+C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi})  \\
+\boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}).
+\end{aligned}
+\]
+
+The posterior distribution of $\boldsymbol{\pi}$ is $\boldsymbol{\pi} \mid C,\boldsymbol{\alpha} \sim \textrm{Dirichlet}(\mathbf{C} + \boldsymbol{\alpha})$, where $\mathbf{C} = (C_1,\dots,C_{96})$ are the counts of mutations present in the tumor for each of the 96 contexts.
+We compute an empirical bayes estimate of $\boldsymbol{\pi}$ by choosing $\mathbf{C}$ as the set of mutations assigned a TLOD by MuTect above some threshold, which we choose as 10.
+We show through extensive simulation that our estimate of $\boldsymbol{\pi}$ converges quickly its true simulated value.
+
+Returning to the model above, we can calculate the log posterior odds in favor of $\mathbf{H_1}$ as
+
+\[
+  \textrm{log}_{10} \left(\frac{(\mathcal{L}_{\nu=\hat{f},m}(\mathbf{x})\mathrm{p}(m,M \mid C)}{(\mathcal{L}_{\nu=0,m}(\mathbf{x})(1-\mathrm{p}(m,M \mid C))} \right) = \textrm{TLOD} + \textrm{log prior odds},
+\]
+
+and the posterior odds ratio in favor of $\mathbf{H_1}$ as
+\[
+10^{(\textrm{TLOD} + \textrm{log prior odds})}.
+\]
+
+# False positive rate control.
+
+
+We develop a method, following Efron(2008), for controlling the false positive rate.
+Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either *null* (non-variant with $\nu = 0$) or *nonnull* (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
 
 $$
-  \mathcal{L}(M^{m}_{f}) = P(\{ b_i \} \mid \{ e_{b_i} \}, r, m, f) = 
-  \prod_{i=1}^{d} P(b_i \mid e_{b_i}, r, m, f)
+\begin{array}{ll}
+p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
+p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
+\end{array}
 $$
 
-and the probability of $M^{m}_{f}$ can be written
+Controlling false positive rate implies $\textrm{P}\{\textrm{nonnull} \mid \mathbf{x}\} / \textrm{P}\{\textrm{null} \mid \mathbf{x}\}$ to some ratio of true positives to false positives.
+Defining $\textrm{f}(\mathbf{x}) = \textrm{f}_{0}(\mathbf{x}) + \textrm{f}_{1}(\mathbf{x})$, then $\textrm{fdr}(\mathbf{x}) = p_0\textrm{f}_0(\mathbf{x}) / \textrm{f}(\mathbf{x})$, and
+$$
+\frac{\textrm{P}\{\textrm{nonnull} \mid \mathbf{x}\}}{\textrm{P}\{\textrm{null} \mid \mathbf{x}\}} = \frac{1-\textrm{frd}(\mathbf{x})}{\textrm{frd}(\mathbf{x})} = \frac{p_1\textrm{f}_1(\mathbf(x))}{p_0\textrm{f}_0(\mathbf(x))}.
+$$
+The posterior odds ratio $\textrm{f}_1(\mathbf{x}) / \textrm{f}_0(\mathbf{x})$ is the one computed by the algorithm above, and we compute the prior odds in the following manner
 
-$$ 
-  P(m, f \mid \{ b_i \}, \{ e_{b_i} \}, r) = 
-      \mathcal{L}(M^{m}_{f}) \frac{P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
+# Prior odds site is non-null
+
+The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
+In a neutrally evolving tumor, or any tumor without very strong late selective sweeps, the count of variants with a given allele frequency $N(f)$ is(bozic et al)
+$$
+N(f) = \frac{N\mu}{f},
 $$
 
-We can also express this probability in terms of the model $M_0$
-
-$$ 
-  1 - P(m, f \mid \{ b_i \}, \{ e_i \}, r) = 
-      \mathcal{L}(M_{0}) \frac{1 - P(m,f)}{P({\{ b_i \}} \mid {\{ e_{b_i} \}}, r)}.
+Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability[@Bozic2016].(*Ryan, this seems like a wierd citation for this although it is where I first understood it. Is it the kind of thing that needs a citation?*).
+The estimated local nonnull probability is then
 $$
-
-Taking the log of the ratio of the two previous equations gives the log odds in favor of $M^{m}_{f}$, and some cancellation yields
-
-$$
-  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right).
-$$
-
-A classifier for variants is constructed by selecting an odds threshold $\delta_T$ and labeling variants satisfying the condition
-
-$$
-  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m,f)}{\mathcal{L}(M^{m}_{0})(1-P(m,f))} \right)
-    \ge \textrm{log}_{10} \delta_T
-$$
-as true variants, and rejecting them otherwise.
-Note that the expression for $LOD_{T}(m,f)$ can be further factorized as the sum of the log-likelihood ratio of the two models and the log odds of the prior for $M^{m}_{f}$.
-Current variant callers calculate this prior by assuming the allele and its frequency are independent, and that $f \sim \textrm{U}(0,1)$, so that $P(f) = 1$.
-If all substitutions are equally likely, then $P(m) = \mu/3$ where $\mu = 3 \times 10^{-6}$, the estimated per-base mutation rate in tumors.
-Given these assumptions the log prior odds is a constant, and the classifier can be re-written as
-
-$$
-  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})}{\mathcal{L}(M^{m}_{0})} \right) \ge
-    \textrm{log}_{10} \delta_T - \textrm{log}_{10} \left(\frac{P(m)}{1 - P(m)} \right) \ge \theta_T.
-$$
-
-If $\delta_T = 2$, i.e the odds in favor of $M^{m}_{f}$ is 2, then $\theta_T = 6.3$, and this is the threshold implemented in MuTect 1. 
-
-*Mutect 2 was released with a threshold of 5.3, implying odds much less than 1.(I have this calculation somewhere). This is made safer by using our method?*
-
-
-The conditional probability that a mutation to allele $m$ will occur given a specific genomic context $C$, $P(m \mid C)$ can be computed from the empirical data in Figure \ref{fig2}, but $P(M \mid C)$ can not be.
-Using Bayes rule we can rewrite$P(m \mid C)$ as
-
-$$
-  P(m \mid C) = P(C \mid m) \frac{P(m)}{P(C)}.
-$$
-
-Now $P(C \mid m)$ is the mutation spectrum of the tumor, $P(m) = \mu$, and $P(C)$ can be estimated as the frequency of context $C$ in the genome.
-The new expression for the log odds is
-
-$$
-  LOD_{T}(m,f) = \textrm{log}_{10} \left(\frac{\mathcal{L}(M^{m}_{f})P(m \mid C)}{\mathcal{L}(M^{m}_{0})(1-P(m \mid C))} \right).
+\hat{p}_1 = \frac{N(f)}{N} = \frac{\mu}{f}
 $$
 
 
