@@ -29,7 +29,9 @@ The first is the spontaneous accumulation of mutations that occurs in all dividi
 The second, and far more complex, process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor [@Alexandrov2013a;@Helleday2014a;@Nik-Zainal2016;@Kandoth2013;@Alexandrov2016].
 
-Here we present our method ....
+Here we present an empirical bayes method for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
+We then extend the method with an application of the local false discovery rate by computing the probability that a site is non-null under an assumption of clonal expansion with either early or small selective differences between clones.
+We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect.
 
 
 
@@ -297,11 +299,9 @@ $$
 
 
 ## Variant allele frequency distribution
-The allele frequency spectrum of a particular tumor is determined by intrinsic factors including mutation rate and the action of natural selection.
-In a neutrally evolving tumor the allele frequency distribution is $M(f) \approx  1/f$ [@Bozic2016], which creates a roughly decreasing exponential shape on $[0,1]$ for allele frequency.
-In this case we are interested in a distribution that has a realistic shape, while also providing a sufficient number of low frequency variants to challenge the algorithm.
-We chose a Beta(1,6) distribution for WGS simulations at 100X depth, where 20% of variants have frequency between .017 and .057 and 50% are less than .1.
-For WES simulations at 500X we chose a Beta(2,40) distribution where 20% of variants have frequency between .01 and .025 and 50% are less than .05.
+We simulated tumors with three different allele frequency distributions.
+For whole genome simulations with depth 100X we generated variant allele frequencies from a Beta(1,6) distribution, where 20% of variants have frequency between .017 and .057 and 50% are less than .1.
+Whole exome simulations at 500X depth were generated from a Beta(2,40) distribution where 20% of variants have frequency between .01 and .025 and 50% are less than .05.
 
 ## Simulated tumors spectra
 We simulated tumors with three different mutation spectra.
