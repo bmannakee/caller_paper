@@ -228,7 +228,7 @@ MuTect reports the log likelihood ratio $\mathrm{log}(\mathcal{L}_{\nu=\hat{f},m
 By fixing the threshold posterior odds at two, the site-specific mutation probability a constant $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$, and $\mathrm{p}(m \mid M)$ the prior probability of mutation to specific allele $m$ constant $\mathrm{p}(m \mid M) = \mu/3 = 1\mathrm{e}{-6}$, they derive a TLOD threshold of 6.3 for classifying a site as a somatic variant.
 Here we examine the effect of the assumption of a constant prior probability of mutation.
 
-# Site-specific prior probability of mutation
+### Site-specific prior probability of mutation
 
 While variant calling algorithms typically assume a constant probability of mutation at every site in the genome, work by Alexandrov and others show that the random mutation generating process actually varies from site to site in a nucleotide context specific manner.
 We develop a model of the prior probability of mutation to allele $m$ conditional on the observed genomic context $\mathrm{p}(m,M \mid C)$, and demonstrate an empirical Bayes method for computing this probability from MuTect output.
@@ -266,7 +266,7 @@ and the posterior odds ratio in favor of $\mathbf{H_1}$ as
 10^{(\textrm{TLOD} + \textrm{log prior odds})}.
 \]
 
-# False positive rate control.
+### False positive rate control.
 
 
 We develop a method, following Efron(2008), for controlling the false positive rate.
@@ -286,7 +286,7 @@ $$
 $$
 The posterior odds ratio $\textrm{f}_1(\mathbf{x}) / \textrm{f}_0(\mathbf{x})$ is the one computed by the algorithm above.
 
-# Prior odds site is non-null
+### Prior odds site is non-null
 
 The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
 In a neutrally evolving tumor, or any tumor without very strong late selective sweeps, the count of variants with a given allele frequency $N(f)$ is(bozic et al)
@@ -313,7 +313,7 @@ We used mutation signatures 1, 7, and 11 to represent a highly concentrated muta
 - We selected mutations according to these signatures from a set of previously reported cancer mutations derived from the combined TCGA and PCAWG databases.
 
 
-# Simulated bam files
+## Simulated bam files
 We simulated 100X whole genome and 500X exome normal reads from the GRCH38 reference genome with VarSim/art [@Mu2015], and aligned them to GRch38 with BWA [@Li2009a], both with default parameters.
 Variants were spiked to create tumors with Bamsurgeon with default parameters [@Ewing2015a],
 and called with MuTect 1.1.7 [@Cibulskis2013] with the following parameters:
