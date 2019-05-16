@@ -89,9 +89,12 @@ MuSE is continuous time markov evolutionary model, still assuming no biological 
 
 
 
-## Origin of sensitivity and specificity differences
-- Everything comes down to the number of variants with low alternate read count.
-- This is a complicated function of sequencing depth, evolutionary history, mutation rate.
+## Performance measurements
+We are interested in measuring two different quantities here.
+First, we want to know whether the addition of a biological prior improves the statistical model.
+We use the area under the ROC curve to measure whether the biological prior provides a better ordering of true and false positive variants.
+Second, we want to know whether a particular decision threshold implemented on the biological prior provides an improved tradeoff of true to false positives than MuTect.
+Both the shape and the area under the precision-recall curve are informative here.
 
 ## Implementation
 
