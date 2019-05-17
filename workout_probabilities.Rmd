@@ -83,3 +83,34 @@ and the posterior odds ratio in favor of $\mathbf{H_1}$ as
 \]
 
 We show via extensive simulation that under the assumption that the mutation signature describes the biological process generating mutations in a tumor, our posterior odds ratio is a better classifier than MuTect at any threshold.
+Unfortunately, this increased classification performance comes at a cost in terms of decision-making.
+As measured by AUPRC, performance is a complex function of sequencing depth, mutation signature concentration, and the allele frequency distribution.
+In our simulations there is always a point on the PRC curve where MuTect outperforms our method.
+This is a result of the fact that for a given there is an allele frequency at which the ratio of expect true positives to expected false positives from being greater than 1 to less than 1.
+There is also an asymmetry in that around any particular threshold, the gradient of the ratio is fairly steep (good lord, this is awful).
+
+# False positive rate control.
+
+
+We develop a method, following Efron(2008), for controlling the false positive rate.
+Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either *null* (non-variant with $\nu = 0$) or *nonnull* (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
+
+$$
+\begin{array}{ll}
+p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
+p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
+\end{array}
+$$
+
+The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
+In a neutrally evolving tumor, the count of variants with a given allele frequency is(bozic et al)
+$$
+N(f) = \frac{N\mu}{f},
+$$
+Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
+This results in the estimated local nonnull probability
+$$
+\hat{p}_1 = \frac{N(f)}{N} = \frac{\mu}{f}
+$$
+and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
+the rest just copies Efron. Time to implement and try to find out how it performs.
