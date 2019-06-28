@@ -1,20 +1,23 @@
 ---
-title: "workout_probabilities"
+title: "Probability Model"
 author: "Brian Mannakee"
-date: "4/22/2019"
+date: "6/25/2019"
 output:
-  pdf_document: default
-  word_document: default
-  html_document: default
+    pdf_document:
+        fig_caption: yes
+
+bibliography: caller_paper.bib
 ---
 
-# Intro
+# Introduction
 
 Variant callers are statistical classifiers.
 Usefulness of any classifier is a combination of the ranking performance of the classifier, and the quality of decisions based on the classifier in the real world.
-Here we describe an empirical Bayes method which uses very high confidence variant calls from MuTect to create a biologically inspired prior probability of mutation based in the mutation spectrum of the tumor.
-We use realistic tumor simulations to show that this method is superior to MuTect as a classifier based on AUROC, while equal or inferior to MuTect based on AUPRC except in situations where the distribution of allele frequencies is extreme and unrealistic.
-We then implement a method of false discovery rate control that recovers the superiority of the classifier in the decision context.
+Here we describe an empirical Bayes method which uses very high confidence variant calls from MuTect to create a biologically inspired prior probability of mutation based on the mutation spectrum of the tumor.
+We use realistic tumor simulations to show that this method is superior to MuTect as a classifier based on AUROC, while equal or inferior to MuTect based on AUPRC.
+The model above is poorly calibrated, so we use estimates of the mutation rate and the distribution of allele frequencies under the null hypothesis.
+These estimates rely only the well-supported assumption that after initiation the tumor is evolving essentially neutrally.
+We show that the model is well-calibrated with this full estimate of the posterior distribution.
 
 # Somatic variant calling base statistical model
 
@@ -83,16 +86,29 @@ and the posterior odds ratio in favor of $\mathbf{H_1}$ as
 \]
 
 We show via extensive simulation that under the assumption that the mutation signature describes the biological process generating mutations in a tumor, our posterior odds ratio is a better classifier than MuTect at any threshold.
-Unfortunately, this increased classification performance comes at a cost in terms of decision-making.
-As measured by AUPRC, performance is a complex function of sequencing depth, mutation signature concentration, and the allele frequency distribution.
-In our simulations there is always a point on the PRC curve where MuTect outperforms our method.
-This is a result of the fact that for a given there is an allele frequency at which the ratio of expect true positives to expected false positives from being greater than 1 to less than 1.
-There is also an asymmetry in that around any particular threshold, the gradient of the ratio is fairly steep (good lord, this is awful).
+Unfortunately, this increased classification performance comes at a cost in terms of calibration, The probabilities from this model are substantially worse than those from Mutect, such that threshold selection is essentially impossible and precision/recall is substantially worse for this model.
+There are several distributional assumptions in this model that effect model calibration, and we address all of them below.
 
-# False positive rate control.
+# Estimating the mutation rate from the data
 
+As discussed above, MuTect fixes the site-specific mutation probability at $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$.
+All variant callers we are aware of either fix this parameter $\mu$ or allow the user to input the value, but there is no way to really know this value until the variant allele frequencies have been observed.
+As with estimation of the mutation signature, we can use high confidence mutations and a model of tumor evolution to compute the tumor-specific mutation rate.
+@Bozic2016 show that for any variant allele frequency $\alpha$, the total number of mutations with frequency greater than $\alpha$ and less than $0.25$ is
 
-We develop a method, following Efron(2008), for controlling the false positive rate.
+$$
+N(\alpha) = N\mu \left( \frac{1}{\alpha} - \frac{1}{0.25} \right)
+$$
+
+Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
+By selecting $\alpha$ such that we are highly confident in all calls at frequencies greater than $\alpha$, we can compute $\mu$ and recompute the odds in favor of $\mathbf{H_1}$.
+This improves the calibration of the model, but it is still worse than MuTect.
+The final assumption embedded in the model is that all variants, regardless of allele frequency, have the same prior probability of being true variants.
+Below we address this assumption.
+
+# False positive rate control
+
+We develop a method, following @Efron2008, for controlling the false positive rate.
 Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either *null* (non-variant with $\nu = 0$) or *nonnull* (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
 
 $$
@@ -103,14 +119,38 @@ p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \t
 $$
 
 The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
-In a neutrally evolving tumor, the count of variants with a given allele frequency is(bozic et al)
+In a neutrally evolving tumor, the number of cells is growing exponentially, and the count of variants with an allele frequency greater than a given allele frequency $f$ is [@Bozic2016,@Williams2016a]
 $$
 N(f) = \frac{N\mu}{f},
 $$
 Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
-This results in the estimated local nonnull probability
+The estimated fraction of all of the sites in the genome that will have a mutation with frequency $f$ is
 $$
-\hat{p}_1 = \frac{N(f)}{N} = \frac{\mu}{f}
+\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .1f} -  \frac{\mu}{f + .1f}
 $$
 and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
-the rest just copies Efron. Time to implement and try to find out how it performs.
+@Williams2016a provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
+
+# Results
+
+Figure 1 shows that the calibration is better than MuTect or the model without false positive rate control.
+In addition estimation of mu from the data results in better calibration than assuming a mis-specified rate.
+
+# Figures
+
+
+![Model performance 500X whole exome for 3 classes of mutation spectrum](figures/wes_left_plot.pdf)
+
+![Allele frequency profile 500X whole exome for 3 classes of mutation spectrum. Frequencies at a threshold p(H1) = 0.8](figures/wes_right_plot.pdf)
+
+
+![Model performance 100X whole genome for 3 classes of mutation spectrum](figures/wgs_left_plot.pdf)
+
+![Allele frequency profile 100X whole genome for 3 classes of mutation spectrum. Frequencies at a threshold p(H1) = 0.8](figures/wgs_right_plot.pdf)
+
+![Convergence of empirical prior](figures/kl_figure.png)
+
+![Referene input signatures](figures/input_signatures.png)
+
+# References
+

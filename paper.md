@@ -282,7 +282,7 @@ $$
 Controlling false positive rate implies $\textrm{P}\{\textrm{nonnull} \mid \mathbf{x}\} / \textrm{P}\{\textrm{null} \mid \mathbf{x}\}$ to some ratio of true positives to false positives.
 Defining $\textrm{f}(\mathbf{x}) = \textrm{f}_{0}(\mathbf{x}) + \textrm{f}_{1}(\mathbf{x})$, then $\textrm{fdr}(\mathbf{x}) = p_0\textrm{f}_0(\mathbf{x}) / \textrm{f}(\mathbf{x})$, and
 $$
-\frac{\textrm{P}\{\textrm{nonnull} \mid \mathbf{x}\}}{\textrm{P}\{\textrm{null} \mid \mathbf{x}\}} = \frac{1-\textrm{frd}(\mathbf{x})}{\textrm{frd}(\mathbf{x})} = \frac{p_1\textrm{f}_1(\mathbf(x))}{p_0\textrm{f}_0(\mathbf(x))}.
+\frac{\textrm{P}\{\textrm{nonnull} \mid \mathbf{x}\}}{\textrm{P}\{\textrm{null} \mid \mathbf{x}\}} = \frac{1-\textrm{frd}(\mathbf{x})}{\textrm{frd}(\mathbf{x})} = \frac{p_1\textrm{f}_1(\mathbf{x})}{p_0\textrm{f}_0(\mathbf{x})}.
 $$
 The posterior odds ratio $\textrm{f}_1(\mathbf{x}) / \textrm{f}_0(\mathbf{x})$ is the one computed by the algorithm above.
 
