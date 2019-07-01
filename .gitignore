@@ -11,6 +11,6 @@
 *.ilg
 *.ind
 *.log
-*.synctex.gz
+*.gz
 *.html
 *.docx
