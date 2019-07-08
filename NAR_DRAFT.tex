@@ -170,7 +170,7 @@ Below we address this assumption.
 \subsubsection{False positive rate control.}
 
 We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
-Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either *null* (non-variant with $\nu = 0$) or *nonnull* (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
+Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either \textit{null} (non-variant with $\nu = 0$) or \textit{nonnull} (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
 
 $$
 \begin{array}{ll}
@@ -190,10 +190,10 @@ $$
 \hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .1f} -  \frac{\mu}{f + .1f}
 $$
 and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
-citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
+\citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
 
 
-\subsubsection{False positive rate control.}
+\subsubsection{Tumor simulations.}
 
 Tumor variants via a branching process to simulate neutral evolution with no death.
 Variants selected from PCAWG and TCGA lists(with download dates).
@@ -201,8 +201,10 @@ We simulated 100X whole genome and 500X exome normal reads from the GRCH38 refer
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
 and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 
+\begin{tiny}
 \begin{verbatim}
-java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
+
+  java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
         --dbsnp $db_snp \
         --enable_extended_output \
         --fraction_contamination 0.00 \
@@ -213,8 +215,9 @@ java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_p
         --input_file:tumor $tmp_tumor \
         --out $out_path/$chr.txt \
         --coverage_file $out_path/$chr.cov
-\end{verbatim}
 
+\end{verbatim}
+\end{tiny}
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
 
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
