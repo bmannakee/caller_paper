@@ -107,7 +107,7 @@ By fixing the threshold posterior odds at two, the site-specific mutation probab
 
 
 
-\subsubsection{Estimation of the mutation signature.}
+\subsection{Estimation of the mutation signature.}
 
 While variant calling algorithms typically assume a constant probability of mutation at every site in the genome, work by Alexandrov and others show that the random mutation generating process actually varies from site to site in a nucleotide context specific manner.
 We develop a model of the prior probability of mutation to allele $m$ conditional on the observed genomic context $\mathrm{p}(m,M \mid C)$, and demonstrate an empirical Bayes method for computing this probability from MuTect output.
@@ -149,7 +149,7 @@ We show via extensive simulation that under the assumption that the mutation sig
 Unfortunately, this increased classification performance comes at a cost in terms of calibration, The probabilities from this model are substantially worse than those from Mutect, such that threshold selection is essentially impossible and precision/recall is substantially worse for this model.
 There are several distributional assumptions in this model that effect model calibration, and we address all of them below.
 
-\subsubsection{Estimation of the mutation rate.}
+\subsection{Estimation of the mutation rate.}
 
 As discussed above, MuTect fixes the site-specific mutation probability at $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$.
 All variant callers we are aware of either fix this parameter $\mu$ or allow the user to input the value, but there is no way to really know this value until the variant allele frequencies have been observed.
@@ -167,7 +167,7 @@ The final assumption embedded in the model is that all variants, regardless of a
 Below we address this assumption.
 
 
-\subsubsection{False positive rate control.}
+\subsection{False positive rate control.}
 
 We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
 Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either \textit{null} (non-variant with $\nu = 0$) or \textit{nonnull} (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
@@ -187,17 +187,17 @@ $$
 Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
 The estimated fraction of all of the sites in the genome that will have a mutation with frequency $f$ is
 $$
-\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .1f} -  \frac{\mu}{f + .1f}
+\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .01} -  \frac{\mu}{f + .01}
 $$
 and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
 \citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
 
 
-\subsubsection{Tumor simulations.}
+\subsection{Tumor simulations.}
 
-Tumor variants via a branching process to simulate neutral evolution with no death.
-Variants selected from PCAWG and TCGA lists(with download dates).
-We simulated 100X whole genome and 500X exome normal reads from the GRCH38 reference genome with VarSim \cite{Mu2015}, and aligned them to GRch38 with BWA \cite{Li2009a}, both with default parameters.
+We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
+Variants were selected from TCGA and PCAWG variant files(dates).
+Whole genome (100X depth), and whole exome (500X depth) reads from the GRCH38 reference genome with VarSim \cite{Mu2015}, and aligned them to GRch38 with BWA \cite{Li2009a}, both with default parameters.
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
 and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 
@@ -220,53 +220,7 @@ and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 \end{tiny}
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text:
-\begin{align}
-\mathrm{LD}^r = \frac{\mathrm{LD}}{A_\mathrm{iso}}
-= 1.5 S \left( 3 \cos^2 \alpha_i - 1 \right)
-\end{align}
 
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-
-
-\subsection{Materials subsection two}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text
-(see Figure \ref{NAR-fig1}).
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text.
-\begin{equation*}
-\mathrm{LD} \left( t \right) =
-\sum\limits_i
-a_i \exp \left( \frac{-t}{\tau_i} \right)
-\end{equation*}
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text.
 
 \begin{figure}[t]
 \begin{center}
