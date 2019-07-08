@@ -1,8 +1,11 @@
 \documentclass[a4,center,fleqn]{NAR}
 
+
 \usepackage{NAR-natbib}
 \bibliographystyle{unsrtnat}
-
+\usepackage{color}
+\newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
+\newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
 % Enter dates of publication
 \copyrightyear{2008}
 \pubdate{31 July 2009}
@@ -189,6 +192,8 @@ The estimated fraction of all of the sites in the genome that will have a mutati
 $$
 \hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .01} -  \frac{\mu}{f + .01}
 $$
+
+\bkmcomment{This is wrong. This is the cdf. I need the integral of the derivative which is the density.}
 and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
 \citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
 
@@ -224,7 +229,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics{NAR-fig1.eps}
+\includegraphics{figures/wes_left_plot.pdf}
 \end{center}
 \caption{Caption for figure within column.}
 \label{NAR-fig1}
@@ -297,7 +302,7 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \begin{figure*}[t]
 \begin{center}
-\includegraphics{NAR-fig2.eps}
+\includegraphics{figures/kl_figure.png}
 \end{center}
 \caption{Caption for wide figure over two columns.
 \textbf{(a)} Left figure.
