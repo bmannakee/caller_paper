@@ -222,6 +222,11 @@ and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 \end{tiny}
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
 
+\subsection{Real tumor data.}
+\subsubsection{Acute Myeloid Leukemia}
+We downloaded the whole genome sequence for aml31 \bkmcomment{citation and download date}.
+We merged the gold and platinum lists, and define is \textit{not present} any variant for which deep sequencing was performed and zero alternate reads were observed.
+This is a very conservative metric.
 
 
 \begin{figure}[t]
