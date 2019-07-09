@@ -1,8 +1,11 @@
 \documentclass[a4,center,fleqn]{NAR}
 
+
 \usepackage{NAR-natbib}
 \bibliographystyle{unsrtnat}
-
+\usepackage{color}
+\newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
+\newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
 % Enter dates of publication
 \copyrightyear{2008}
 \pubdate{31 July 2009}
@@ -69,7 +72,7 @@ The first is the spontaneous accumulation of mutations that occurs in all dividi
 The second, and far more complex, process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 
-Here we present an algorithm f estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
+Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
 We then extend the method with an application of the local false discovery rate by computing the probability that a site is non-null under an assumption of clonal expansion with either early or small selective differences between clones.
 We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect.
 
@@ -162,35 +165,34 @@ $$
 
 Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
 By selecting $\alpha$ such that we are highly confident in all calls at frequencies greater than $\alpha$, we can compute $\mu$ and recompute the odds in favor of $\mathbf{H_1}$.
-This improves the calibration of the model, but it is still worse than MuTect.
-The final assumption embedded in the model is that all variants, regardless of allele frequency, have the same prior probability of being true variants.
-Below we address this assumption.
 
 
-\subsection{False positive rate control.}
+%`\subsection{False positive rate control.}
 
-We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
-Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either \textit{null} (non-variant with $\nu = 0$) or \textit{nonnull} (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
+%We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
+%Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either \textit{null} (non-variant with $\nu = 0$) or \textit{nonnull} (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
 
-$$
-\begin{array}{ll}
-p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
-p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
-\end{array}
-$$
+%$$
+%\begin{array}{ll}
+%p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
+%p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
+%\end{array}
+%$$
 
-The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
-In a neutrally evolving tumor, the number of cells is growing exponentially, and the count of variants with an allele frequency greater than a given allele frequency $f$ is \cite{Bozic2016,Williams2016a}.
-$$
-N(f) = \frac{N\mu}{f},
-$$
-Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
-The estimated fraction of all of the sites in the genome that will have a mutation with frequency $f$ is
-$$
-\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .01} -  \frac{\mu}{f + .01}
-$$
-and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
-\citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
+%The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
+%In a neutrally evolving tumor, the number of cells is growing exponentially, and the count of variants with an allele frequency greater than a given allele frequency $f$ is \cite{Bozic2016,Williams2016a}.
+%$$
+%N(f) = \frac{N\mu}{f},
+%$$
+%Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
+%The estimated fraction of all of the sites in the genome that will have a mutation with frequency $f$ is
+%$$
+%\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .01} -  \frac{\mu}{f + .01}
+%$$
+
+%\bkmcomment{This is wrong. This is the cdf. I need the integral of the derivative which is the density.}
+%and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
+%\citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
 
 
 \subsection{Tumor simulations.}
@@ -224,7 +226,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics{NAR-fig1.eps}
+\includegraphics{figures/wes_left_plot.pdf}
 \end{center}
 \caption{Caption for figure within column.}
 \label{NAR-fig1}
@@ -297,7 +299,7 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \begin{figure*}[t]
 \begin{center}
-\includegraphics{NAR-fig2.eps}
+\includegraphics{figures/kl_figure.png}
 \end{center}
 \caption{Caption for wide figure over two columns.
 \textbf{(a)} Left figure.
