@@ -224,16 +224,15 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 \subsection{Real tumor data.}
 \subsubsection{Acute Myeloid Leukemia}
-We downloaded the whole genome sequence for aml31 \bkmcomment{citation and download date} \cite{Griffith2015}.
+We downloaded the whole genome sequence for aml31 \bkmcomment{citation and download date, and primary/relapse distinction} \cite{Griffith2015}.
 We merged the gold and platinum lists, and define as \textit{not present} any variant for which deep sequencing was performed and zero alternate reads were observed.
 This is a very conservative metric.
 \subsubsection{What I call the cell paper} Not sure if this will get used.
 
 \subsection{Calibration}
 We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
-Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-fig1} \textbf{e}).
+Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-fig2}\textbf{b,d}).
 Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the total area between the result and a diagonal line.
-\bkmcomment{Honestly, just putting the R code here exactly as Austin does is probably the best explanation?}
 
 \begin{figure}[t]
 \begin{center}
@@ -245,6 +244,7 @@ Plotting the smoothed regression predictions against the actual predictions woul
 
 
 \section{RESULTS}
+\bkmcomment{I can't find a measured mutation rate for aml31. I get 3e-8 which isn't out of line for a leukemia primary.}
 
 \subsection{Convergence of the mutation prior to the true mutation profile}
 
@@ -300,7 +300,7 @@ AML 31 & Actual & Row 1 & Row 1 & -- & -- &&
 \botrule
 \end{tabular*}%
 }
-{AUROC/AUPRC = area under ROC/PRC curve. ICI = Integrated calibration index}
+{$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
 \end{table*}
 
 
