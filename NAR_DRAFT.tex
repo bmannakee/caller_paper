@@ -276,16 +276,26 @@ In all cases we find that the Calibrated model is better calibrated than MuTect.
 \caption{This is a table with auroc, auprc, ICI, and maybe fraction called?}
 \label{table:01}%
 }{%
-\begin{tabular*}{\columnwidth}{@{}llllllll@{}}
+\begin{tabular*}{\textwidth}{@{}lllllllll@{}}
 \toprule
-Experiment & $\mu$ & AUROC &  & AUPRC & & ICI & 
+Depth & Signature & $\mu$ & AUROC &  & AUPRC & & ICI & 
 \\
-& & MuTect & Calibrated & MuTect & Calibrated & MuTect & Calibrated
+& & & MuTect & Calibrated & MuTect & Calibrated & MuTect & Calibrated
 \\
 \colrule
-Row 1 & Row 1 & Row 1 & -- & -- &&&
+100X WGS & Concentrated & Row 1 & Row 1 & -- & -- &&
 \\
-Row 2 & Row 2 & Row 2 & Row 2 & Row 2 &&&
+100X WGS & Intermediate & Row 1 & Row 1 & -- & -- &&
+\\
+100X WGS & Diffuse & Row 1 & Row 1 & -- & -- &&
+\\
+500X WES & Concentrated & Row 1 & Row 1 & -- & -- &&
+\\
+500X WES & Intermediate & Row 1 & Row 1 & -- & -- &&
+\\
+500X WES & Diffuse & Row 1 & Row 1 & -- & -- &&
+\\
+AML 31 & Actual & Row 1 & Row 1 & -- & -- &&
 \\
 \botrule
 \end{tabular*}%
