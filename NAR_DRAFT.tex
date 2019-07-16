@@ -240,20 +240,30 @@ This is a very conservative metric.
 
 \section{RESULTS}
 
-\subsection{Results subsection one}
+\subsection{Convergence of the mutation prior to the true mutation profile}
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text.
+The dirichlet prior probability of mutation converges quickly to the true mutation signature.
+The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-fig1}\textbf{e,f}).
+\subsection{Performance on real data}
+
+\begin{itemize}
+  \item Similar performance in aml31
+  \item Similar calibration
+  \item caveats about the fact that we don't have true false positive/false negative data
+\end{itemize}
+
+
+
+\subsection{Simulated data}
+
+\subsubsection{classification}
+We simulated both whole genome and whole exome tumors with three different mutation signatures.
+Measures of classification performance are positively correlated with signature concentration.
+For all simulations the calibrated model produces a better variant classifier than MuTect (Figure \ref{NAR-fig2} \textbf{a} and \textbf{c}).
+
+\subsubsection{calibration}
+We computed the Integrated Calibration Index \cite{Austin2019} for both simulated (Figure \ref{NAR-fig2} \textbf{b,d}) and real tumors \bkmcomment{aml31 when the plot is ready.}.
+In all cases we find that the Calibrated model is better calibrated than MuTect.\bkmcomment{not perfect though}
 
 \begin{table}[b]
 \tableparts{%
@@ -278,30 +288,6 @@ Row 2 & Row 2 & Row 2 & Row 2 & Row 2
 \end{table}
 
 
-\subsection{Results subsection two}
-
-Text.  Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text (see Table \ref{table:01}).
-
-Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text (see Figure \ref{NAR-fig2}a).
-
-Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-
 \begin{figure*}[t]
 \begin{center}
 \includegraphics{figures/fig2.pdf}
@@ -313,21 +299,6 @@ A perfectly calibrated model would generate the diagonal line.
 }
 \label{NAR-fig2}
 \end{figure*}
-
-
-\subsection{Results subsection three}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text.
 
 
 \section{DISCUSSION}
