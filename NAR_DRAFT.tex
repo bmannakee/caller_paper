@@ -94,7 +94,7 @@ For a given read with base $b_i$ and q-score $q_i$, the density function under a
 Making the common assumption that NGS reads are independent, the posterior probability of a given hypothesis is 
 $$
   \begin{array}{rl}
-    P(m,\nu) = &p(m,\nu) \cdot \mathcal{L}_{m,\nu}(\mathbf{x}) \\
+    P(m,\nu) = &p(m,\nu) \cdot \mathcal{L}_{m,\nu}(\mathbf{x}) \\ \\
              = &p(m,\nu) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i),
   \end{array}
 $$
@@ -103,8 +103,8 @@ where the density $\textrm{f}_{m,\nu}(x_i)$ is
 $$
   \textrm{f}_{m,\nu}({b_i,q_i}) = \left\{
     \begin{array}{cr}
-      \nu \frac{10^{-q_i/10}}{3} + (1-\nu)(1-10^{-q_i/10}) & b_i = \textrm{reference}\\
-      \nu(1-10^{-q_i/10}) + (1-\nu) \frac{10^{-q_i/10}}{3} & b_i = m\\
+      \nu \frac{10^{-q_i/10}}{3} + (1-\nu)(1-10^{-q_i/10}) & b_i = \textrm{reference}\\ \\
+      \nu(1-10^{-q_i/10}) + (1-\nu) \frac{10^{-q_i/10}}{3} & b_i = m\\ \\
       \frac{10^{-q_i/10}}{3} & otherwise.
     \end{array}
     \right.
