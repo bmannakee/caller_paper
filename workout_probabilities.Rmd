@@ -19,7 +19,7 @@ The model above is poorly calibrated, so we use estimates of the mutation rate a
 These estimates rely only the well-supported assumption that after initiation the tumor is evolving essentially neutrally.
 We show that the model is well-calibrated with this full estimate of the posterior distribution.
 
-# Somatic variant calling base statistical model
+# Somatic variant calling base probability model
 
 At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots D$ of base calls and their associated quality scores, where $D$ is total read depth.
 The goal is to use $\mathbf{x}$ to select between competing hypotheses;
@@ -29,11 +29,19 @@ $$
 \mathbf{H_1}:\quad \textrm{Alt allele} = m;\quad\nu = \hat{f},
 \end{array}
 $$
-where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternative non-reference bases.
+where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternate non-reference bases.
 For a given read with base $b_i$ and q-score $q_i$, the density function under a particular hypothesis is defined as
 
+Making the common assumption that NGS reads are independent, the posterior probability of a given hypothesis, $P(m,\nu)$ is 
 $$
-  \textrm{f}_{\nu,m}(b_i,q_i) = \left\{
+  \begin{array}{cr}
+    P(m,\nu) = &p(m,\nu) \cdot $\mathcal{L}_{m,\nu}(\mathbf{x}). \\
+             = &p(m,\nu) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i),
+  \end{array}
+$$
+where the density \textrm{f}_{m,\nu}(x_i) is
+$$
+  \textrm{f}_{m,\nu}({b_i,q_i}) = \left\{
     \begin{array}{cr}
       \nu \frac{10^{-q_i/10}}{3} + (1-\nu)(1-10^{-q_i/10}) & b_i = \textrm{reference}\\
       \nu(1-10^{-q_i/10}) + (1-\nu) \frac{10^{-q_i/10}}{3} & b_i = m\\
@@ -42,12 +50,20 @@ $$
     \right.
 $$
 
-The likelihood under the hypothesis is then $\mathcal{L}_{\nu,m}(\mathbf{x}) = \prod_{i=1}^{D} \textrm{f}_{\nu,m}(x_i)$.
-MuTect reports the log likelihood ratio $\mathrm{log}(\mathcal{L}_{\nu=\hat{f},m}(\mathbf{x})/\mathcal{L}_{\nu=0,m}(\mathbf{x}))$ as either TLOD or t_lod_fstar depending on the version.
-By fixing the threshold posterior odds at two, the site-specific mutation probability a constant $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$, and $\mathrm{p}(m \mid M)$ the prior probability of mutation to specific allele $m$ constant $\mathrm{p}(m \mid M) = \mu/3 = 1\mathrm{e}{-6}$, they derive a TLOD threshold of 6.3 for classifying a site as a somatic variant.
-Here we examine the effect of the assumption of a constant prior probability of mutation.
+Assuming that the identity of the alternate allele and the estimated allele frequency are independent of each other, and $\nu$ is uniformly distributed results in the final model
+$$
+  P(m,\nu) = p(m) \times $\mathcal{L}_{m,\nu}(\mathbf{x}).
+$$
 
 # Site-specific prior probability of mutation
+
+The probability which we have denoted $p(m)$ for compactness above is actually the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
+However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution -- conditional on the genomic context surrounding the site -- described by the mutation signature of the tumor and denoted $p(m,M | C)$(citations).
+The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
+$$
+\mathrm{p}(m,M \mid C) = \mathrm{p}(C \mid M,m) \frac{p(m,M)}{p(C)}
+$$
+\bkmcomment{This is a problem. I am having trouble with the fact that C includes m. Maybe $p(C | M)$}
 
 While variant calling algorithms typically assume a constant probability of mutation at every site in the genome, work by Alexandrov and others show that the random mutation generating process actually varies from site to site in a nucleotide context specific manner.
 We develop a model of the prior probability of mutation to allele $m$ conditional on the observed genomic context $\mathrm{p}(m,M \mid C)$, and demonstrate an empirical Bayes method for computing this probability from MuTect output.
