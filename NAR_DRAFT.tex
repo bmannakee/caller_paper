@@ -79,9 +79,8 @@ We provide a simple implementation in R that takes MuTect caller output as input
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
 
-\bkmcomment{I feel like a discussion of the mutation signature should go first. Referencing the figure? The issue is that I have this m,M notation but the context C rolls in the m.}
 At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots D$ of base calls and their associated quality scores, where $D$ is total read depth.
-The goal is to use $\mathbf{x}$ to select between competing hypotheses;
+We want to use $\mathbf{x}$ to select between competing hypotheses;
 $$
   \begin{array}{l}
     \mathbf{H_0}:\quad \textrm{Alt allele} = m;\quad\nu = 0\\
@@ -115,20 +114,23 @@ $$
   P(m,\nu) = p(m) \cdot \mathcal{L}_{m,\nu}(\mathbf{x}).
 $$
 
-\subsection{Site-specific prior probability of mutation}
+\subsection{Estimation of the mutation signature}
+The 3-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
+There are four possible bases 3` and 5` of the site, leading to 16 possible flanking base combinations.
+Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site, and three possible alternate alleles for each.
+Thus, there are $2 \cdot 3 \cdot 16 = 96$ possible combinations of flanking bases, reference bases, and alternate alleles (see Figure \ref{NAR-sigfig}).
+The mutation context $C$ is indexed by $i=\{1 \dots 16\}$ flanking base combinations, $j = \{1,2\}$ reference bases, and $j = \{1,2,3\}$ alternate alleles.
+We model $ p(C | M) $ as a multinomial distribution with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j,k}\} $ and pseudo-count hyper-parameter $\boldsymbol{\alpha}$
 
-The probability which we have denoted $p(m)$ for compactness above is actually the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
-However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution -- conditional on the genomic context surrounding the site -- described by the mutation signature of the tumor and denoted $p(m,M | C)$(citations).
-The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
 $$
-\mathrm{p}(m,M \mid C) = \mathrm{p}(C \mid M,m) \frac{p(m,M)}{p(C)}
+\begin{array}{rl}
+  C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi})  \\
+  \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}).
+\end{array}
 $$
-\bkmcomment{This is a problem. I am having trouble with the fact that C includes m. Maybe $p(C | M)$}
+We use high confidence variant calls -- odds in favor of the mutation greater than 10:1 -- to estimate $\boldsymbol{\pi}$.
 
 \subsection{Estimation of the mutation rate.}
-
-As discussed above, MuTect fixes the site-specific mutation probability at $\mathrm{p}(M)= \mu = 3\mathrm{e}{-6}$.
-All variant callers we are aware of either fix this parameter $\mu$ or allow the user to input the value, but there is no way to really know this value until the variant allele frequencies have been observed.
 As with estimation of the mutation signature, we can use high confidence mutations and a model of tumor evolution to compute the tumor-specific mutation rate.
 \citet{Bozic2016} show that for any variant allele frequency $\alpha$, the total number of mutations with frequency greater than $\alpha$ and less than $0.25$ is
 
@@ -137,8 +139,30 @@ N(\alpha) = N\mu \left( \frac{1}{\alpha} - \frac{1}{0.25} \right)
 $$
 
 Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
-By selecting $\alpha$ such that we are highly confident in all calls at frequencies greater than $\alpha$, we can compute $\mu$ and recompute the odds in favor of $\mathbf{H_1}$.
+By selecting $\alpha$ such that we are highly confident in all calls at frequencies greater than $\alpha$, we can compute $\hat{\mu}$.
+In all results here we select $\alpha = 0.05$.
 
+\subsection{Site-specific prior probability of mutation}
+The probability which we have denoted $p(m)$ for compactness above is actually the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
+However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution -- conditional on the genomic context surrounding the site -- described by the mutation signature of the tumor and denoted here $p(m,M | C)$ \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
+The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
+$$
+\begin{array}{rl}
+  \mathrm{p}(m,M \mid C) = &\mathrm{p}(m \mid C) \mathrm{p}(M \mid C) \\ \\ 
+  = &\mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}
+\end{array}
+$$
+since the probability of a mutation at a site and the probability that it is to allele $m$ are independent conditional on the context.
+The estimated mutation signature and mutation rate, allow us to compute $p(m,M | C)$ as 
+
+$$
+\begin{array}{rl}
+  \mathrm{p}(m \mid C) = & \pi_{i,j,k} \\ \\
+  \mathrm{p}(C \mid M) = & \sum_{k}\pi_{i,j} \\ \\
+  \mathrm{p}(M) = & \hat{\mu},
+\end{array}
+$$
+with $\mathrm{p}(C)$ the fraction of all sites in the genome with context $C_{i,j}$ divided by 3.
 
 %`\subsection{False positive rate control.}
 
@@ -172,7 +196,7 @@ By selecting $\alpha$ such that we are highly confident in all calls at frequenc
 
 We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
 Variants were selected from TCGA and PCAWG variant files(dates).
-Whole genome (100X depth), and whole exome (500X depth) reads from the GRCH38 reference genome with VarSim \cite{Mu2015}, and aligned them to GRch38 with BWA \cite{Li2009a}, both with default parameters.
+Whole genome (100X depth), and whole exome (500X depth) reads were simulated from the GRCH38 reference genome using VarSim \cite{Mu2015}, and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
 and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 
@@ -205,31 +229,45 @@ This is a very conservative metric.
 \subsection{Calibration}
 We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
 Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-fig2}\textbf{b,d}).
-Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the total area between the result and a diagonal line.
+Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the result and a diagonal line.
 
 \begin{figure}[t]
 \begin{center}
 \includegraphics{figures/signature_figure.pdf}
 \end{center}
-\caption{Signature words.}
-\label{NAR-fig1}
+\caption{Mutation signatures. 
+\textbf{(a)} The observed mutation signature of the AML31 primary tumor. 
+\textbf{(b)} A mutation signature used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+\textbf{(c)} Equal proportions of signatures 1, 4, \& 5.
+\textbf{(d)} Equal proportions of signatures 1, 3, \& 5.
+KL divergence between the estimated signature and the simulated mutation signature for \textbf{e)} Whole exomes and \textbf{f)} whole genomes.
+The estimated mutation signature converges quickly to the target as the number of mutations evaluated rises.
+}
+\label{NAR-sigfig}
 \end{figure}
 
 
 \section{RESULTS}
-\bkmcomment{I can't find a measured mutation rate for aml31. I get 3e-8 which isn't out of line for a leukemia primary.}
+\begin{figure*}[t]
+  \begin{center}
+  \includegraphics{figures/aml_plot.pdf}
+  \end{center}
+  \caption{Model performance on 300X Whole leukemia genome.
+  \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
+  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
+  A perfectly calibrated model would generate the diagonal line.}
+  \label{NAR-aml}
+\end{figure*}
 
 \subsection{Convergence of the mutation prior to the true mutation profile}
 
 The dirichlet prior probability of mutation converges quickly to the true mutation signature.
-The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-fig1}\textbf{e,f}).
+The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-sigfig}\textbf{e,f}).
 \subsection{Performance on real data}
 
-\begin{itemize}
-  \item Similar performance in aml31
-  \item Similar calibration
-  \item caveats about the fact that we don't have true false positive/false negative data
-\end{itemize}
+The Calibrated model has better AUROC and AUPRC than the MuTect model in this real tumor (Figure \ref{NAR-aml}\textbf{a,c}, Table \ref{table:01}).
+The Calibrated model has slightly worse calibration as measure by ICI, but both models substantially underestimate the true positive probability throughout the range of possible values (Figure \ref{NAR-aml} \textbf{b,d}).
+One caveat to consider when considering these results is that while AML31 was subject to extensive variant calling validation, their list of true positive calls likely does not include every true variant at low allele frequencies, and true negative calls were not evaluated.
 
 
 
@@ -241,12 +279,12 @@ Measures of classification performance are positively correlated with signature 
 For all simulations the calibrated model produces a better variant classifier than MuTect (Figure \ref{NAR-fig2} \textbf{a} and \textbf{c}).
 
 \subsubsection{calibration}
-We computed the Integrated Calibration Index \cite{Austin2019} for both simulated (Figure \ref{NAR-fig2} \textbf{b,d}) and real tumors \bkmcomment{aml31 when the plot is ready.}.
-In all cases we find that the Calibrated model is better calibrated than MuTect.\bkmcomment{not perfect though}
+The Calibrated model tends to score true negative variants lower and true positive variants higher than Mutect (Figure \ref{NAR-fig2} \textbf{b,d}).
+The Integrated calibration index for the Calibrated model is better than that of the MuTect model for all tumors simulated.
 
 \begin{table*}[b]
 \tableparts{%
-\caption{This is a table with auroc, auprc, ICI, and maybe fraction called?}
+\caption{This is a table with $\mu$, auroc, auprc, ICI, and maybe fraction called?}
 \label{table:01}%
 }{%
 \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
@@ -256,19 +294,19 @@ Depth & Signature & $\mu$ & AUROC &  & AUPRC & & ICI &
 & & (estimated) & MuTect & Calibrated & MuTect & Calibrated & MuTect & Calibrated
 \\
 \colrule
-100X WGS & Concentrated & Row 1 & Row 1 & -- & -- &&
+100X whole genome & Concentrated & Row 1 & Row 1 & -- & -- & -- & -- & --
 \\
-100X WGS & Intermediate & Row 1 & Row 1 & -- & -- &&
+100X whole genome & Intermediate & Row 1 & Row 1 & -- & -- & -- & -- & --
 \\
-100X WGS & Diffuse & Row 1 & Row 1 & -- & -- &&
+100X whole genome & Diffuse & Row 1 & Row 1 & -- & -- & -- & -- & --
 \\
-500X WES & Concentrated & Row 1 & Row 1 & -- & -- &&
+500X whole exome & Concentrated & Row 1 & .848 & .928 & .674 & .757 & .0585 & .0465
 \\
-500X WES & Intermediate & Row 1 & Row 1 & -- & -- &&
+500X whole exome & Intermediate & Row 1 & .847 & .842 & .677 & .707 & .0587 & .0566 
 \\
-500X WES & Diffuse & Row 1 & Row 1 & -- & -- &&
+500X whole exome & Diffuse & Row 1 & .850 & .873 & .676 & .698 & .0565 & .0575
 \\
-AML 31 & Actual & $3.6e-8$ & Row 1 & -- & -- &&
+AML 31 & Actual & $3.6e-8$ & .935 & .949 & .995 & .996 & 0.121 & 0.155
 \\
 \botrule
 \end{tabular*}%
@@ -291,13 +329,7 @@ A perfectly calibrated model would generate the diagonal line.
 
 
 \section{DISCUSSION}
-\begin{figure}[t]
-  \begin{center}
-  \includegraphics{figures/aml_plot.pdf}
-  \end{center}
-  \caption{aml result words.}
-  \label{NAR-fig3}
-  \end{figure}
+
 \subsection{Discussion subsection one}
 
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
