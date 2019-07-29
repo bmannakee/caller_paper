@@ -7,7 +7,7 @@
 \usepackage{xfrac}
 \newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
-\newcommand{\batcave}{\textbf{BATCAVE }}
+\newcommand{\batcave}{BATCAVE }
 % Enter dates of publication
 \copyrightyear{2008}
 \pubdate{31 July 2009}
@@ -302,7 +302,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
   \caption{Model performance on 500X simulated whole exome.
   \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
-  A perfectly calibrated model would generate the diagonal line.}
+  A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
 \label{NAR-wes_fig}
 \end{figure*}
 
@@ -323,6 +323,9 @@ In this case the lower effective rate is not due to normal contamination of the 
 \bkmcomment{possible to quantify that this is very close to the actual insertion rate. Do it}.
 
 We measured calibration performance using the Integrated Calibration Index described in Methods \citep{Austin2019}.
+For all simulated tumors the calibration of \batcave is better across the full spectrum of posterior probabilities.
+As we can see in Figure \ref{NAR-wes_fig} \textbf{b)} and \textbf{d)}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
+As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
 
 
@@ -339,12 +342,12 @@ We measured calibration performance using the Integrated Calibration Index descr
 }{%
 \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
 \toprule
-Depth & Signature & $\mu$ & AUROC &  & AUPRC & & ICI & 
+Depth & Signature & $\mu/\beta$ & AUROC &  & AUPRC & & ICI & 
 \\
-& & (estimated) & MuTect & Calibrated & MuTect & Calibrated & MuTect & Calibrated
+& & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
 \\
 \colrule
-100X whole genome & Concentrated & Row 1 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Concentrated & 3.6e-7 & Row 1 & -- & -- & -- & -- & --
 \\
 100X whole genome & Intermediate & Row 1 & Row 1 & -- & -- & -- & -- & --
 \\
@@ -356,7 +359,7 @@ Depth & Signature & $\mu$ & AUROC &  & AUPRC & & ICI &
 \\
 500X whole exome & Diffuse & Row 1 & .850 & .873 & .676 & .698 & .0565 & .0575
 \\
-AML 31 & Actual & $3.6e-8$ & .935 & .949 & .995 & .996 & 0.121 & 0.155
+AML 31 & Actual & 3.6e-8 & .935 & .949 & .995 & .996 & 0.121 & 0.155
 \\
 \botrule
 \end{tabular*}%
