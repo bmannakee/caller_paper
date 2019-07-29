@@ -4,8 +4,10 @@
 \usepackage{NAR-natbib}
 \bibliographystyle{unsrtnat}
 \usepackage{color}
+\usepackage{xfrac}
 \newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
+\newcommand{\batcave}{\textbf{BATCAVE }}
 % Enter dates of publication
 \copyrightyear{2008}
 \pubdate{31 July 2009}
@@ -17,7 +19,7 @@
 
 \begin{document}
 
-\title{Article title}
+\title{\batcave: Bayesian Analysis Tools for Context-Aware Variant Evaluation}
 
 \author{%
 Brian K. Mannakee\,$^{1}$ and
@@ -26,9 +28,9 @@ Ryan N. Gutenkunst\,$^{2}$%
 Email: rgutenk@email.arizona.edu}}
 
 \address{%
-$^{1}$University of Arizona Mel and Enid Zuckerman College of Public Health
+$^{1}$Mel and Enid Zuckerman College of Public Health, University of Arizona, Tucson AZ
 and
-$^{2}$University of Arizona Department of Molecular and Cellular Biology}
+$^{2}$Department of Molecular and Cellular Biology, University of Arizona, Tucson AZ}
 % Affiliation must include:
 % Department name, institution name, full road and district address,
 % state, Zip or postal code, country
@@ -74,8 +76,8 @@ Many mutagens and DNA repair mechanism defects also have highly specific mutatio
 
 Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
 We then extend the method with an application of the local false discovery rate by computing the probability that a site is non-null under an assumption of clonal expansion with either early or small selective differences between clones.
-We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect.
-\newpage
+We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect. \bkmcomment{batcave,batcaver,batcaveR}
+
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
 
@@ -88,16 +90,130 @@ $$
   \end{array}
 $$
 where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternate non-reference bases.
-For a given read with base $b_i$ and q-score $q_i$, the density function under a particular hypothesis is defined as
+The posterior probability of a given hypothesis, $P(m,\nu)$, is the product of the likelihood of the data given the hypothesis and the prior probability of the hypothesis. 
+Assuming that reads are independent, we have
 
-Making the common assumption that NGS reads are independent, the posterior probability of a given hypothesis is 
+\begin{equation}
+  \label{eqn:1}
 $$
-  \begin{array}{rl}
-    P(m,\nu) = &p(m,\nu) \cdot \mathcal{L}_{m,\nu}(\mathbf{x}) \\ \\
-             = &p(m,\nu) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i),
-  \end{array}
+  P(m,\nu) = p(m,\nu) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i),
 $$
-where the density $\textrm{f}_{m,\nu}(x_i)$ is
+\end{equation}
+where the density $\textrm{f}_{m,\nu}(x_i)$ can take several forms.
+
+Assuming that the identity of the alternate allele and its allele frequency are independent of each other, and $\nu$ is uniformly distributed (i.e. $p(\nu) = 1$), we can rewrite equation \ref{eqn:1} as
+\begin{equation}
+  \label{eqn:2}
+$$
+  P(m,\nu) = p(m) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i).
+$$
+\end{equation}
+Here we show how \batcave can be used to provide a tumor-specific estimate of the mutation probability $p(m)$.
+
+\subsection{Site-specific prior probability of mutation}
+The probability which we have denoted $p(m)$ in equation \ref{eqn:2} for compactness is more precisely the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
+However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution conditional on the genomic context surrounding the site, denoted here $p(m,M | C)$ \bkmcomment{citation for genomic context in general} .
+Assuming that $m$ and $M$ are independent conditional on the genomic context, $\mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(M \mid C)$, which we can use Bayes' rule to further decompose as 
+
+\begin{equation}
+  \label{eqn:full_prior}
+  $$
+  \mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}.
+  $$
+\end{equation}
+We next show how to estimate the quantities in equation \ref{eqn:full_prior}.
+
+\subsection{Estimation of the mutation profile}
+There are many aspects of local genomic architecture, generally described as the genomic \textit{context}, which can affect the local somatic mutation rate at a particular site in the genome.
+Here we focus on the tri-nucleotide context, which has been shown to have a strong effect on the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
+The tri-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
+There are four possible bases {\{A,C,T,G\}} 3` and 5` of the site, leading to 16 possible flanking base combinations.
+Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site {\{C,T\}}, and three possible alternate alleles {\{A,(C/T),G\}} for each.
+Thus, there are $2 \cdot 3 \cdot 16 = 96$ possible combinations of flanking bases, reference bases, and alternate alleles. 
+
+\begin{figure}[t]
+  \begin{center}
+  \includegraphics{figures/signature_figure.pdf}
+  \end{center}
+  \caption{Mutation profiles. 
+  \textbf{(a)} The observed mutation profile of the AML31 primary tumor. 
+  \textbf{(b)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+  \textbf{(c)} Equal proportions of signatures 1, 4, \& 5.
+  \textbf{(d)} Equal proportions of signatures 1, 3, \& 5.
+  KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{e)} Whole exomes and \textbf{f)} whole genomes.
+  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.
+  }
+  \label{NAR-sigfig}
+  \end{figure}
+
+Figure \ref{NAR-sigfig} shows several examples of mutation profiles from both real and simulated tumors.
+The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi} = \{\pi_1,\dots,\pi_{96}\}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all mutations present in the tumor that occur at each of the 96 possible contexts.
+We define a mutation context $C$, indexed by $i=\{1 \dots 16\}$ flanking base combinations, $j = \{1,2\}$ reference bases, and $k = \{1,2,3\}$ alternate alleles. 
+The distribution of observed contexts $ p(C \mid M) $, where $M$ is the condition that a mutation has occurred, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j,k}\} $.
+In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
+As a result we need to model $p(C \mid M)$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
+
+$$
+\begin{aligned}
+  \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
+  C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
+\end{aligned}
+$$
+In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a-priori a mutation is equally likely in any context.
+
+Let $\mathrm{D}$ be the set of high confidence variant calls, and $c \in \mathrm{D}$ be the context of each mutation in $\mathrm{D}$.
+The posterior distribution of $\boldsymbol{\pi}$ is then $p(\boldsymbol{\pi} \mid D) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
+  $$
+    \alpha^{\prime}_{i,j,k} = \alpha_{i,j,k} + \sum\limits_{c \in \mathrm{D}} \mathrm{I}\{c = c_{i,j,k}\}.
+  $$
+Returning to equation \ref{eqn:full_prior}, we can compute the posterior predictive probability $p(C_{i,j} \mid M,\mathrm{D})$ as
+\begin{equation}
+  \label{eqn:post_pred}
+  $$
+  p(C = C_{i,j} \mid M,\mathrm{D}) = \frac{\sum_{k}\alpha^{\prime}_{i,j,k}}{\sum_{i,j,k}\alpha^{\prime}_{i,j,k}}.
+  $$
+\end{equation}
+The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C_{i,j}$, $p(m \mid C_{i,j},\mathrm{D})$ is then
+\begin{equation}
+  \label{eqn:to_allele}
+  $$
+   p(m = k \mid C_{i,j},\mathrm{D}) = \frac{\alpha^{\prime}_{i,j,k}}{\sum_{k} \alpha^{\prime}_{i,j,k}}.
+  $$
+\end{equation}
+The remaining context dependent component in equation \ref{eqn:full_prior} is $p(C)$, the prior probability of seeing a mutation with a particular tri-nucleotide context.
+We compute this as simply the proportion of all tri-nucleotide contexts with the context $C_{i,j}$ divided by three. \bkmcomment{I have a pre-computed table in batcaver for wes and wgs. Should I add that bit here?}
+
+\subsection{Estimation of the mutation rate.}
+The final piece of equation \ref{eqn:full_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
+In an exponentially growing tumor, the number of new mutations per cell division is the product of the number of bases $N$, the per base mutation rate $\mu$, and the \textit{effective} birth rate $\beta$, which is a function of the birth and death rate.
+\citet{Williams2016} showed that if 
+$$
+  \beta = \frac{b-d}{b},
+$$
+then the number of new mutations per cell division is
+$$
+  \frac{N \mu}{\beta}.
+$$
+In a neutrally or nearly neutrally evolving tumor, they further show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
+\begin{equation}
+  \label{eqn:mut_rate}
+$$
+  \mathrm{M}(f_{min},f_{max}) = N\frac{\mu}{\beta}\left(\frac{1}{f_{min}} - \frac{1}{f_{max}}\right).
+$$
+\end{equation}
+\bkmcomment{Gets weaker here in terms of how this needs to be said and how much of it needs to be said. Need to decide where to add the factor of two.}
+
+The number of bases $N$ is fixed at $3\cdot10^9$ for a whole genome sequence and $3\cdot10^7$ for a whole exome.
+Returning to the set of high confidence mutations $\mathrm{D}$, we can set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, $f_{min}$ as the lowest, and count the number of mutations in $D$ falling between the two.
+In practice it is usually best to select a conservative value for $f_{min}$, which is strongly dependent on sequencing depth, and we include this as a parameter in the R implementation of \batcave.
+In all results presented in this paper we have set $f_{min}$ to 0.05 because we are working with very high sequencing depth.
+A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}. 
+Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu/\beta$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
+We now return to equation \ref{eqn:2} and describe the probability density function and method implemented in \batcave.
+
+\subsection{The mutect likelihood function}
+\bkmcomment{Assuming that the above full specification of the method is on track, this is where the mutect likelihood model goes along with a description of how \batcave folds it in and uses it.
+I could use some help with thinking about how far to go here.}
 
 $$
   \textrm{f}_{m,\nu}({b_i,q_i}) = \left\{
@@ -108,62 +224,6 @@ $$
     \end{array}
     \right.
 $$
-
-Assuming that the identity of the alternate allele and the estimated allele frequency are independent of each other, and $\nu$ is uniformly distributed results in the final model
-$$
-  P(m,\nu) = p(m) \cdot \mathcal{L}_{m,\nu}(\mathbf{x}).
-$$
-
-\subsection{Estimation of the mutation signature}
-The 3-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
-There are four possible bases 3` and 5` of the site, leading to 16 possible flanking base combinations.
-Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site, and three possible alternate alleles for each.
-Thus, there are $2 \cdot 3 \cdot 16 = 96$ possible combinations of flanking bases, reference bases, and alternate alleles (see Figure \ref{NAR-sigfig}).
-The mutation context $C$ is indexed by $i=\{1 \dots 16\}$ flanking base combinations, $j = \{1,2\}$ reference bases, and $j = \{1,2,3\}$ alternate alleles.
-We model $ p(C | M) $ as a multinomial distribution with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j,k}\} $ and pseudo-count hyper-parameter $\boldsymbol{\alpha}$
-
-$$
-\begin{array}{rl}
-  C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi})  \\
-  \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}).
-\end{array}
-$$
-We use high confidence variant calls -- odds in favor of the mutation greater than 10:1 -- to estimate $\boldsymbol{\pi}$.
-
-\subsection{Estimation of the mutation rate.}
-As with estimation of the mutation signature, we can use high confidence mutations and a model of tumor evolution to compute the tumor-specific mutation rate.
-\citet{Bozic2016} show that for any variant allele frequency $\alpha$, the total number of mutations with frequency greater than $\alpha$ and less than $0.25$ is
-
-$$
-N(\alpha) = N\mu \left( \frac{1}{\alpha} - \frac{1}{0.25} \right)
-$$
-
-Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
-By selecting $\alpha$ such that we are highly confident in all calls at frequencies greater than $\alpha$, we can compute $\hat{\mu}$.
-In all results here we select $\alpha = 0.05$.
-
-\subsection{Site-specific prior probability of mutation}
-The probability which we have denoted $p(m)$ for compactness above is actually the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
-However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution -- conditional on the genomic context surrounding the site -- described by the mutation signature of the tumor and denoted here $p(m,M | C)$ \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
-The prior probability $\mathrm{p}(m,M \mid C)$ can be decomposed as
-$$
-\begin{array}{rl}
-  \mathrm{p}(m,M \mid C) = &\mathrm{p}(m \mid C) \mathrm{p}(M \mid C) \\ \\ 
-  = &\mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}
-\end{array}
-$$
-since the probability of a mutation at a site and the probability that it is to allele $m$ are independent conditional on the context.
-The estimated mutation signature and mutation rate, allow us to compute $p(m,M | C)$ as 
-
-$$
-\begin{array}{rl}
-  \mathrm{p}(m \mid C) = & \pi_{i,j,k} \\ \\
-  \mathrm{p}(C \mid M) = & \sum_{k}\pi_{i,j} \\ \\
-  \mathrm{p}(M) = & \hat{\mu},
-\end{array}
-$$
-with $\mathrm{p}(C)$ the fraction of all sites in the genome with context $C_{i,j}$ divided by 3.
-
 %`\subsection{False positive rate control.}
 
 %We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
@@ -219,68 +279,48 @@ and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 \end{tiny}
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
 
-\subsection{Real tumor data.}
-\subsubsection{Acute Myeloid Leukemia}
-We downloaded the whole genome sequence for aml31 \bkmcomment{citation and download date, and primary/relapse distinction} \cite{Griffith2015}.
-We merged the gold and platinum lists, and define as \textit{not present} any variant for which deep sequencing was performed and zero alternate reads were observed.
-This is a very conservative metric.
-\subsubsection{What I call the cell paper} Not sure if this will get used.
-
-\subsection{Calibration}
-We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
-Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-fig2}\textbf{b,d}).
-Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the result and a diagonal line.
-
-\begin{figure}[t]
-\begin{center}
-\includegraphics{figures/signature_figure.pdf}
-\end{center}
-\caption{Mutation signatures. 
-\textbf{(a)} The observed mutation signature of the AML31 primary tumor. 
-\textbf{(b)} A mutation signature used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
-\textbf{(c)} Equal proportions of signatures 1, 4, \& 5.
-\textbf{(d)} Equal proportions of signatures 1, 3, \& 5.
-KL divergence between the estimated signature and the simulated mutation signature for \textbf{e)} Whole exomes and \textbf{f)} whole genomes.
-The estimated mutation signature converges quickly to the target as the number of mutations evaluated rises.
-}
-\label{NAR-sigfig}
-\end{figure}
 
 
 \section{RESULTS}
-\begin{figure*}[t]
+% \begin{figure*}[t]
+%   \begin{center}
+%   \includegraphics{figures/aml_plot.pdf}
+%   \end{center}
+%   \caption{Model performance on 300X Whole leukemia genome.
+%   \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
+%   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
+%   A perfectly calibrated model would generate the diagonal line.}
+%   \label{NAR-aml}
+% \end{figure*}
+\begin{figure*}
   \begin{center}
-  \includegraphics{figures/aml_plot.pdf}
+  \includegraphics{figures/fig2.pdf}
   \end{center}
-  \caption{Model performance on 300X Whole leukemia genome.
-  \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
-  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
+  \caption{Model performance on 500X simulated whole exome.
+  \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
+  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
   A perfectly calibrated model would generate the diagonal line.}
-  \label{NAR-aml}
+\label{NAR-wes_fig}
 \end{figure*}
 
-\subsection{Convergence of the mutation prior to the true mutation profile}
-
-The dirichlet prior probability of mutation converges quickly to the true mutation signature.
-The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-sigfig}\textbf{e,f}).
-\subsection{Performance on real data}
-
-The Calibrated model has better AUROC and AUPRC than the MuTect model in this real tumor (Figure \ref{NAR-aml}\textbf{a,c}, Table \ref{table:01}).
-The Calibrated model has slightly worse calibration as measure by ICI, but both models substantially underestimate the true positive probability throughout the range of possible values (Figure \ref{NAR-aml} \textbf{b,d}).
-One caveat to consider when considering these results is that while AML31 was subject to extensive variant calling validation, their list of true positive calls likely does not include every true variant at low allele frequencies, and true negative calls were not evaluated.
-
-
-
 \subsection{Simulated data}
+We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
+For each of the two types we simulated tumors with variants drawn from three different mutation profiles (Concentrated,Intermediate, and Diffuse) as described in Materials \& Methods.
+These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
+\bkmcomment{Should there be a longer discussion of what sorts of tumors the profiles represent, or leave that for the methods only?}
 
-\subsubsection{classification}
-We simulated both whole genome and whole exome tumors with three different mutation signatures.
-Measures of classification performance are positively correlated with signature concentration.
-For all simulations the calibrated model produces a better variant classifier than MuTect (Figure \ref{NAR-fig2} \textbf{a} and \textbf{c}).
+We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are deeply unbalanced.
+By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a)} and \textbf{c)}, and Table \ref{table:01}).
+The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
+Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
 
-\subsubsection{calibration}
-The Calibrated model tends to score true negative variants lower and true positive variants higher than Mutect (Figure \ref{NAR-fig2} \textbf{b,d}).
-The Integrated calibration index for the Calibrated model is better than that of the MuTect model for all tumors simulated.
+
+
+\subsection{Real tumor data.}
+\bkmcomment{need to rework this figure. the template allows only one full width figure.}
+
+\bkmcomment{add TPR/FPR at 1\% and 3\%?}
+
 
 \begin{table*}[b]
 \tableparts{%
@@ -315,104 +355,16 @@ AML 31 & Actual & $3.6e-8$ & .935 & .949 & .995 & .996 & 0.121 & 0.155
 \end{table*}
 
 
-\begin{figure*}[t]
-\begin{center}
-\includegraphics{figures/fig2.pdf}
-\end{center}
-\caption{Model performance on 500X simulated whole exome.
-\textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
-Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
-A perfectly calibrated model would generate the diagonal line.
-}
-\label{NAR-fig2}
-\end{figure*}
+\subsection{Convergence of the mutation prior to the true mutation profile}
+
+The dirichlet prior probability of mutation converges quickly to the true mutation signature.
+The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-sigfig}\textbf{e,f}).
 
 
 \section{DISCUSSION}
 
 \subsection{Discussion subsection one}
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text.
-
-
-\subsection{Discussion subsection two}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text.
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-
-
-\subsection{Discussion subsection three}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text.
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text.
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text.
 
 
 \section{CONCLUSION}
