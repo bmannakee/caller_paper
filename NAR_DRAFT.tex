@@ -124,7 +124,7 @@ Assuming that $m$ and $M$ are independent conditional on the genomic context, $\
 We next show how to estimate the quantities in equation \ref{eqn:full_prior}.
 
 \subsection{Estimation of the mutation profile}
-There are many aspects of genomic architecture which can affect the somatic mutation rate at multiple scales \citet{Buisson2019}.
+There are many aspects of genomic architecture which can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the tri-nucleotide context, which has been shown to have a strong effect on the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The tri-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
 There are four possible bases {\{A,C,T,G\}} 3` and 5` of the site, leading to 16 possible flanking base combinations.
@@ -146,7 +146,7 @@ Thus, there are $2 \cdot 3 \cdot 16 = 96$ possible combinations of flanking base
   \label{NAR-sigfig}
   \end{figure}
 
-Figure \ref{NAR-sigfig} shows several examples of mutation profiles from both real and simulated tumors.
+Figure \ref{NAR-sigfig} \textbf{a-d} shows several examples of mutation profiles from both real and simulated tumors.
 The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi} = \{\pi_1,\dots,\pi_{96}\}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all mutations present in the tumor that occur at each of the 96 possible contexts.
 We define a mutation context $C$, indexed by $i=\{1 \dots 16\}$ flanking base combinations, $j = \{1,2\}$ reference bases, and $k = \{1,2,3\}$ alternate alleles. 
 The distribution of observed contexts $ p(C \mid M) $, where $M$ is the condition that a mutation has occurred, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j,k}\} $.
@@ -313,23 +313,23 @@ These 6 simulated tumor/normal pairs were used to assess the effect of sequencin
 \bkmcomment{Should there be a longer discussion of what sorts of tumors the profiles represent, or leave that for the methods only?}
 
 We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are deeply unbalanced.
-By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a)} and \textbf{c)}, and Table \ref{table:01}).
+By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a} and \textbf{c}, and Table \ref{table:01}).
 The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
 Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
 
-The estimated effective mutation rate, $\mu/\beta$, is in the range of 3e-7 \bkmcomment{filling in today} for all simulated tumors.
-We note that the effective mutation rate is lower than the simulated rate of 3e-7.
+The estimated effective mutation rate, $\mu/\beta$, is in the range of 3e-7 for all simulated tumors.
+We note that the effective mutation rate is lower than the simulated rate of 3e-6.
 In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
 \bkmcomment{possible to quantify that this is very close to the actual insertion rate. Do it}.
 
 We measured calibration performance using the Integrated Calibration Index described in Methods \citep{Austin2019}.
 For all simulated tumors the calibration of \batcave is better across the full spectrum of posterior probabilities.
-As we can see in Figure \ref{NAR-wes_fig} \textbf{b)} and \textbf{d)}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
+As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
 The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
 We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
-In Figure \ref{NAR-sigfig} \textbf{e)} and \textbf{f)} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
+In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
 For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
 
 \subsection{Real tumor data.}
