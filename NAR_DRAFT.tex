@@ -327,7 +327,10 @@ For all simulated tumors the calibration of \batcave is better across the full s
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b)} and \textbf{d)}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
-
+The heart of \batcave, the context-dependent prior probability of mutation, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
+We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
+In Figure \ref{NAR-sigfig} \textbf{e)} and \textbf{f)} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
+For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
 
 \subsection{Real tumor data.}
 \bkmcomment{need to rework this figure. the template allows only one full width figure.}
@@ -349,7 +352,7 @@ Depth & Signature & $\mu/\beta$ & AUROC &  & AUPRC & & ICI &
 \colrule
 100X whole genome & Concentrated & 3.6e-7 & Row 1 & -- & -- & -- & -- & --
 \\
-100X whole genome & Intermediate & Row 1 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Intermediate & 3.2e-7 & Row 1 & -- & -- & -- & -- & --
 \\
 100X whole genome & Diffuse & Row 1 & Row 1 & -- & -- & -- & -- & --
 \\
@@ -375,6 +378,7 @@ The rate and degree of convergence are correlated with the concentration of the 
 
 
 \section{DISCUSSION}
+
 
 \subsection{Discussion subsection one}
 
