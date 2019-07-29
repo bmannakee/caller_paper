@@ -161,6 +161,8 @@ $$
 $$
 In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a-priori a mutation is equally likely in any context.
 
+\bkmcomment{Introduce D earlier as its own section describing how we get it? Or expound here instead.}
+
 Let $\mathrm{D}$ be the set of high confidence variant calls, and $c \in \mathrm{D}$ be the context of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $p(\boldsymbol{\pi} \mid D) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
@@ -255,6 +257,7 @@ $$
 \subsection{Tumor simulations.}
 
 We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
+The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
 Variants were selected from TCGA and PCAWG variant files(dates).
 Whole genome (100X depth), and whole exome (500X depth) reads were simulated from the GRCH38 reference genome using VarSim \cite{Mu2015}, and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
@@ -305,7 +308,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
-For each of the two types we simulated tumors with variants drawn from three different mutation profiles (Concentrated,Intermediate, and Diffuse) as described in Materials \& Methods.
+For each of the two types we simulated tumors with variants drawn from three different mutation profiles (Concentrated,Intermediate, and Diffuse) as described in Materials \& Methods and Figure \ref{NAR-sigfig}.
 These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
 \bkmcomment{Should there be a longer discussion of what sorts of tumors the profiles represent, or leave that for the methods only?}
 
@@ -313,6 +316,13 @@ We assessed classification performance with both the area under the ROC curve an
 By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a)} and \textbf{c)}, and Table \ref{table:01}).
 The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
 Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
+
+The estimated effective mutation rate, $\mu/\beta$, is in the range of 3e-7 \bkmcomment{filling in today} for all simulated tumors.
+We note that the effective mutation rate is lower than the simulated rate of 3e-7.
+In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
+\bkmcomment{possible to quantify that this is very close to the actual insertion rate. Do it}.
+
+We measured calibration performance using the Integrated Calibration Index described in Methods \citep{Austin2019}.
 
 
 
