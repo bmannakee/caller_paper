@@ -124,8 +124,8 @@ Assuming that $m$ and $M$ are independent conditional on the genomic context, $\
 We next show how to estimate the quantities in equation \ref{eqn:full_prior}.
 
 \subsection{Estimation of the mutation profile}
-There are many aspects of local genomic architecture, generally described as the genomic \textit{context}, which can affect the local somatic mutation rate at a particular site in the genome.
-Here we focus on the tri-nucleotide context, which has been shown to have a strong effect on the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
+There are many aspects of genomic architecture which can affect the somatic mutation rate at multiple scales \citet{Buisson2019}.
+Here we focus on a small-scale feature, the tri-nucleotide context, which has been shown to have a strong effect on the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The tri-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
 There are four possible bases {\{A,C,T,G\}} 3` and 5` of the site, leading to 16 possible flanking base combinations.
 Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site {\{C,T\}}, and three possible alternate alleles {\{A,(C/T),G\}} for each.
@@ -187,7 +187,7 @@ We compute this as simply the proportion of all tri-nucleotide contexts with the
 
 \subsection{Estimation of the mutation rate.}
 The final piece of equation \ref{eqn:full_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
-In an exponentially growing tumor, the number of new mutations per cell division is the product of the number of bases $N$, the per base mutation rate $\mu$, and the \textit{effective} birth rate $\beta$, which is a function of the birth and death rate.
+In an exponentially growing tumor, the number of new mutations per cell division is the product of the number of bases $N$, the per base mutation rate $\mu$, and the \textit{effective} birth rate $\beta$, which is a function of the birth $b$ and death $d$ rates.
 \citet{Williams2016} showed that if 
 $$
   \beta = \frac{b-d}{b},
@@ -255,7 +255,7 @@ $$
 
 
 \subsection{Tumor simulations.}
-
+\bkmcomment{if $\pi$ works above, describe profile as $\pi$, and $\pi$ as linear combination of 3 signatures.}
 We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
 The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
 Variants were selected from TCGA and PCAWG variant files(dates).
@@ -327,7 +327,7 @@ For all simulated tumors the calibration of \batcave is better across the full s
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b)} and \textbf{d)}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
-The heart of \batcave, the context-dependent prior probability of mutation, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
+The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
 We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
 In Figure \ref{NAR-sigfig} \textbf{e)} and \textbf{f)} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
 For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
@@ -345,7 +345,7 @@ For both whole exome and whole genome the prior converges to the data generating
 }{%
 \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
 \toprule
-Depth & Signature & $\mu/\beta$ & AUROC &  & AUPRC & & ICI & 
+Depth & Mutation profile & $\mu/\beta$ & AUROC & & AUPRC & & ICI & 
 \\
 & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
 \\
@@ -354,7 +354,7 @@ Depth & Signature & $\mu/\beta$ & AUROC &  & AUPRC & & ICI &
 \\
 100X whole genome & Intermediate & 3.2e-7 & Row 1 & -- & -- & -- & -- & --
 \\
-100X whole genome & Diffuse & Row 1 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Diffuse & 3.2e-7 & Row 1 & -- & -- & -- & -- & --
 \\
 500X whole exome & Concentrated & Row 1 & .848 & .928 & .674 & .757 & .0585 & .0465
 \\
@@ -371,14 +371,9 @@ AML 31 & Actual & 3.6e-8 & .935 & .949 & .995 & .996 & 0.121 & 0.155
 \end{table*}
 
 
-\subsection{Convergence of the mutation prior to the true mutation profile}
-
-The dirichlet prior probability of mutation converges quickly to the true mutation signature.
-The rate and degree of convergence are correlated with the concentration of the mutation signature operating in the tumor (Figure \ref{NAR-sigfig}\textbf{e,f}).
-
-
 \section{DISCUSSION}
 
+Simulations suggest that if the mutation profile is the data generating distribution, \batcave can estimate effective mutation rate and data generating distribution, and doing so improves both classification and calibration.
 
 \subsection{Discussion subsection one}
 
