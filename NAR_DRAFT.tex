@@ -297,7 +297,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 % \end{figure*}
 \begin{figure*}
   \begin{center}
-  \includegraphics{figures/fig2.pdf}
+  \includegraphics{figures/fig_wes.pdf}
   \end{center}
   \caption{Model performance on 500X simulated whole exome.
   \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
@@ -350,17 +350,17 @@ Depth & Mutation profile & $\mu/\beta$ & AUROC & & AUPRC & & ICI &
 & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
 \\
 \colrule
-100X whole genome & Concentrated & 3.6e-7 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & -- & --
 \\
-100X whole genome & Intermediate & 3.2e-7 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & -- & --
 \\
-100X whole genome & Diffuse & 3.2e-7 & Row 1 & -- & -- & -- & -- & --
+100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & -- & --
 \\
-500X whole exome & Concentrated & 3.6e-7 & .848 & .928 & .674 & .757 & .0585 & .0465
+500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .0585 & .0462
 \\
-500X whole exome & Intermediate & 3.6e-7 & .847 & .842 & .677 & .707 & .0587 & .0566 
+500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .0587 & .0568 
 \\
-500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .0565 & .0575
+500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .0565 & .0576
 \\
 AML 31 & Actual & 3.6e-8 & .935 & .949 & .995 & .996 & 0.121 & 0.155
 \\
@@ -373,8 +373,10 @@ AML 31 & Actual & 3.6e-8 & .935 & .949 & .995 & .996 & 0.121 & 0.155
 
 \section{DISCUSSION}
 
-Simulations suggest that if the mutation profile is the data generating distribution, \batcave can estimate effective mutation rate and data generating distribution, and doing so improves both classification and calibration.
+-- Simulations suggest that if the mutation profile is the data generating distribution, \batcave can estimate effective mutation rate and data generating distribution, and doing so improves both classification and calibration.
 
+-- One hope is to enable higher confidence in low frequency alleles as sequencing depth increases. Depth seems to have a very large effect on performance i.e. results are more compelling for 500X wes than for 100x wgs, although if you do 100 wgs you will still benefit.
+In other words sequence depth matters more performance wise than sequencing breadth if the only desire is to see low frequency alleles. No advantage is gained (after a certain depth) of adding variants(sites) by wgs sequencing.
 \subsection{Discussion subsection one}
 
 
@@ -406,6 +408,17 @@ Text. Text. Text. Text.
 
 \bibliography{caller_paper}
 
+\section{Supplementary Figures}
 
+\begin{figure*}
+  \begin{center}
+  \includegraphics{figures/fig_wes.pdf}
+  \end{center}
+  \caption{Model performance on 100X simulated whole genome.
+  \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
+  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
+  A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
+\label{NAR-wgs_fig}
+\end{figure*}
 
 \end{document}
