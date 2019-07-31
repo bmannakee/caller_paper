@@ -112,7 +112,7 @@ Here we show how \batcave can be used to provide a tumor-specific estimate of th
 
 \subsection{Site-specific prior probability of mutation}
 The probability which we have denoted $p(m)$ in equation \ref{eqn:2} for compactness is more precisely the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
-However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution conditional on the genomic context surrounding the site, denoted here $p(m,M | C)$ \bkmcomment{citation for genomic context in general} .
+However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution conditional on the genomic context surrounding the site, denoted here $p(m,M | C)$ \cite{Buisson2019}.
 Assuming that $m$ and $M$ are independent conditional on the genomic context, $\mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(M \mid C)$, which we can use Bayes' rule to further decompose as 
 
 \begin{equation}
@@ -263,6 +263,10 @@ Whole genome (100X depth), and whole exome (500X depth) reads were simulated fro
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
 and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 
+\subsection{Evaluation methods}
+ROC
+PRC
+ICI. We used loess smoothing "loess" function in R with span = 0.5.
 \begin{tiny}
 \begin{verbatim}
 
@@ -421,4 +425,14 @@ Text. Text. Text. Text.
   \label{NAR-aml}
 \end{figure*}
 
+\begin{figure*}
+  \begin{center}
+  \includegraphics{figures/fig_wes.pdf}
+  \end{center}
+  \caption{Model performance on 100X simulated whole genome.
+  \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
+  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
+  A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
+\label{NAR-wgs_fig}
+\end{figure*}
 \end{document}
