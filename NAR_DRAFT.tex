@@ -81,7 +81,7 @@ We provide a simple implementation in R that takes MuTect caller output as input
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
 
-At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots D$ of base calls and their associated quality scores, where $D$ is total read depth.
+At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is total read depth.
 We want to use $\mathbf{x}$ to select between competing hypotheses;
 $$
   \begin{array}{l}
@@ -96,7 +96,7 @@ Assuming that reads are independent, we have
 \begin{equation}
   \label{eqn:1}
 $$
-  P(m,\nu) = p(m,\nu) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i),
+  P(m,\nu) = p(m,\nu) \cdot \prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu}(x_i),
 $$
 \end{equation}
 where the density $\textrm{f}_{m,\nu}(x_i)$ can take several forms.
@@ -126,37 +126,51 @@ We next show how to estimate the quantities in equation \ref{eqn:full_prior}.
 \subsection{Estimation of the mutation profile}
 There are many aspects of genomic architecture which can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the tri-nucleotide context, which has been shown to have a strong effect on the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
-The tri-nucleotide context at a particular base is made up of the identity of the reference base, the identity of the alternate allele, and the identity of the 3` and 5` flanking bases.
+The tri-nucleotide context at a particular genomic site is made up of the identity of the reference base and the identity of the 3` and 5` flanking bases.
 There are four possible bases {\{A,C,T,G\}} 3` and 5` of the site, leading to 16 possible flanking base combinations.
-Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site {\{C,T\}}, and three possible alternate alleles {\{A,(C/T),G\}} for each.
-Thus, there are $2 \cdot 3 \cdot 16 = 96$ possible combinations of flanking bases, reference bases, and alternate alleles. 
+Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site {\{C,T\}}, resulting in $2 \cdot 16 = 32$ possible tri-nucleotide contexts.
+We define a mutation context $C$ indexed by $i=\{1 \dots 32\}$, to be the tri-nucleotide context of a particular site in the genome. 
+For each context, a mutation can be to any of the three possible alternate alleles {\{A,(C/T),G\}}. 
+We can thus define $\mathrm{S}$, the substitution type, indexed by $i=\{1 \dots 32\}$ contexts and $j = \{1 \dots 3\}$ alternate bases, resulting in 96 possible substitution types.
+Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_prior} as 
+
+\begin{equation}
+  \label{eqn:detailed_prior}
+  $$
+  \begin{array}{rcc}
+  \mathrm{p}(\mathrm{S}) &=&  \mathrm{p}(m =j, M | C = i) \\
+                            &=& \mathrm{p}(m = j \mid C = i) \mathrm{p}(C = i \mid M)\frac{p(M)}{p(C = i)},
+  \end{array}
+  $$
+\end{equation}
+where $\mathrm{p}(\mathrm{S})$ is the probability that a substitution of type $S$ has occurred.
 
 \begin{figure}[t]
   \begin{center}
   \includegraphics{figures/signature_figure.pdf}
   \end{center}
   \caption{Mutation profiles. 
-  \textbf{(a)} The observed mutation profile of the AML31 primary tumor. 
-  \textbf{(b)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
-  \textbf{(c)} Equal proportions of signatures 1, 4, \& 5.
-  \textbf{(d)} Equal proportions of signatures 1, 3, \& 5.
-  KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{e)} Whole exomes and \textbf{f)} whole genomes.
+  \textbf{(a)} The observed mutation profile of a breast cancer sample from \cite{Shi2018}.
+  \textbf{(b)} The observed mutation profile of the AML 31 primary tumor from \cite{Griffith2015}.
+  \textbf{(c)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+  \textbf{(d)} Equal proportions of signatures 1, 4, \& 5.
+  \textbf{(e)} Equal proportions of signatures 1, 3, \& 5.
+  KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(f)} Whole exomes and \textbf{(g)} whole genomes.
   The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.
   }
   \label{NAR-sigfig}
   \end{figure}
 
-Figure \ref{NAR-sigfig} \textbf{a-d} shows several examples of mutation profiles from both real and simulated tumors.
-The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi} = \{\pi_1,\dots,\pi_{96}\}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all mutations present in the tumor that occur at each of the 96 possible contexts.
-We define a mutation context $C$, indexed by $i=\{1 \dots 16\}$ flanking base combinations, $j = \{1,2\}$ reference bases, and $k = \{1,2,3\}$ alternate alleles. 
-The distribution of observed contexts $ p(C \mid M) $, where $M$ is the condition that a mutation has occurred, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j,k}\} $.
+Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
+The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{i,j}$.
+The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j}\} $.
 In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
-As a result we need to model $p(C \mid M)$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
+As a result we need to model $p(S)$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
 
 $$
 \begin{aligned}
   \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
-  C \mid M,\boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
+  S \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
 \end{aligned}
 $$
 In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a-priori a mutation is equally likely in any context.
@@ -164,26 +178,27 @@ In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\a
 \bkmcomment{Introduce D earlier as its own section describing how we get it? Or expound here instead.}
 
 Let $\mathrm{D}$ be the set of high confidence variant calls, and $c \in \mathrm{D}$ be the context of each mutation in $\mathrm{D}$.
-The posterior distribution of $\boldsymbol{\pi}$ is then $p(\boldsymbol{\pi} \mid D) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
+The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
-    \alpha^{\prime}_{i,j,k} = \alpha_{i,j,k} + \sum\limits_{c \in \mathrm{D}} \mathrm{I}\{c = c_{i,j,k}\}.
+    \alpha^{\prime}_{i,j} = \alpha_{i,j} + \sum\limits_{c \in \mathrm{D}} \mathrm{I}\{c = c_{i,}\}.
   $$
-Returning to equation \ref{eqn:full_prior}, we can compute the posterior predictive probability $p(C_{i,j} \mid M,\mathrm{D})$ as
+Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C_{i} \mid M,\mathrm{D})$ as
 \begin{equation}
   \label{eqn:post_pred}
   $$
-  p(C = C_{i,j} \mid M,\mathrm{D}) = \frac{\sum_{k}\alpha^{\prime}_{i,j,k}}{\sum_{i,j,k}\alpha^{\prime}_{i,j,k}}.
+  p(C = C_{i} \mid M,\mathrm{D}) = \frac{\sum_{j}\alpha^{\prime}_{i,j}}{\sum_{i,j}\alpha^{\prime}_{i,j}}.
   $$
 \end{equation}
-The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C_{i,j}$, $p(m \mid C_{i,j},\mathrm{D})$ is then
+The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C_{i}$, $p(m = j \mid C_{i},\mathrm{D})$ is then
 \begin{equation}
   \label{eqn:to_allele}
   $$
-   p(m = k \mid C_{i,j},\mathrm{D}) = \frac{\alpha^{\prime}_{i,j,k}}{\sum_{k} \alpha^{\prime}_{i,j,k}}.
+   p(m = j \mid C_{i},\mathrm{D}) = \frac{\alpha^{\prime}_{i,j}}{\sum_{j} \alpha^{\prime}_{i,j}}.
   $$
 \end{equation}
-The remaining context dependent component in equation \ref{eqn:full_prior} is $p(C)$, the prior probability of seeing a mutation with a particular tri-nucleotide context.
-We compute this as simply the proportion of all tri-nucleotide contexts with the context $C_{i,j}$ divided by three. \bkmcomment{I have a pre-computed table in batcaver for wes and wgs. Should I add that bit here?}
+The remaining context dependent component in equation \ref{eqn:full_prior} is $p(C = C_{i})$, the prior probability of seeing a particular tri-nucleotide context.
+We compute this as simply the proportion of all tri-nucleotide contexts with the context $C_{i}$ present in the genome.
+\bkmcomment{I have a pre-computed table in batcaver for wes and wgs. Should I add that bit here?}
 
 \subsection{Estimation of the mutation rate.}
 The final piece of equation \ref{eqn:full_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
