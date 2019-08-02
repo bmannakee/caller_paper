@@ -165,22 +165,22 @@ Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles
 The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{i,j}$.
 The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j}\} $.
 In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
-As a result we need to model $p(S)$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
+As a result we need to model $\mathrm{p}(\mathrm{S})$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
 
 $$
 \begin{aligned}
   \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
-  S \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
+  \mathrm{S} \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
 \end{aligned}
 $$
 In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a-priori a mutation is equally likely in any context.
 
-\bkmcomment{Introduce D earlier as its own section describing how we get it? Or expound here instead.}
-
-Let $\mathrm{D}$ be the set of high confidence variant calls, and $c \in \mathrm{D}$ be the context of each mutation in $\mathrm{D}$.
+In order to estimate $\boldsymbol{\pi}$, we generate a subset of variants in the tumor in which we have high confidence that the variants are present, based on an initial calculation of their likelihood give the data.
+These are variants such that for any reasonable value of the site-specific prior probability of mutation, the evidence for the variant in the read data erases any doubt about the presence of the variant. 
+Let $\mathrm{D}$ be the set of high confidence variant calls, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
-    \alpha^{\prime}_{i,j} = \alpha_{i,j} + \sum\limits_{c \in \mathrm{D}} \mathrm{I}\{c = c_{i,}\}.
+    \alpha^{\prime}_{i,j} = \alpha_{i,j} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{i,j}\}.
   $$
 Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C = C_{i} \mid M,\mathrm{D})$ as
 \begin{equation}
@@ -196,12 +196,12 @@ The posterior probability of mutation to allele $m$ given that a mutation has oc
    p(m = j \mid C_{i},\mathrm{D}) = \frac{\alpha^{\prime}_{i,j}}{\sum_{j} \alpha^{\prime}_{i,j}}.
   $$
 \end{equation}
-The remaining context dependent component in equation \ref{eqn:full_prior} is $p(C = C_{i})$, the prior probability of seeing a particular tri-nucleotide context.
+The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = C_{i})$, the prior probability of seeing a particular tri-nucleotide context.
 We compute this as simply the proportion of all tri-nucleotide contexts with the context $C_{i}$ present in the genome.
-\bkmcomment{I have a pre-computed table in batcaver for wes and wgs. Should I add that bit here?}
+
 
 \subsection{Estimation of the mutation rate.}
-The final piece of equation \ref{eqn:full_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
+The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
 In an exponentially growing tumor, the number of new mutations per cell division is the product of the number of bases $N$, the per base mutation rate $\mu$, and the \textit{effective} birth rate $\beta$, which is a function of the birth $b$ and death $d$ rates.
 \citet{Williams2016} showed that if 
 $$
@@ -211,6 +211,7 @@ then the number of new mutations per cell division is
 $$
   \frac{N \mu}{\beta}.
 $$
+We make the simplifying assumption that $d = 0$, such that $\beta = 1$
 In a neutrally or nearly neutrally evolving tumor, they further show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
 \begin{equation}
   \label{eqn:mut_rate}
@@ -218,56 +219,19 @@ $$
   \mathrm{M}(f_{min},f_{max}) = N\frac{\mu}{\beta}\left(\frac{1}{f_{min}} - \frac{1}{f_{max}}\right).
 $$
 \end{equation}
-\bkmcomment{Gets weaker here in terms of how this needs to be said and how much of it needs to be said. Need to decide where to add the factor of two.}
 
 The number of bases $N$ is fixed at $3\cdot10^9$ for a whole genome sequence and $3\cdot10^7$ for a whole exome.
 Returning to the set of high confidence mutations $\mathrm{D}$, we can set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, $f_{min}$ as the lowest, and count the number of mutations in $D$ falling between the two.
 In practice it is usually best to select a conservative value for $f_{min}$, which is strongly dependent on sequencing depth, and we include this as a parameter in the R implementation of \batcave.
 In all results presented in this paper we have set $f_{min}$ to 0.05 because we are working with very high sequencing depth.
-A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}. 
-Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu/\beta$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
+A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}.
+We make the simplifying assumption that $d = 0$, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
+Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 We now return to equation \ref{eqn:2} and describe the probability density function and method implemented in \batcave.
 
 \subsection{The mutect likelihood function}
-\bkmcomment{Assuming that the above full specification of the method is on track, this is where the mutect likelihood model goes along with a description of how \batcave folds it in and uses it.
-I could use some help with thinking about how far to go here.}
-
-$$
-  \textrm{f}_{m,\nu}({b_i,q_i}) = \left\{
-    \begin{array}{cr}
-      \nu \frac{10^{-q_i/10}}{3} + (1-\nu)(1-10^{-q_i/10}) & b_i = \textrm{reference}\\ \\
-      \nu(1-10^{-q_i/10}) + (1-\nu) \frac{10^{-q_i/10}}{3} & b_i = m\\ \\
-      \frac{10^{-q_i/10}}{3} & otherwise.
-    \end{array}
-    \right.
-$$
-%`\subsection{False positive rate control.}
-
-%We develop a method, following \citet{Efron2008}, for controlling the false positive rate.
-%Every site with sufficient coverage and at least 1 alternate read falls into one of two classes, they are either \textit{null} (non-variant with $\nu = 0$) or \textit{nonnull} (variant with $\nu = \hat{f}$) with prior probabilities $p_0$ and $p_1 = 1-p_0$,
-
-%$$
-%\begin{array}{ll}
-%p_0 = \textrm{P}\{\textrm{null}\} \quad & \textrm{f}_{0}(\mathbf{x}) \quad \textrm{density if null}\\
-%p_1 = \textrm{P}\{\textrm{nonnull}\} \quad & \textrm{f}_{1}(\mathbf{x}) \quad \textrm{density if nonnull} .
-%\end{array}
-%$$
-
-%The local, or site-specific, true positive probability $p_1$ can be estimated as the fraction of all sequenced sites that are expected to be positive.
-%In a neutrally evolving tumor, the number of cells is growing exponentially, and the count of variants with an allele frequency greater than a given allele frequency $f$ is \cite{Bozic2016,Williams2016a}.
-%$$
-%N(f) = \frac{N\mu}{f},
-%$$
-%Where $N$ is the total number of sites sequenced and $\mu$ is the per-site mutation probability.
-%The estimated fraction of all of the sites in the genome that will have a mutation with frequency $f$ is
-%$$
-%\hat{p}_1 = \frac{\int_{f_{-}}^{f_{+}} N(f)}{N} = \frac{\mu}{f - .01} -  \frac{\mu}{f + .01}
-%$$
-
-%\bkmcomment{This is wrong. This is the cdf. I need the integral of the derivative which is the density.}
-%and the estimated null probability $\hat{p}_0 = 1 - \hat{p}_1$.
-%\citet{Williams2016a} provides a full derivation for this, we are essentially computing the integral here of $N(f)$ in a small area around $f$.
-
+\batcave has been designed as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or > 2.0)\cite{Cibulskis2013}.
+\bkmcomment{need a little more time with this.}
 
 \subsection{Tumor simulations.}
 \bkmcomment{if $\pi$ works above, describe profile as $\pi$, and $\pi$ as linear combination of 3 signatures.}
