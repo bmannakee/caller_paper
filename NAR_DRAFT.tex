@@ -105,7 +105,7 @@ Assuming that the identity of the alternate allele and its allele frequency are 
 \begin{equation}
   \label{eqn:2}
 $$
-  P(m,\nu) = p(m) \cdot \prod_{i=1}^{D} \textrm{f}_{m,\nu}(x_i).
+  P(m,\nu) = p(m) \cdot \prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu}(x_i).
 $$
 \end{equation}
 Here we show how \batcave can be used to provide a tumor-specific estimate of the mutation probability $p(m)$.
@@ -137,13 +137,13 @@ Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_
 \begin{equation}
   \label{eqn:detailed_prior}
   $$
-  \begin{array}{rcc}
-  \mathrm{p}(\mathrm{S}) &=&  \mathrm{p}(m =j, M | C = i) \\
+  \begin{array}{rcl}
+  \mathrm{p}(\mathrm{S_{i,j}}) &=&  \mathrm{p}(m =j, M | C = i) \\
                             &=& \mathrm{p}(m = j \mid C = i) \mathrm{p}(C = i \mid M)\frac{p(M)}{p(C = i)},
   \end{array}
   $$
 \end{equation}
-where $\mathrm{p}(\mathrm{S})$ is the probability that a substitution of type $S$ has occurred.
+where $\mathrm{p}(\mathrm{S_{i,j}})$ is the probability that a substitution of type $\mathrm{S_{i,j}}$ will occur.
 
 \begin{figure}[t]
   \begin{center}
@@ -291,9 +291,9 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
-For each of the two types we simulated tumors with variants drawn from three different mutation profiles (Concentrated,Intermediate, and Diffuse) as described in Materials \& Methods and Figure \ref{NAR-sigfig}.
+For each of the two types we simulated tumors with variants drawn from three different mutation profiles chosen to resemble melanoma (concentrated), a breast cancer (intermediate), and a lung cancer (diffuse)  as described in Materials \& Methods and Figure \ref{NAR-sigfig}.
 These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
-\bkmcomment{Should there be a longer discussion of what sorts of tumors the profiles represent, or leave that for the methods only?}
+
 
 We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are deeply unbalanced.
 By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a} and \textbf{c}, and Table \ref{table:01}).
@@ -328,7 +328,7 @@ For both whole exome and whole genome the prior converges to the data generating
 }{%
 \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
 \toprule
-Depth & Mutation profile & $\mu/\beta$ & AUROC & & AUPRC & & ICI & 
+Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
 \\
 & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
 \\
@@ -345,7 +345,9 @@ Depth & Mutation profile & $\mu/\beta$ & AUROC & & AUPRC & & ICI &
 \\
 500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .0565 & .0576
 \\
-AML 31 & Actual & 3.6e-8 & .935 & .949 & .995 & .996 & 0.121 & 0.155
+Griffith et al. 2015 & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+\\
+Shi et al. 2018 & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
 \\
 \botrule
 \end{tabular*}%
