@@ -228,8 +228,10 @@ We make the simplifying assumption that $d = 0$, so that $\beta = 1$, which for 
 Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 We now return to equation \ref{eqn:2} and describe the probability density function and method implemented in \batcave.
 
-\subsection{The mutect likelihood function}
+\subsection{The likelihood function}
 \batcave has been designed as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or > 2.0)\cite{Cibulskis2013}.
+MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results.
+In addition, MuTect is particularly useful because it directly reports 
 \bkmcomment{need a little more time with this.}
 
 \subsection{Tumor simulations.}
@@ -344,9 +346,9 @@ Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI &
 \\
 500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .0565 & .0576
 \\
-Griffith et al. 2015 & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+\citet{Williams2016} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
 \\
-Shi et al. 2018 & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+\citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
 \\
 \botrule
 \end{tabular*}%
