@@ -318,6 +318,12 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
   A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
 \label{NAR-wes_fig}
 \end{figure*}
+\subsection{Convergence of the site-specific prior to the data generating distribution}
+
+The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
+We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
+In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
+For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
@@ -330,8 +336,8 @@ By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a}
 The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
 Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
 
-The estimated effective mutation rate, $\mu/\beta$, is in the range of 3e-7 for all simulated tumors.
-We note that the effective mutation rate is lower than the simulated rate of 3e-6.
+The estimated mutation rate is approximately $3\cdot10^{-7}$ for all simulated tumors (Table \ref{table:01}).
+We note that the effective mutation rate is lower than the simulated rate of $3\cdot10^{-6}$.
 In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
 
 We measured calibration performance using the Integrated Calibration Index described in Methods \citep{Austin2019}.
@@ -339,16 +345,15 @@ For all simulated tumors the calibration of \batcave is better across the full s
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
-The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
-We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
-In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
-For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
 
 \subsection{Real tumor data.}
-\bkmcomment{need to rework this figure. the template allows only one full width figure.}
+We utilized two real data sets where deep sequencing and variant validation were performed, with the specific purpose of evaluating tumor variant calling pipelines.
+\citet{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
+We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
+We estimated a mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
+The area under the precision recall curve is essentially identical for MuTect and \batcave (RD figure coming and Table \ref{table:01}).
 
-\bkmcomment{add TPR/FPR at 1\% and 3\%?}
-
+\
 
 \begin{table*}[b]
 \tableparts{%
