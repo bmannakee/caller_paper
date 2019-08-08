@@ -399,12 +399,22 @@ Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI &
 
 \section{DISCUSSION}
 
--- Simulations suggest that if the mutation profile is the data generating distribution, \batcave can estimate effective mutation rate and data generating distribution, and doing so improves both classification and calibration.
-
--- One hope is to enable higher confidence in low frequency alleles as sequencing depth increases. Depth seems to have a very large effect on performance i.e. results are more compelling for 500X wes than for 100x wgs, although if you do 100 wgs you will still benefit.
-In other words sequence depth matters more performance wise than sequencing breadth if the only desire is to see low frequency alleles. No advantage is gained (after a certain depth) of adding variants(sites) by wgs sequencing.
-\subsection{Discussion subsection one}
-
+\begin{itemize}
+  \item Every tumor is different. Even tumors of the same type have meaningfully different mutation profiles
+  \item The solution must be specific to each tumor we examine
+  \item The fact that we can think of tumor variant calls as two sets of data, with different measurement error, derived from the same data generating process, makes this possible
+  \item The mutation profile is estimated from the high-confidence (low measurement error) variants, and used as a prior for the low-confidence (high measurement error) variants
+  \item We demonstrate that the mutation generating process (mutation profile) can be reliably retrieved from simulated NGS data.
+  \item We also demonstrate that on the limited real data available, which consists of validated high confidence mutations, the results are equivalent
+  \item What is needed is validation experiments that also allow for the estimation of true and false negative rates, in order to fully illuminate the utility of \batcave
+  \item We have devoloped this algorithm as a post-calling evaluation tool to be used at the end of a variant calling pipeline
+  \item The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
+  \item The benefit from the algorithm varies with both the concentration of the signature and the depth of sequencing
+  \item Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors
+  \item We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
+  \item One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
+  \item We believe the improved calibration achieved with this algorithm will encourage more thoughtful consideration of thresholds in various variant calling contexts
+\end{itemize}
 
 
 \section{CONCLUSION}
