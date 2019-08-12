@@ -206,16 +206,7 @@ We compute this as simply the proportion of all tri-nucleotide contexts with the
 
 \subsection{Estimation of the mutation rate.}
 The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
-In an exponentially growing tumor, the number of new mutations per cell division is the product of the number of bases $N$, the per base mutation rate $\mu$, and the \textit{effective} birth rate $\beta$, which is a function of the birth $b$ and death $d$ rates.
-\citet{Williams2016} showed that if 
-$$
-  \beta = \frac{b-d}{b},
-$$
-then the number of new mutations per cell division is
-$$
-  \frac{N \mu}{\beta}.
-$$
-In a neutrally or nearly neutrally evolving tumor, they further show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
+In an exponentially growing and neutrally or nearly neutrally evolving tumor, \citet{Williams2018} show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
 \begin{equation}
   \label{eqn:mut_rate}
 $$
@@ -228,7 +219,8 @@ Returning to the set of high confidence mutations $\mathrm{D}$, we can set $f_{m
 In practice it is usually best to select a conservative value for $f_{min}$, which is strongly dependent on sequencing depth, and we include this as a parameter in the R implementation of \batcave.
 In all results presented in this paper we have set $f_{min}$ to 0.05 because we are working with very high sequencing depth.
 A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}.
-We make the simplifying assumption that $d = 0$, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
+The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
+We make the simplifying assumption that there is no cell death, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
 Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
 \subsection{The likelihood function}
@@ -261,13 +253,13 @@ We compute the posterior odds for Mutect as
   \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} - 6},
   $$
 \end{equation}
-since $\mathrm{log}_{10}(\mathrm{logit}(3\cdot10^{-6}) \approx -6$.
+since $\mathrm{log}_{10}(\mathrm{logit}(3\cdot10^{-6}) \approx -6$, and $10^{.3} \approx 2$.
 
 \subsection{Tumor simulations.}
 We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
 Tumors were simulated with three different mutation profiles, all of which include a contribution from COSMIC mutation signature 1 which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
 The "Concentrated" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
-The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is common in lung cancers.
+The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
 The "Diffuse" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair.
 The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
 Variants were selected from a combination of Cancer Genome Atlas (TCGA) and Pan-cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
@@ -312,8 +304,7 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
 MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results.
 \batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
-The mutation profile is computed from the high probability sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
-
+The mutation profile is computed from the high confidence sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
 \begin{figure*}
   \begin{center}
   \includegraphics{figures/fig_wes.pdf}
@@ -349,26 +340,25 @@ In this case the lower effective rate is not due to normal contamination of the 
 We measured calibration performance using the Integrated Calibration Index (ICI) described in Methods \citep{Austin2019}.
 The ICI is a measure of the difference between predicted and observed probabilities that is weighted by the empirical density of the predicted probabilities.
 This is useful in our setting because the density of predicted probabilities tends to be strongly bi-modal.
-For all simulated tumors the calibration of \batcave is better across the full spectrum of posterior probabilities.
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
+For 500X tumors the calibration of \batcave is better across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse.
+This effect is likely due to the fact that there are simply very few low probability true positive variants in tumor sequenced to 100X depth.
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
 
 \subsection{Real tumor data.}
-We utilized two real data sets where deep sequencing and variant validation were performed, with the specific purpose of evaluating tumor variant calling pipelines.
+We utilized two real data sets.
+In each, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
+These are among a very small number of tumors which have been sequenced at high depth, and for which variant validation was undertaken.
 \citet{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
+We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
 The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (RD figure coming and Table \ref{table:01}).
 
 \citet{Shi2018} performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$, and validated all variants identified by three different variant calling pipelines.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave.
+We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave.
 
-These two data sets are among a very small number of tumors which have been sequenced at high depth, and for which variant validation was undertaken.
-We report only precision-recall comparisons here because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
-There is thus no way to compute true and false negative fractions for these data sets.
-As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
 
 
 \begin{table*}[b]
@@ -408,8 +398,18 @@ Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI &
 
 \section{DISCUSSION}
 
+\batcave is a post-call variant evalutation tool that 
+We demonstrated here that this method improves classification accuracy in both simulated data, with the magnitude of the improvement dependent on the sequencing depth and the concentration of the mutation profile.
+
+We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
+These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
+At the same time, there is no way to compute true and false negative fractions for these data sets.
+As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
+Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
+
+
 \begin{itemize}
-  \item Every tumor is different. Even tumors of the same type have meaningfully different mutation profiles
+  \item Every tumor is different. Differences within and between tumor types are pronounced \cite{@Stephens2005, @Burrell2005, @Nakamura2015, @Witkeiwicz2015, @Kumar2016}
   \item The solution must be specific to each tumor we examine
   \item The fact that we can think of tumor variant calls as two sets of data, with different measurement error, derived from the same data generating process, makes this possible
   \item The mutation profile is estimated from the high-confidence (low measurement error) variants, and used as a prior for the low-confidence (high measurement error) variants
