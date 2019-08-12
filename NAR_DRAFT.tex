@@ -133,21 +133,21 @@ Here we focus on a small-scale feature, the tri-nucleotide context, which has be
 The tri-nucleotide context at a particular genomic site is made up of the identity of the reference base and the identity of the 3` and 5` flanking bases.
 There are four possible bases {\{A,C,T,G\}} 3` and 5` of the site, leading to 16 possible flanking base combinations.
 Folding the central bases to the pyrimidines leaves 2 possible reference bases at the site {\{C,T\}}, resulting in $2 \cdot 16 = 32$ possible tri-nucleotide contexts.
-We define a mutation context $C$ indexed by $i=\{1 \dots 32\}$, to be the tri-nucleotide context of a particular site in the genome. 
+We define a mutation context $C$ indexed by $c=\{1 \dots 32\}$, to be the tri-nucleotide context of a particular site in the genome. 
 For each context, a mutation can be to any of the three possible alternate alleles {\{A,(C/T),G\}}. 
-We can thus define $\mathrm{S}$, the substitution type, indexed by $i=\{1 \dots 32\}$ contexts and $j = \{1 \dots 3\}$ alternate bases, resulting in 96 possible substitution types.
+We can thus define $\mathrm{S}$, the substitution type, indexed by $c=\{1 \dots 32\}$ contexts and $m = \{1 \dots 3\}$ alternate bases, resulting in 96 possible substitution types.
 Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_prior} as 
 
 \begin{equation}
   \label{eqn:detailed_prior}
   $$
   \begin{array}{rcl}
-  \mathrm{p}(\mathrm{S_{i,j}}) &=&  \mathrm{p}(m =j, M | C = i) \\
-                            &=& \mathrm{p}(m = j \mid C = i) \mathrm{p}(C = i \mid M)\frac{p(M)}{p(C = i)},
+  \mathrm{p}(\mathrm{S_{m,c}}) &=&  \mathrm{p}(m, M | C = c) \\
+                            &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{p(M)}{p(C = c)},
   \end{array}
   $$
 \end{equation}
-where $\mathrm{p}(\mathrm{S_{i,j}})$ is the probability that a substitution of type $\mathrm{S_{i,j}}$ will occur.
+where $\mathrm{p}(\mathrm{S_{m,c}})$ is the probability that a substitution of type $\mathrm{S_{m,c}}$ will occur.
 
 \begin{figure}[t]
   \begin{center}
@@ -167,7 +167,7 @@ where $\mathrm{p}(\mathrm{S_{i,j}})$ is the probability that a substitution of t
 
 Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{i,j}$.
-The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{i,j}\} $.
+The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{m,c}\} $.
 In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
 As a result we need to model $\mathrm{p}(\mathrm{S})$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
 
@@ -184,24 +184,24 @@ These are variants such that for any reasonable value of the site-specific prior
 Let $\mathrm{D}$ be the set of high confidence variant calls, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
-    \alpha^{\prime}_{i,j} = \alpha_{i,j} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{i,j}\}.
+    \alpha^{\prime}_{m,c} = \alpha_{m,c} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{m,c}\}.
   $$
-Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C = C_{i} \mid M,\mathrm{D})$ as
+Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C = c \mid M,\mathrm{D})$ as
 \begin{equation}
   \label{eqn:post_pred}
   $$
-  p(C = C_{i} \mid M,\mathrm{D}) = \frac{\sum_{j}\alpha^{\prime}_{i,j}}{\sum_{i,j}\alpha^{\prime}_{i,j}}.
+  p(C = c \mid M,\mathrm{D}) = \frac{\sum_{m}\alpha^{\prime}_{m,C = c}}{\sum_{m,c}\alpha^{\prime}_{m,c}}.
   $$
 \end{equation}
-The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C_{i}$, $p(m = j \mid C_{i},\mathrm{D})$ is then
+The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C = c$, $p(m  \mid C = c,\mathrm{D})$ is then
 \begin{equation}
   \label{eqn:to_allele}
   $$
-   p(m = j \mid C_{i},\mathrm{D}) = \frac{\alpha^{\prime}_{i,j}}{\sum_{j} \alpha^{\prime}_{i,j}}.
+   p(m \mid C = c,\mathrm{D}) = \frac{\alpha^{\prime}_{m,c}}{\sum_{m} \alpha^{\prime}_{m,C = c}}.
   $$
 \end{equation}
-The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = C_{i})$, the prior probability of seeing a particular tri-nucleotide context.
-We compute this as simply the proportion of all tri-nucleotide contexts with the context $C_{i}$ present in the genome.
+The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = c)$, the prior probability of seeing a particular tri-nucleotide context.
+We compute this as simply the proportion of all tri-nucleotide contexts with the context $C = c$ present in the genome.
 
 
 \subsection{Estimation of the mutation rate.}
