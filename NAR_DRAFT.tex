@@ -73,9 +73,10 @@ Single nucleotide substitions, i.e. simple mutations, arise in tumors at a rate 
 The first is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 The second -- and far more complex -- process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
+The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile.
+Because profiles vary widely both within and between tumor types.
 
 Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
-We then extend the method with an application of the local false discovery rate by computing the probability that a site is non-null under an assumption of clonal expansion with either early or small selective differences between clones.
 We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect. \bkmcomment{batcave,batcaver,batcaveR}
 
 \section{MATERIALS AND METHODS}
@@ -231,10 +232,9 @@ We make the simplifying assumption that $d = 0$, so that $\beta = 1$, which for 
 Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
 \subsection{The likelihood function}
-We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
-MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results.
-In addition, MuTect is particularly useful because it directly reports the log ratio of the of the likelihood functions for the null and alterative hypotheses in \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
-We have used MuTect 1.1.7 for all of the analysis in this paper, so the output of MuTect provides us with
+We designed \batcave to be used as a post-calling evaluation tool with MuTect
+MuTect is particularly useful because it directly reports the log ratio of the of the likelihood functions for the null and alterative hypotheses in \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
+We used MuTect 1.1.7 for all of the analysis in this paper, so the output of MuTect provides us with
 
 \begin{equation}
   \label{eqn:tlod}
@@ -294,25 +294,32 @@ and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 \end{tiny}
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
 
+\subsection{Real Data}
+\begin{itemize}
+  \item aml31 \cite{Griffith2015}
+  \item item used only the platinum calls for evaluation
+  \item Shi2018 \cite{Shi2018}
+  \item used the gold standard calls, and combined all six biological replicates 
+\end{itemize}
 
+\subsection{Calibration metric}
+
+	We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
+	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-wes_fig} \textbf{e}).
+	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the mean area between the result and a diagonal line.
 
 \section{RESULTS}
-% \begin{figure*}[t]
-%   \begin{center}
-%   \includegraphics{figures/aml_plot.pdf}
-%   \end{center}
-%   \caption{Model performance on 300X Whole leukemia genome.
-%   \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
-%   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
-%   A perfectly calibrated model would generate the diagonal line.}
-%   \label{NAR-aml}
-% \end{figure*}
+We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
+MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results.
+\batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
+The mutation profile is computed from the high probability sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
+
 \begin{figure*}
   \begin{center}
   \includegraphics{figures/fig_wes.pdf}
   \end{center}
   \caption{Model performance on 500X simulated whole exome.
-  \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
+  \textbf{(a)} Precision recall curves and \textbf{(c)} Receiver operating characteristic curves for 3 mutation signatures.
   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
   A perfectly calibrated model would generate the diagonal line.}
 \label{NAR-wes_fig}
@@ -339,7 +346,9 @@ The estimated mutation rate is approximately $3\cdot10^{-7}$ for all simulated t
 We note that the effective mutation rate is lower than the simulated rate of $3\cdot10^{-6}$.
 In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
 
-We measured calibration performance using the Integrated Calibration Index described in Methods \citep{Austin2019}.
+We measured calibration performance using the Integrated Calibration Index (ICI) described in Methods \citep{Austin2019}.
+The ICI is a measure of the difference between predicted and observed probabilities that is weighted by the empirical density of the predicted probabilities.
+This is useful in our setting because the density of predicted probabilities tends to be strongly bi-modal.
 For all simulated tumors the calibration of \batcave is better across the full spectrum of posterior probabilities.
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
