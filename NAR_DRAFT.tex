@@ -407,9 +407,10 @@ Deep sequencing experiments where a large random sample of uncalled potential va
 
 We have chosen to implement \batcave as a post-calling algorithm for use with MuTect because it presents a simple model and a well-tested set of heuristic filters.
 However, in principle there is no barrier to using the method with other variant callers.
-For instance Strelka, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability of that the tumor carries a somatic mutation is set to a constant.
+For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
-In general we are advancing the idea that there is substantial prior information about the site-specific mutation probability encoded in NGS data, and we should be using it.
+In general we are advancing the idea that there is substantial prior information about the tumor and site-specific mutation probability encoded in NGS data, and we should be using it.
+
 
 
 
