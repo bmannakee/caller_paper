@@ -73,8 +73,7 @@ Single nucleotide substitions, i.e. simple mutations, arise in tumors at a rate 
 The first is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 The second -- and far more complex -- process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
-The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile.
-Because profiles vary widely both within and between tumor types.
+The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}
 
 Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
 We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect. \bkmcomment{batcave,batcaver,batcaveR}
@@ -399,13 +398,21 @@ Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI &
 \section{DISCUSSION}
 
 \batcave is a post-call variant evalutation tool that 
-We demonstrated here that this method improves classification accuracy in both simulated data, with the magnitude of the improvement dependent on the sequencing depth and the concentration of the mutation profile.
-
+We demonstrated here that \batcave improves classification accuracy in simulated data, with the magnitude of the improvement dependent on the sequencing depth and the concentration of the mutation profile.
 We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
 These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
 At the same time, there is no way to compute true and false negative fractions for these data sets.
 As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
 Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
+
+We have chosen to implement \batcave as a post-calling algorithm for use with MuTect because it presents a simple model and a well-tested set of heuristic filters.
+However, in principle there is no barrier to using the method with other variant callers.
+For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
+Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
+In general we are advancing the idea that there is substantial prior information about the tumor and site-specific mutation probability encoded in NGS data, and we should be using it.
+
+
+
 
 
 \begin{itemize}
