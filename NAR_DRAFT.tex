@@ -93,7 +93,7 @@ $$
 $$
 \end{equation}
 where $\nu$ is the variant allele frequency, $\hat{f}$ is the maximum likelihood estimate of $\nu$ given data $\mathbf{x}$, i.e. the ratio of the count of variant reads and total read depth, and $m$ is any of the 3 possible alternate non-reference bases.
-The posterior probability of a given hypothesis, $P(m,\nu)$, is the product of the likelihood of the data given the hypothesis and the prior probability of the hypothesis. 
+The posterior probability of a given hypothesis, $\mathrm{P}(m,\nu)$, is the product of the likelihood of the data given the hypothesis and the prior probability of the hypothesis. 
 Assuming that reads are independent, we have
 
 \begin{equation}
@@ -104,7 +104,7 @@ $$
 \end{equation}
 where the density $\textrm{f}_{m,\nu}(x_i)$ can take several forms.
 
-Assuming that the identity of the alternate allele and its allele frequency are independent of each other, and $\nu$ is uniformly distributed (i.e. $p(\nu) = 1$), we can rewrite equation \ref{eqn:1} as
+Assuming that the identity of the alternate allele and its allele frequency are independent of each other, and $\nu$ is uniformly distributed (i.e. $\mathrm{p}(\nu) = 1$), we can rewrite equation \ref{eqn:1} as
 \begin{equation}
   \label{eqn:2}
 $$
@@ -114,14 +114,14 @@ $$
 Here we show how \batcave can be used to provide a tumor and site-specific estimate of the prior probability of mutation $p(m)$.
 
 \subsection{Site-specific prior probability of mutation}
-The probability which we have denoted $p(m)$ in equation \ref{eqn:2} for compactness is more precisely the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $p(m,M)$.
-However, $p(m,M)$ is not constant for every site in the genome, and follows a distribution conditional on the genomic context surrounding the site, denoted here $p(m,M | C)$ \cite{Buisson2019}.
+The probability which we have denoted $\mathrm{p}(m)$ in equation \ref{eqn:2} for compactness is more precisely the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $\mathrm{p}(m,M)$.
+However, $\mathrm{p}(m,M)$ is not constant for every site in the genome, and follows a distribution conditional on the genomic context surrounding the site, denoted here $\mathrm{p}(m,M | C)$ \cite{Buisson2019}.
 Assuming that $m$ and $M$ are independent conditional on the genomic context, $\mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(M \mid C)$, which we can use Bayes' rule to further decompose as 
 
 \begin{equation}
   \label{eqn:full_prior}
   $$
-  \mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{p(M)}{p(C)}.
+  \mathrm{p}(m,M \mid C) = \mathrm{p}(m \mid C) \mathrm{p}(C \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C)}.
   $$
 \end{equation}
 We next show how to estimate the quantities in equation \ref{eqn:full_prior}.
@@ -189,14 +189,14 @@ Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior pre
 \begin{equation}
   \label{eqn:post_pred}
   $$
-  p(C = c \mid M,\mathrm{D}) = \frac{\sum_{m}\alpha^{\prime}_{m,C = c}}{\sum_{m,c}\alpha^{\prime}_{m,c}}.
+  \mathrm{p}(C = c \mid M,\mathrm{D}) = \frac{\sum_{m}\alpha^{\prime}_{m,C = c}}{\sum_{m,c}\alpha^{\prime}_{m,c}}.
   $$
 \end{equation}
 The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C = c$, $p(m  \mid C = c,\mathrm{D})$ is then
 \begin{equation}
   \label{eqn:to_allele}
   $$
-   p(m \mid C = c,\mathrm{D}) = \frac{\alpha^{\prime}_{m,c}}{\sum_{m} \alpha^{\prime}_{m,C = c}}.
+   \mathrm{p}(m \mid C = c,\mathrm{D}) = \frac{\alpha^{\prime}_{m,c}}{\sum_{m} \alpha^{\prime}_{m,C = c}}.
   $$
 \end{equation}
 The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = c)$, the prior probability of seeing a particular tri-nucleotide context.
