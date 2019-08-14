@@ -74,6 +74,7 @@ The first is the spontaneous accumulation of mutations that occurs in all dividi
 The second -- and far more complex -- process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}
+Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
 Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
 We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect. \bkmcomment{batcave,batcaver,batcaveR}
@@ -164,9 +165,9 @@ where $\mathrm{p}(\mathrm{S_{m,c}})$ is the probability that a substitution of t
   \label{NAR-sigfig}
   \end{figure}
 
-Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
+
 The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{m,c}$.
-The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{m,c}\} $.
+The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is modeled as multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{m,c}\} $.
 In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
 As a result we need to model $\mathrm{p}(\mathrm{S})$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
 
@@ -180,7 +181,7 @@ In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\a
 
 In order to estimate $\boldsymbol{\pi}$, we generate a subset of variants in the tumor in which we have high confidence that the variants are present, based on an initial calculation of their likelihood give the data.
 These are variants such that for any reasonable value of the site-specific prior probability of mutation, the evidence for the variant in the read data erases any doubt about the presence of the variant. 
-Let $\mathrm{D}$ be the set of high confidence variant calls, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
+Let $\mathrm{D}$ be the set of high confidence variant calls -- which we define as having posterior odds greater than 10 to 1 -- and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
     \alpha^{\prime}_{m,c} = \alpha_{m,c} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{m,c}\}.
@@ -297,11 +298,11 @@ Variants identified by MuTect are labelled as to whether they pass all MuTect fi
 
 	We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
 	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-wes_fig} \textbf{e}).
-	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the mean area between the result and a diagonal line.
+	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average area between the loess fit and a diagonal line.
 
 \section{RESULTS}
 We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
-MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results.
+MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
 \batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
 The mutation profile is computed from the high confidence sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
 \begin{figure*}
@@ -315,11 +316,10 @@ The mutation profile is computed from the high confidence sites, and the posteri
 \label{NAR-wes_fig}
 \end{figure*}
 \subsection{Convergence of the site-specific prior to the data generating distribution}
-
 The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
-We use the Kullback-Leibler divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
+We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
 In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
-For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations. 
+For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for our real datasets are \bkmcomment{X} and for our simulated data sets are 1500 to 5000.
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
@@ -327,7 +327,7 @@ For each of the two types we simulated tumors with variants drawn from three dif
 These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
 
 
-We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are deeply unbalanced.
+We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
 By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a} and \textbf{c}, and Table \ref{table:01}).
 The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
 Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
@@ -378,11 +378,11 @@ Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI &
 \\
 100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & -- & --
 \\
-500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .0585 & .0462
+500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
 \\
-500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .0587 & .0568 
+500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
 \\
-500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .0565 & .0576
+500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
 \\
 \citet{Williams2016} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
 \\
@@ -466,16 +466,16 @@ Text. Text. Text. Text.
 
 \section{Supplementary Figures}
 
-\begin{figure*}[t]
-  \begin{center}
-  \includegraphics{figures/aml_plot.pdf}
-  \end{center}
-  \caption{Model performance on 300X Whole leukemia genome.
-  \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
-  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
-  A perfectly calibrated model would generate the diagonal line.}
-  \label{NAR-aml}
-\end{figure*}
+% \begin{figure*}[t]
+%   \begin{center}
+%   \includegraphics{figures/aml_plot.pdf}
+%   \end{center}
+%   \caption{Model performance on 300X Whole leukemia genome.
+%   \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
+%   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
+%   A perfectly calibrated model would generate the diagonal line.}
+%   \label{NAR-aml}
+% \end{figure*}
 
 \begin{figure*}
   \begin{center}
