@@ -382,26 +382,34 @@ For instance Strelka2, another widely used variant caller, computes a joint post
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
 In general we are advancing the idea that there is substantial prior information about the tumor and site-specific mutation probability encoded in NGS data, and we should be using it.
 
+\batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
+The first is the set of mutations that pass all heuristics filters, and a very large posterior probability of being present given the observed read data.
+We think of these high-probability variants as data generated from a distribution, the mutation profile, with very low measurement error.
+This low measurement error data allows us to reliably estimate the distribution of substitution types.
+Variants with low probability given the read data can be thought of as noisy measurements of samples from the same data generating distribution.
+We then use the estimated distribution of substitution types to sharpen the prior probability of mutation for these lower probability variants.
+
+The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
+\bkmcomment{coming}
+
+The benefit derived from \batcave varies with both the concentration of the tumor mutation profile and the depth of sequencing.
+Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
+Deep sequencing is useful \cite{Zehir2017}.
+We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
 
 
+One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
+Clinical studies often threshold at a vaf, rather than using the evidence threshold of the caller. 272X 5\% cutoff \cite{Parsons2016}, why go so deep?
+One problem with this is that vaf and associated evidence is dependent on local depth. This is no different than just having a minimum number of variant reads. Why have a model?
 
 \begin{itemize}
-  \item Every tumor is different. Differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}
-  \item The solution must be specific to each tumor we examine
   \item The fact that we can think of tumor variant calls as two sets of data, with different measurement error, derived from the same data generating process, makes this possible
   \item The mutation profile is estimated from the high-confidence (low measurement error) variants, and used as a prior for the low-confidence (high measurement error) variants
   \item We demonstrate that the mutation generating process (mutation profile) can be reliably retrieved from simulated NGS data.
   \item We also demonstrate that on the limited real data available, which consists of validated high confidence mutations, the results are equivalent
   \item What is needed is validation experiments that also allow for the estimation of true and false negative rates, in order to fully illuminate the utility of \batcave
   \item We have devoloped this algorithm as a post-calling evaluation tool to be used at the end of a variant calling pipeline
-  \item The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
-  \item The benefit from the algorithm varies with both the concentration of the signature and the depth of sequencing
-  \item Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors
-  \item Deep sequencing is useful \cite{Zehir2017}
-  \item We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
-  \item One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
-  \item Clinical studies often threshold at a vaf, rather than using the evidence threshold of the caller. 272X 5\% cutoff \cite{Parsons2016}, why go so deep?
-  \item One problem with this is that vaf and associated evidence is dependent on local depth. This is no different than just having a minimum number of variant reads. Why have a model?
+  \
   \item We believe the improved calibration achieved with this algorithm will encourage more thoughtful consideration of thresholds in various variant calling contexts
   \item The field believes that little information can be gained by wes rather than panels, but they are assuming the only information is mutations \cite{Hyman2015}
 \end{itemize}
