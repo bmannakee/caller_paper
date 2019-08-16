@@ -224,8 +224,8 @@ We make the simplifying assumption that there is no cell death, so that $\beta =
 Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
 \subsection{The likelihood function}
-We designed \batcave to be used as a post-calling evaluation tool with MuTect
-MuTect is particularly useful because it directly reports the log ratio of the of the likelihood functions for the null and alterative hypotheses in \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
+We designed \batcave to be used as a post-calling evaluation tool with MuTect.
+MuTect is particularly useful because it directly reports the log ratio of the likelihood functions for the null and alterative hypotheses in \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
 We used MuTect 1.1.7 for all of the analysis in this paper, so the output of MuTect provides us with
 
 \begin{equation}
@@ -302,6 +302,7 @@ We called variants using Mutect 1.1.7 with the same parameters as described abov
 
 \section{RESULTS}
 We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
+The algorithm is effecient, processing 22,000 variants per second on a typical iMac desktop computer, which corresponds to 100 seconds to process a 500X exome and 2000 seconds for a 100X whole genome.
 MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
 \batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
 The mutation profile is computed from the high confidence sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
@@ -320,7 +321,7 @@ The mutation profile is computed from the high confidence sites, and the posteri
 The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
 We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
 In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
-For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for our real datasets are \bkmcomment{X} and for our simulated data sets are 1500 to 5000.
+For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the \citet{Griffith2015} leukemia is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
@@ -346,10 +347,11 @@ The estimated mutation rate is approximately $3\cdot10^{-7}$ for all simulated t
 We note that the effective mutation rate is lower than the simulated rate of $3\cdot10^{-6}$.
 In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
 
-We measured calibration performance using the Integrated Calibration Index (ICI) described in Methods \citep{Austin2019}.
+We measured overall calibration performance using the Integrated Calibration Index (ICI) described in Methods \citep{Austin2019}.
 The ICI is a measure of the difference between predicted and observed probabilities that is weighted by the empirical density of the predicted probabilities.
-This is useful in our setting because the density of predicted probabilities tends to be strongly bi-modal.
-As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (top density curves), and decrease the probability of low probability but false variants (bottom density curves.).
+This is useful in our setting because the density of posterior probabilities tends to be strongly bi-modal.
+A large fraction of true negative variants have posterior probabilities of less than $10{-4}$, which is a probability far below any threshold that is meaningful, we evaluate calibration only on variants with posterior probability greater than .01.
+As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (density curves) while decreasing the probability of low probability but false variants (density not shown).
 For 500X tumors the calibration of \batcave is better across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse.
 This effect is likely due to the fact that there are simply very few low probability true positive variants in tumor sequenced to 100X depth.
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
