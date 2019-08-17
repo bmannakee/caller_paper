@@ -76,8 +76,25 @@ Many mutagens and DNA repair mechanism defects also have highly specific mutatio
 The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}
 Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
+
 Here we present an algorithm for estimating the prior probability of mutation at a given site using the observed mutation spectrum of the tumor as well as its mutation rate, and show that the addition of this prior to the MuTect variant calling model produces a superior variant classifier in both simulated and real tumor data.
 We provide a simple implementation in R that takes MuTect caller output as input, and returns the posterior probability that a site is variant for every site observed by MuTect. \bkmcomment{batcave,batcaver,batcaveR}
+
+\begin{figure}
+  \begin{center}
+  \includegraphics{figures/signature_figure.pdf}
+  \end{center}
+  \caption{Mutation profiles. 
+  \textbf{(a)} The observed mutation profile of a breast cancer sample from \cite{Shi2018}.
+  \textbf{(b)} The observed mutation profile of the AML 31 primary tumor from \cite{Griffith2015}.
+  \textbf{(c)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+  \textbf{(d)} Equal proportions of signatures 1, 4, \& 5.
+  \textbf{(e)} Equal proportions of signatures 1, 3, \& 5.
+  KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(f)} Whole exomes and \textbf{(g)} whole genomes.
+  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.
+  }
+  \label{NAR-sigfig}
+  \end{figure}
 
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
@@ -149,21 +166,6 @@ Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_
 \end{equation}
 where $\mathrm{p}(\mathrm{S_{m,c}})$ is the probability that a substitution of type $\mathrm{S_{m,c}}$ will occur.
 
-\begin{figure}[t]
-  \begin{center}
-  \includegraphics{figures/signature_figure.pdf}
-  \end{center}
-  \caption{Mutation profiles. 
-  \textbf{(a)} The observed mutation profile of a breast cancer sample from \cite{Shi2018}.
-  \textbf{(b)} The observed mutation profile of the AML 31 primary tumor from \cite{Griffith2015}.
-  \textbf{(c)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
-  \textbf{(d)} Equal proportions of signatures 1, 4, \& 5.
-  \textbf{(e)} Equal proportions of signatures 1, 3, \& 5.
-  KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(f)} Whole exomes and \textbf{(g)} whole genomes.
-  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.
-  }
-  \label{NAR-sigfig}
-  \end{figure}
 
 
 The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{m,c}$.
@@ -203,6 +205,7 @@ The posterior probability of mutation to allele $m$ given that a mutation has oc
 The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = c)$, the prior probability of seeing a particular tri-nucleotide context.
 We compute this as simply the proportion of all tri-nucleotide contexts with the context $C = c$ present in the target genome, which is slightly different depending on whether we are analyzing a whole genome or an exome.
 
+add to change
 
 \subsection{Estimation of the mutation rate.}
 The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
@@ -300,22 +303,25 @@ We called variants using Mutect 1.1.7 with the same parameters as described abov
 	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-wes_fig} \textbf{e}).
 	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the loess fit and a diagonal line.
 
+  \begin{figure*}
+    \begin{center}
+    \includegraphics{figures/fig_wes.pdf}
+    \end{center}
+    \caption{Model performance on 500X simulated whole exome.
+    \textbf{(a)} Precision recall curves and \textbf{(c)} Receiver operating characteristic curves for 3 mutation signatures.
+    Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
+    A perfectly calibrated model would generate the diagonal line.}
+  \label{NAR-wes_fig}
+  \end{figure*}
+
 \section{RESULTS}
 We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
 The algorithm is effecient, processing 22,000 variants per second on a typical iMac desktop computer, which corresponds to 100 seconds to process a 500X exome and 2000 seconds for a 100X whole genome.
 MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
 \batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
 The mutation profile is computed from the high confidence sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
-\begin{figure*}
-  \begin{center}
-  \includegraphics{figures/fig_wes.pdf}
-  \end{center}
-  \caption{Model performance on 500X simulated whole exome.
-  \textbf{(a)} Precision recall curves and \textbf{(c)} Receiver operating characteristic curves for 3 mutation signatures.
-  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
-  A perfectly calibrated model would generate the diagonal line.}
-\label{NAR-wes_fig}
-\end{figure*}
+
+
 
 \subsection{Convergence of the site-specific prior to the data generating distribution}
 The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
@@ -323,20 +329,15 @@ We use the Kullback-Leibler (KL) divergence as a measure of the distance (or ent
 In Figure \ref{NAR-sigfig} \textbf{e} and \textbf{f} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
 For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the \citet{Griffith2015} leukemia is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
+
+
+
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
 For each of the two types we simulated tumors with variants drawn from three different mutation profiles chosen to resemble melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse)  as described in Materials \& Methods and Figure \ref{NAR-sigfig}.
 These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
 
-\begin{figure}
-  \begin{center}
-  \includegraphics{figures/ppv_wes.pdf}
-  \end{center}
-  \caption{Model performance on 500X simulated whole exome. 
-  Positive predictive values vs. Recall for three different probability cutoffs. 
-  Note the restricted axes to improve readability of points.}
-\label{NAR-ppv_fig}
-\end{figure}
+
 
 We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
 By both metrics \batcave outperforms MuTect (Figure \ref{NAR-wes_fig} \textbf{a} and \textbf{c}, and Table \ref{table:01}).
@@ -370,7 +371,15 @@ The area under the precision-recall curve is essentially identical (.995 \& .996
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave.
 
-
+\begin{figure}
+  \begin{center}
+  \includegraphics{figures/ppv_wes.pdf}
+  \end{center}
+  \caption{Model performance on 500X simulated whole exome. 
+  Positive predictive values vs. Recall for three different probability cutoffs. 
+  Note the restricted axes to improve readability of points.\bkmcomment{how do called allele frequency distributions differ?}}
+\label{NAR-ppv_fig}
+\end{figure}
 
 
 
@@ -450,84 +459,9 @@ Text. Text. Text. Text.
 \subsubsection{Conflict of interest statement.} None declared.
 
 
-
-
-
-
-\section{Supplementary Figures}
-
-% \begin{figure*}[t]
-%   \begin{center}
-%   \includegraphics{figures/aml_plot.pdf}
-%   \end{center}
-%   \caption{Model performance on 300X Whole leukemia genome.
-%   \textbf{(a)} Precision/recall curves and \textbf{(c)} Reciever operating characteristic curves.
-%   Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the Calibrated model.
-%   A perfectly calibrated model would generate the diagonal line.}
-%   \label{NAR-aml}
-% \end{figure*}
-
-\begin{figure*}
-  \begin{center}
-  \includegraphics{figures/fig_wgs.pdf}
-  \end{center}
-  \caption{Model performance on 100X simulated whole genome.
-  \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
-  Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
-  A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
-\label{NAR-wgs_fig}
-\end{figure*}
-
-
-
-\section{Supplememtary Table}
-
-\begin{table*}[b]
-  \tableparts{%
-  \caption{This is a table with $\mu$, auroc, auprc, ICI, and maybe fraction called?}
-  \label{table:01}%
-  }{%
-  \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
-  \toprule
-  Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
-  \\
-  & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
-  \\
-  \colrule
-  100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & -- & --
-  \\
-  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & -- & --
-  \\
-  100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & -- & --
-  \\
-  500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
-  \\
-  500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
-  \\
-  500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
-  \\
-  \citet{Williams2016} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
-  \\
-  \citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
-  \\
-  \botrule
-  \end{tabular*}%
-  }
-  {$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
-  \end{table*}
-
-
 \bibliography{caller_paper}
 
-  
-\begin{figure}
-  \begin{center}
-  \includegraphics{figures/ppv_wgs.pdf}
-  \end{center}
-  \caption{Model performance on 500X simulated whole exome. 
-  Positive predictive values vs. Recall for three different probability cutoffs. 
-  Note the restricted axes to improve readability of points.}
-\label{NAR-ppv_wgs_fig}
-\end{figure}
+\include{supplement}
 
 \end{document}
+
