@@ -358,43 +358,6 @@ The area under the precision-recall curve is essentially identical (.995 \& .996
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave.
 
-
-
-\begin{table*}[b]
-\tableparts{%
-\caption{This is a table with $\mu$, auroc, auprc, ICI, and maybe fraction called?}
-\label{table:01}%
-}{%
-\begin{tabular*}{\textwidth}{@{}lllllllll@{}}
-\toprule
-Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
-\\
-& & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
-\\
-\colrule
-100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & -- & --
-\\
-100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & -- & --
-\\
-100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & -- & --
-\\
-500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
-\\
-500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
-\\
-500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
-\\
-\citet{Williams2016} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
-\\
-\citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
-\\
-\botrule
-\end{tabular*}%
-}
-{$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
-\end{table*}
-
-
 \section{DISCUSSION}
 
 \batcave is a post-call variant evalutation tool that uses MuTect output and the tumor-specific mutation profile to sharpen the posterior probability assigned to SNVs.
@@ -464,7 +427,7 @@ Text. Text. Text. Text.
 
 
 
-\bibliography{caller_paper}
+
 
 \section{Supplementary Figures}
 
@@ -489,4 +452,46 @@ Text. Text. Text. Text.
   A perfectly calibrated model would generate the diagonal line.\bkmcomment{change the axis on b and d to be the same as the steyerberg paper. much clearer}}
 \label{NAR-wgs_fig}
 \end{figure*}
+
+
+
+\section{Supplememtary Table}
+
+\begin{table*}[b]
+  \tableparts{%
+  \caption{This is a table with $\mu$, auroc, auprc, ICI, and maybe fraction called?}
+  \label{table:01}%
+  }{%
+  \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
+  \toprule
+  Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
+  \\
+  & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
+  \\
+  \colrule
+  100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & -- & --
+  \\
+  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & -- & --
+  \\
+  100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & -- & --
+  \\
+  500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
+  \\
+  500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
+  \\
+  500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
+  \\
+  \citet{Williams2016} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+  \\
+  \citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+  \\
+  \botrule
+  \end{tabular*}%
+  }
+  {$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
+  \end{table*}
+
+
+  \bibliography{caller_paper}
 \end{document}
+
