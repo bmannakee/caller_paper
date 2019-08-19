@@ -417,7 +417,7 @@ Modifying the algorithm to work with the Strelka statistical model would involve
 In general we are advancing the idea that there is substantial prior information about the tumor and site-specific mutation probability encoded in NGS data, and we should be using it.
 
 \batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
-The first is the set of mutations that pass all heuristics filters, and a very large posterior probability of being present given the observed read data.
+The first is the set of mutations that pass all heuristics filters, and a having a very large posterior probability of being present given the observed read data.
 We think of these high-probability variants as data generated from a distribution, the mutation profile, with very low measurement error.
 This low measurement error data allows us to reliably estimate the distribution of substitution types.
 Variants with low probability given the read data can be thought of as noisy measurements of samples from the same data generating distribution.
