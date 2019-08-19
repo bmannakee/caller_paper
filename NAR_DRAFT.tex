@@ -306,7 +306,7 @@ We called variants using Mutect 1.1.7 with the same parameters as described abov
 \subsection{Calibration metric}
 
 	We use the Integrated Calibration Index to quantify the difference between MuTect and \batcave \cite{Austin2019}.
-	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-wes_fig} \textbf{e}).
+	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and \batcave (Figure \ref{NAR-wgs_fig} \textbf{e} and \textbf{f} and Table \ref{table:01}).
 	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the loess fit and a diagonal line.
 
   \begin{figure*}
@@ -359,7 +359,7 @@ The ICI is a measure of the difference between predicted and observed probabilit
 This is useful in our setting because the density of posterior probabilities tends to be strongly bi-modal.
 A large fraction of true negative variants have posterior probabilities of less than $10{-4}$, which is a probability far below any threshold that is meaningful, we evaluate calibration only on variants with posterior probability greater than .01.
 As we can see in Figure \ref{NAR-wes_fig} \textbf{b} and \textbf{d}, \batcave tends to increase posterior probabilities of low probability but true variants (density curves) while decreasing the probability of low probability but false variants (density not shown).
-For 500X tumors the calibration of \batcave is better across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse.
+For 500X tumors the calibration of \batcave is better across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse (Figure \ref{NAR-wgs_fig} and Table \ref{table:01}).
 This effect is likely due to the fact that there are simply very few low probability true positive variants in tumor sequenced to 100X depth.
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
