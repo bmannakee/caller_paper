@@ -368,7 +368,7 @@ As with all other metrics, the benefit of \batcave increases as the concentratio
 Figure \ref{NAR-ppv_fig} takes a consolidated view of classification accuracy and calibration in the portion of the posterior probability distribution relevant to clinicians and researchers.
 For any probability between .6 and .95 \batcave is better calibrated than Mutect.
 Essentially, for any posterior probability above .7 MuTect has a false positive rate around 8\%, which \batcave has a false positive rate that increases as posterior probability decreases.
-The cost of this compression is recall.
+The cost of this compression is recall, which is 3-5\% better than MuTect at 95\% posterior probability, and 3-7\% better at 90\%
 At any posterior probability \batcave returns a larger fraction of all positive calls than MuTect.
 
 \subsection{Real tumor data.}
@@ -378,11 +378,11 @@ These are among a very small number of tumors which have been sequenced at high 
 \citet{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
-The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{a)} and Table \ref{table:01}).
+The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{a} and Table \ref{table:01}).
 
 \citet{Shi2018} performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$, and validated all variants identified by three different variant calling pipelines.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{b)} and Table \ref{table:01}).
+We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{b} and Table \ref{table:01}).
 
 \begin{figure}
   \begin{center}
@@ -390,7 +390,7 @@ We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the
   \end{center}
   \caption{Model performance on 500X simulated whole exome. 
   Positive predictive values vs. Recall for three different probability cutoffs. 
-  Note the restricted axes to improve readability of points.\bkmcomment{how do called allele frequency distributions differ?}}
+  Note the restricted axes to improve readability of points}
 \label{NAR-ppv_fig}
 \end{figure}
 
