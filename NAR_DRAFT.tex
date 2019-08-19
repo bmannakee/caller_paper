@@ -482,7 +482,7 @@ Text. Text. Text. Text.
   \end{center}
   \caption{Model performance on 100X simulated whole genome.
   \textbf{(a)} Precision recall curves and \textbf{(c)} Reciever operating characteristic curves for 3 mutation signatures.
-  Distribution of estimated true positive probabilities for true positive  variants for \textbf{b)} the MuTect model and \textbf{d)} the BATCAVE model.
+  Distribution of estimated true positive probabilities for true positive  variants for \textbf{b)} the MuTect model and \textbf{d)} the \batcave model.
   A perfectly calibrated model would generate the diagonal line.}
 \label{NAR-wgs_fig}
 \end{figure}
@@ -502,19 +502,19 @@ Text. Text. Text. Text.
 
 \begin{table}
   \tableparts{%
-  \caption{This is a table with $\mu$, auroc, auprc, ICI, and maybe fraction called?}
+  \caption{Performance characteristics as measured for all data sets.}
   \label{table:01}%
   }{%
   \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
   \toprule
   Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
   \\
-  & & (estimated) & MuTect & BATCAVE & MuTect & BATCAVE & MuTect & BATCAVE
+  & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
   \\
   \colrule
   100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & .117 & .287
   \\
-  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & .118 & 214
+  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & .118 & .214
   \\
   100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & .120 & .219
   \\
@@ -524,9 +524,9 @@ Text. Text. Text. Text.
   \\
   500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
   \\
-  Williams & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+  \citet{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
   \\
-  Shi & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+  \citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
   \\
   \botrule
   \end{tabular*}%
