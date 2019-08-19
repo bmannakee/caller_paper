@@ -365,6 +365,11 @@ For 500X tumors the calibration of \batcave is better across the full spectrum o
 This effect is likely due to the fact that there are simply very few low probability true positive variants in tumor sequenced to 100X depth.
 As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
 
+Figure \ref{NAR-ppv_fig} takes a consolidated view of classification accuracy and calibration in the portion of the posterior probability distribution relevant to clinicians and researchers.
+For any probability between .6 and .95 \batcave is better calibrated than Mutect.
+Essentially, for any posterior probability above .7 MuTect has a false positive rate around 8\%, which \batcave has a false positive rate that increases as posterior probability decreases.
+The cost of this compression is recall.
+At any posterior probability \batcave returns a larger fraction of all positive calls than MuTect.
 
 \subsection{Real tumor data.}
 We utilized two real data sets.
