@@ -9,6 +9,8 @@
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
 \newcommand{\batcave}{BATCAVE }
 \newcommand{\beginsupplement}{%
+        \clearpage
+        \onecolumn
         \setcounter{table}{0}
         \renewcommand{\thetable}{S\arabic{table}}%
         \setcounter{figure}{0}
@@ -417,7 +419,6 @@ Variants with low probability given the read data can be thought of as noisy mea
 We then use the estimated distribution of substitution types to sharpen the prior probability of mutation for these lower probability variants.
 
 The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
-\bkmcomment{coming}
 
 The benefit derived from \batcave varies with both the concentration of the tumor mutation profile and the depth of sequencing.
 Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
@@ -466,8 +467,7 @@ Text. Text. Text. Text.
 \subsubsection{Conflict of interest statement.} None declared.
 
 \bibliography{caller_paper}
-\clearpage
-\onecolumn
+
 \beginsupplement
 \section{Supplememtary Figures}
 
