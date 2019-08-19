@@ -75,7 +75,7 @@ joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClon
 All of these methods have varying levels of complexity, and some are focused on specific types of data.
 The one thing they all have in common is that they either implicitly or explicitly assume that the probability of a mutation occuring at a particular site is proportional to the overall mutation rate, and the same at every site in the genome.
 
-Single nucleotide substitions, i.e. simple mutations, arise in tumors at a rate and at genomic locations driven by two main processes. 
+Single nucleotide variants (SNV) arise in tumors at a rate and at genomic locations driven by two main processes. 
 The first is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 The second -- and far more complex -- process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
@@ -165,12 +165,12 @@ Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_
   \label{eqn:detailed_prior}
   $$
   \begin{array}{rcl}
-  \mathrm{p}(\mathrm{S_{m,c}}) &=&  \mathrm{p}(m, M | C = c) \\
+  \mathrm{p}(\mathrm{S}_{m,c}) &=&  \mathrm{p}(m, M | C = c) \\
                             &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{p(M)}{p(C = c)},
   \end{array}
   $$
 \end{equation}
-where $\mathrm{p}(\mathrm{S_{m,c}})$ is the probability that a substitution of type $\mathrm{S_{m,c}}$ will occur.
+where $\mathrm{p}(\mathrm{S}_{m,c})$ is the probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
 
 
@@ -210,11 +210,10 @@ The posterior probability of mutation to allele $m$ given that a mutation has oc
 \end{equation}
 The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = c)$, the prior probability of seeing a particular tri-nucleotide context.
 We compute this as simply the proportion of all tri-nucleotide contexts with the context $C = c$ present in the target genome, which is slightly different depending on whether we are analyzing a whole genome or an exome.
-
-add to change
+The R implementation for \batcave ships with pre-computed tables for both whole exomes and whole genomes.
 
 \subsection{Estimation of the mutation rate.}
-The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which usually specified as the mutation \textit{rate} per base $\mu$.
+The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which we specify as the per-base mutation rate $\mu$.
 In an exponentially growing and neutrally or nearly neutrally evolving tumor, \citet{Williams2018} show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
 \begin{equation}
   \label{eqn:mut_rate}
@@ -234,7 +233,7 @@ Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have
 
 \subsection{The likelihood function}
 We designed \batcave to be used as a post-calling evaluation tool with MuTect.
-MuTect is particularly useful because it directly reports the log ratio of the likelihood functions for the null and alterative hypotheses in \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
+MuTect is particularly useful because it directly reports the log ratio of the likelihood functions for the null and alterative hypotheses in equation \ref{eqn:hypothesis} as either \texttt{TLOD} (MuTect1) or \texttt{t\_lod\_fstar} (MuTect2).
 We used MuTect 1.1.7 for all of the analysis in this paper, so the output of MuTect provides us with
 
 \begin{equation}
@@ -249,10 +248,10 @@ The log posterior odds is the log likelihood ratio (\texttt{TLOD}) + the log pri
 \begin{equation}
   \label{eqn:computed_posterior}
   $$
-  \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} + \mathrm{logit}_{10}(\mathrm{p}(\mathrm{S_{m,c}}))},
+  \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} + \mathrm{logit}_{10}(\mathrm{p}(\mathrm{S}_{m,c}))},
   $$
 \end{equation}
-where $\mathrm{p}(\mathrm{S_{m,c}})$ is the prior probability of a substitution of type $\mathrm{S_{m,c}}$, as described in equation \ref{eqn:detailed_prior} and specified in equations \ref{eqn:post_pred} - \ref{eqn:mut_rate}.
+where $\mathrm{p}(\mathrm{S}_{m,c})$ is the prior probability of a substitution of type $\mathrm{S}_{m,c}$, as described in equation \ref{eqn:detailed_prior} and specified in equations \ref{eqn:post_pred} - \ref{eqn:mut_rate}.
 When comparing our posterior odds to those of MuTect in this paper, we use the assumption put forward by the MuTect authors in \citet{Cibulskis2013}.
 They suggest a threshold for the posterior odds of 2, and a prior per-base probability of mutation of $3\cdot10^{-6}$, leading to a \texttt{TLOD} threshold of 6.3.
 We compute the posterior odds for Mutect as
@@ -424,6 +423,7 @@ Deeper sequencing leads to more benefit from the algorithm because there are sim
 Deep sequencing is useful \cite{Zehir2017}.
 We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
 
+\bkmcomment{Discuss assumption that vaf in uniform. opportunity for further work.}
 
 One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
 Clinical studies often threshold at a vaf, rather than using the evidence threshold of the caller. 272X 5\% cutoff \cite{Parsons2016}, why go so deep?
