@@ -8,6 +8,12 @@
 \newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
 \newcommand{\batcave}{BATCAVE }
+\newcommand{\beginsupplement}{%
+        \setcounter{table}{0}
+        \renewcommand{\thetable}{S\arabic{table}}%
+        \setcounter{figure}{0}
+        \renewcommand{\thefigure}{S\arabic{figure}}%
+     }
 % Enter dates of publication
 \copyrightyear{2008}
 \pubdate{31 July 2009}
@@ -129,7 +135,7 @@ $$
   P(m,\nu) = p(m) \cdot \prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu}(x_i).
 $$
 \end{equation}
-Here we show how \batcave can be used to provide a tumor and site-specific estimate of the prior probability of mutation $p(m)$.
+Here we show how \batcave can be used to provide a tumor and site-specific estimate of the prior probability of mutation $\mathrm{p}(m)$.
 
 \subsection{Site-specific prior probability of mutation}
 The probability which we have denoted $\mathrm{p}(m)$ in equation \ref{eqn:2} for compactness is more precisely the joint probability that a mutation has occured $M$, and that it was to allele $m$, which we will denote here $\mathrm{p}(m,M)$.
@@ -299,7 +305,7 @@ We called variants using Mutect 1.1.7 with the same parameters as described abov
 
 \subsection{Calibration metric}
 
-	We use the Integrated Calibration Index to quantify the difference between MuTect and the Calibrated model \cite{Austin2019}.
+	We use the Integrated Calibration Index to quantify the difference between MuTect and \batcave \cite{Austin2019}.
 	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and the Calibrated model (Figure \ref{NAR-wes_fig} \textbf{e}).
 	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the loess fit and a diagonal line.
 
@@ -461,6 +467,7 @@ Text. Text. Text. Text.
 \bibliography{caller_paper}
 \clearpage
 \onecolumn
+\beginsupplement
 \section{Supplememtary Figures}
 
 \begin{figure}[b]
