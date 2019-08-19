@@ -270,7 +270,7 @@ The "Concentrated" profile is simulated with $\mathbf{\pi}$ set to an equal comb
 The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
 The "Diffuse" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair.
 The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
-Variants were selected from a combination of Cancer Genome Atlas (TCGA) and Pan-cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
+Variants were selected from a combination of the Cancer Genome Atlas (TCGA) and Pan-cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth), and whole exome (500X depth) reads were simulated from the GRCH38 reference genome using VarSim \cite{Mu2015}, and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were spiked to create tumors with Bamsurgeon with default parameters \cite{Ewing2015a},
 and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
@@ -370,11 +370,11 @@ These are among a very small number of tumors which have been sequenced at high 
 \citet{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
-The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (RD figure coming and Table \ref{table:01}).
+The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{a)} and Table \ref{table:01}).
 
 \citet{Shi2018} performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$, and validated all variants identified by three different variant calling pipelines.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave.
+We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{b)} and Table \ref{table:01}).
 
 \begin{figure}
   \begin{center}
