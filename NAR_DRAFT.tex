@@ -107,7 +107,7 @@ We provide a simple implementation in R that takes MuTect caller output as input
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
 
-At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is total read depth.
+At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector \bkmcomment{push equation onto separate line} $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is total read depth.
 We want to use $\mathbf{x}$ to select between competing hypotheses;
 \begin{equation}
   \label{eqn:hypothesis}
@@ -134,7 +134,7 @@ Assuming that the identity of the alternate allele and its allele frequency are 
 \begin{equation}
   \label{eqn:2}
 $$
-  P(m,\nu) = p(m) \cdot \prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu}(x_i).
+  \mathrm{P}(m,\nu) = \mathrm{p}(m) \cdot \prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu}(x_i).
 $$
 \end{equation}
 Here we show how \batcave can be used to provide a tumor and site-specific estimate of the prior probability of mutation $\mathrm{p}(m)$.
@@ -168,7 +168,7 @@ Using the substitution type $\mathrm{S}$, we can rewrite equation \ref{eqn:full_
   $$
   \begin{array}{rcl}
   \mathrm{p}(\mathrm{S}_{m,c}) &=&  \mathrm{p}(m, M | C = c) \\
-                            &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{p(M)}{p(C = c)},
+                            &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C = c)},
   \end{array}
   $$
 \end{equation}
@@ -231,7 +231,7 @@ In all results presented in this paper we have set $f_{min}$ to 0.05 because we 
 A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
 We make the simplifying assumption that there is no cell death, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
-Equation \ref{eqn:mut_rate} then allows us to estimate $p(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
+Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
 \subsection{The likelihood function}
 We designed \batcave to be used as a post-calling evaluation tool with MuTect.
@@ -500,7 +500,7 @@ Text. Text. Text. Text.
 
 \section{Supplememtary Table}
 
-\begin{table}
+\begin{table}[b]
   \tableparts{%
   \caption{Performance characteristics as measured for all data sets.}
   \label{table:01}%
