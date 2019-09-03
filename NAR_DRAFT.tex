@@ -401,12 +401,6 @@ We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the
 \batcave is a post-call variant evalutation tool that uses MuTect output and the tumor-specific mutation profile to sharpen the posterior probability assigned to SNVs.
 We demonstrated here that \batcave improves classification accuracy in simulated data, with the magnitude of the improvement dependent on the sequencing depth and the concentration of the mutation profile.
 
-We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
-These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
-At the same time, there is no way to compute true and false negative fractions for these data sets.
-As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
-Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
-
 The \batcave algorithm focuses on the tri-nucleotide context and substitution type, which has been shown to have a large effect on site-specific mutation rates \cite{Martincorena2015,Hollstein2017}.
 There are, however, many other types of \textit{genomic context} which can effect local mutation rates including replication timing, expression level, and chromosome organization \cite{Buisson2019,Schuster-Bockler2012,Pleasance2010} .
 These could be very useful in computing a local or regional mutation rate, as opposed to the genome-wide but tumor-specific mutation rate used by \batcave.
@@ -428,6 +422,16 @@ We use the estimated distribution of substitution types to adjust the prior prob
 The benefit derived from \batcave varies with both the concentration of the tumor mutation profile and the depth of sequencing.
 Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
 Deep sequencing is useful \cite{Zehir2017}.
+
+We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
+These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
+At the same time, there is no way to compute true and false negative fractions for these data sets.
+As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
+Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
+
+
+
+
 We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
 
 One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
