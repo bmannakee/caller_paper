@@ -410,20 +410,19 @@ The \batcave algorithm focuses on the tri-nucleotide context and substitution ty
 There are many other types of \textit{genomic context} which can effect local mutation rates \cite{Buisson2019}.
 These could be very useful in computing a local or regional mutation rate, as opposed to the genome-wide but tumor-specific mutation rate used by \batcave.
 
-We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple model and a well-tested set of heuristic filters.
+We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple statistical model and a well-tested set of heuristic filters.
 However, in principle there is no barrier to using the method with other variant callers.
 For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
-In general we are advancing the idea that there is substantial prior information about the tumor and site-specific mutation probability encoded in NGS data, and we should be using it.
+The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
 
 \batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
-The first is the set of mutations that pass all heuristics filters, and a having a very large posterior probability of being present given the observed read data.
-We think of these high-probability variants as data generated from a distribution, the mutation profile, with very low measurement error.
-This low measurement error data allows us to reliably estimate the distribution of substitution types.
-Variants with low probability given the read data can be thought of as noisy measurements of samples from the same data generating distribution.
-We then use the estimated distribution of substitution types to sharpen the prior probability of mutation for these lower probability variants.
+The first is the set of mutations that pass all heuristics filters, and  have a very large posterior probability of being present given the observed read data.
+These are high-probability variants generated from a distribution, the mutation profile, and measured with very small error.
+This data allows us to reliably estimate the distribution of substitution types.
+Variants with low probability given the read data are noisy measurements of samples from the same data generating distribution.
+We use the estimated distribution of substitution types to adjust the prior probability of mutation for these lower probability variants.
 
-The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
 
 The benefit derived from \batcave varies with both the concentration of the tumor mutation profile and the depth of sequencing.
 Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
