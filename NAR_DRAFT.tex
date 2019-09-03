@@ -423,7 +423,7 @@ The benefit derived from \batcave varies with both the concentration of the tumo
 Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
 Deep sequencing is useful \cite{Zehir2017}.
 
-We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent.
+We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent \cite{Griffith2015,Shi2018}.
 These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
 At the same time, there is no way to compute true and false negative fractions for these data sets.
 As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
