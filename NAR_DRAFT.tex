@@ -410,11 +410,12 @@ The \batcave algorithm focuses on the tri-nucleotide context and substitution ty
 There are many other types of \textit{genomic context} which can effect local mutation rates \cite{Buisson2019}.
 These could be very useful in computing a local or regional mutation rate, as opposed to the genome-wide but tumor-specific mutation rate used by \batcave.
 
-We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple statistical model and a well-tested set of heuristic filters.
-However, in principle there is no barrier to using the method with other variant callers.
+We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple model and a well-tested set of heuristic filters.
+However, the model is very general, and in principle there is no barrier to using the method with other variant callers.
 For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
-The algorithm has low computational overhead, and in principle there should be no bar to simply incorporating it into existing variant calling algorithms.
+The majority of the computational overhead in \batcave is associated with extracting the tri-nucleotide context for each potential variant site from the reference genome.
+Since most variant callers are already walking the reference genome as part of the calling process, extracting the tri-nucleotide context simultaneously would dramatically reduce the computational overhead associated with implementing \batcave.
 
 \batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
 The first is the set of mutations that pass all heuristics filters, and  have a very large posterior probability of being present given the observed read data.
@@ -423,13 +424,10 @@ This data allows us to reliably estimate the distribution of substitution types.
 Variants with low probability given the read data are noisy measurements of samples from the same data generating distribution.
 We use the estimated distribution of substitution types to adjust the prior probability of mutation for these lower probability variants.
 
-
 The benefit derived from \batcave varies with both the concentration of the tumor mutation profile and the depth of sequencing.
 Deeper sequencing leads to more benefit from the algorithm because there are simply more low frequency, and thus more ambiguous, variants accessible in deeply sequenced tumors.
 Deep sequencing is useful \cite{Zehir2017}.
 We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
-
-\bkmcomment{Discuss assumption that vaf in uniform. opportunity for further work.}
 
 One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
 Clinical studies often threshold at a vaf, rather than using the evidence threshold of the caller. 272X 5\% cutoff \cite{Parsons2016}, why go so deep?
