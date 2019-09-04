@@ -378,7 +378,7 @@ These are among a very small number of tumors which have been sequenced at high 
 \citet{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
-The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure \ref{NAR-wes_fig} \textbf{a} and Table \ref{table:01}).
+The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure \ref{NAR-real_data_fig} \textbf{a} and Table \ref{table:01}).
 
 \citet{Shi2018} performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$, and validated all variants identified by three different variant calling pipelines.
 We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
@@ -397,6 +397,7 @@ We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the
 
 
 \section{DISCUSSION}
+ 
 We hope that the availability of this algorithm will have a positive effect on the cost/benefit ratio of deeper sequencing in both research and clinical applications
 One size does not fit all with respect to the evidence threshold. Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of sensitivity and specificty
 Clinical studies often threshold at a vaf, rather than using the evidence threshold of the caller. 272X 5\% cutoff \cite{Parsons2016}, why go so deep?
@@ -478,6 +479,15 @@ Text. Text. Text. Text.
   A perfectly calibrated model would generate the diagonal line.}
 \label{NAR-wgs_fig}
 \end{figure}
+
+\begin{figure}[b]
+  \begin{center}
+  \includegraphics{figures/aml_plot.pdf}
+  \end{center}
+  \caption{aml and cell. Need no color and drop calibration}
+\label{NAR-real_data_fig}
+\end{figure}
+
 
 \clearpage
 \begin{figure}
