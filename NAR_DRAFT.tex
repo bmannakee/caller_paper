@@ -431,6 +431,7 @@ We have chosen to implement \batcave as a post-calling algorithm for exclusive u
 However, the model is very general, and in principle there is no barrier to using the method with other variant callers.
 For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
+
 The R implementation \texttt{batcaver} adds 1 second per 22,000 variants evaluated to a standard GATK best practices variant calling pipeline. 
 The majority of the computational overhead in \batcave is associated with extracting the tri-nucleotide context for each potential variant site from the reference genome.
 Since most variant callers are already walking the reference genome as part of the calling process, extracting the tri-nucleotide context simultaneously would dramatically reduce the computational overhead associated with implementing \batcave.
