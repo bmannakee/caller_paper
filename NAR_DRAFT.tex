@@ -419,6 +419,7 @@ Importantly, \batcave is better calibrated than MuTect at relevant probability t
 We are unable to study calibration in real data, because complete false positive/true negative data for real data is not available. 
 Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
 
+\bkmcomment{I think it really is empirical bayes, but may be better described as a set of data you can consider labelled in some way}
 \bkmcomment{can I work a citation in here? using data sets from the same data generating distribution as a prior? Struggling to find one, but will keep looking.}
 \batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
 The first is the set of mutations that pass all heuristics filters, and  have a very large posterior probability of being present given the observed read data.
