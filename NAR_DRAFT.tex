@@ -419,13 +419,19 @@ Importantly, \batcave is better calibrated than MuTect at relevant probability t
 We are unable to study calibration in real data, because complete false positive/true negative data for real data is not available. 
 Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
 
-\bkmcomment{I think it really is empirical bayes, but may be better described as a set of data you can consider labelled in some way}
-\bkmcomment{can I work a citation in here? using data sets from the same data generating distribution as a prior? Struggling to find one, but will keep looking.}
-\batcave approaches the set of variant calls returned from MuTect as two distinct sets of data.
-The first is the set of mutations that pass all heuristics filters, and  have a very large posterior probability of being present given the observed read data.
-This data allows us to reliably estimate the distribution of substitution types, i.e. the mutation profile.
-Variants with low probability given the read data are noisy measurements of samples from the same data generating distribution.
-We use the estimated distribution of substitution types to adjust the prior probability of mutation for these lower probability variants.
+\batcave resembles an empirical Bayes approach, but is not really empirical Bayes.
+In fact, variants are best described as sequential samples from a data generating distribution represented by the mutation profile.
+Early mutations are classified with low error, while later mutations are classified with less certainty.
+We show here that sequential updating of the dirichlet-multinomial posterior converges to the true data generating distribution using the set of early mutations.
+Along with the assumption that tumor evolution is approximately neutral, this allows us to generate a tumor and site-specific that sharpens the classification and calibration of later mutations.
+Thus, \batcave is best described as an algorithm trained on early mutations.
+
+\bkmcomment{this needs more work}
+We simulate tumors with three mutation profiles, and evaluate two real tumor data sets.
+Among these performance is best with the most concentrated simulatin profile.
+The intermediate and diffuse mutation profiles are designed to represent baseline or minimal profiles of Lung and Breast tumors respectively.
+In fact, lung and breast tumors have heterogeneous mutation profiles with a wide range of levels of concentration.
+The Acute Myeloid Leukemia we evaluated has a particularly diffuse profile, which is common for these tumors \cite{Alexandrov2019}.
 
 The \batcave algorithm focuses on the tri-nucleotide context and substitution type, which has been shown to have a large effect on site-specific mutation rates \cite{Martincorena2015,Hollstein2017}.
 There are, however, many other types of \textit{genomic context} which can effect local mutation rates including replication timing, expression level, and chromosome organization \cite{Buisson2019,Schuster-Bockler2012,Pleasance2010}.
@@ -446,19 +452,22 @@ One size does not fit all with respect to the evidence threshold.
 Users are interested in true and false positive fractions, and users of different types will have different trade-offs in terms of precision and recall.
 We present \batcave, and the R package \texttt{batcaver} to provide the user with a more accurate sense of these trade-offs.
 
-\section{CONCLUSION}
-\bkmcomment{I looked at a bunch of NAR methods papers, and none include a conclusions section, so I moved it to the last paragraph of discussion.}
+% \section{CONCLUSION}
+% \bkmcomment{I looked at a bunch of NAR methods papers, and none include a conclusions section, so I moved it to the last paragraph of discussion.}
 
 \section{Software Availability}
 \bkmcomment{working on this today}
+
 github for source code
+
 zenodo for figures, simulations
+
 zenodo for package at time of bioarxiv
 
 \section{ACKNOWLEDGEMENTS}
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text.
+This work was supported by the National Science Foundation via Graduate Research Fellowship DGE-1143953 to BKM and \bkmcomment{RNG NIH}.
+The authors would like to thank Professor Edward J. Bedrick for fruitful discussions about the statistical model.
 
 
 \subsubsection{Conflict of interest statement.} None declared.
