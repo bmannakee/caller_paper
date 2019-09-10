@@ -1,10 +1,8 @@
 \documentclass[a4,center,fleqn]{NAR}
-
-
-\usepackage{NAR-natbib}
-\bibliographystyle{NAR-natbib}
+\bibliographystyle{plainnat}
 \usepackage{color}
 \usepackage{xfrac}
+
 \newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
 \newcommand{\batcave}{BATCAVE }
@@ -73,7 +71,7 @@ Low frequency mutations present a significant problem for current mutation calli
 Methods for identifying true somatic mutations - i.e. variant calling -  from NGS data are an active area of research in bioinformatics.
 The earliest widely used somatic variant callers aimed specifically at tumors, Mutect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants, setting a threshold for that score designed to balance sensitivity and specificity \citep{Koboldt2012,Cibulskis2013}.
 Subsequent research gave rise to a number of alternate variant calling strategies including haplotype based callers \citep{Garrison2012},
-joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone)\citep{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE)\citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and a mixture of ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC).
+joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone)\cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE)\citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and a mixture of ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC).
 All of these methods have varying levels of complexity, and some are focused on specific types of data.
 The one thing they all have in common is that they either implicitly or explicitly assume that the probability of a mutation occuring at a particular site is proportional to the overall mutation rate, and the same at every site in the genome.
 
