@@ -54,31 +54,34 @@ Most of the mutations in a tumor at time of diagnosis are present in only a smal
 Identification of these low frequency mutations is increasingly important as evidence has accumulated for their role in treatment resistance, and the value of tumor heterogeneity as a diagnostic biomarker.
 The identification of low frequency mutations from Next Generation Sequencing data remains challenging.
 In general the ability to reliably detect low frequency mutations increases as sequencing depth increases, yet false positive identification rates also increase with sequencing depth.
+\rngcomment{A little too much intro in abstract.}
 This dynamic has historically hindered the use of sequencing depths much greater than about 150X average coverage for non-targeted sequencing such as whole exome or whole genome.
 Here we present \batcave, an algorithm that uses variant calls produced by MuTect to compute a tumor and site-specific prior probability of mutation for every potential variant, and uses this prior probability to calibrate the posterior probability for every variant.
 \batcave uses the mutation profile and allele frequency spectrum of high-confidence mutations to estimate the data generating distribution giving rise to variants.
 We show that high-confidence variant calls are sufficient to generate a good estimate of this data generating distribution, and the posterior probabilies of mutation for called variants are better calibrated than those arising from current variant calling algorithms.
+\rngcomment{Need a sentence about what new analysis this enables. How does \batcave (at least help) solve the problem you raised earlier?}
 We provide an R package implementing the \batcave algorithm for use with MuTect output.
 \end{abstract}
 
 
 \section{Introduction}
 
-Cancer develops as the result of the accumulation of somatic mutations and clonal selection of cells with mutations that confer a selective advantage on the cell.
-Understanding the forces that shaped the evolutionary history of a tumor, the mutations that are responsible for its growth, the rate at which mutations are occurring, or how much genetic diversity is likely present in the tumor, requires accurate variant calling, particularly at low variant allele frequency \cite{Williams2016,Bozic2016,Williams2018,Shi2018}.
-Accurate variant identification is also critical in optimizing the treatment regime for an individual patients disease \citep{Ding2012,Mardis2012,Chen2013,Borad2014,Findlay2016}.
-Low frequency mutations present a significant problem for current mutation calling methods because their signature in the data is difficult to distinguish from the noise introduced by Next Generation Sequencing (NGS), and this problem increases as sequencing depth increases.
+Cancer develops through the accumulation of somatic mutations and clonal selection of cells with mutations that confer an advantage.
+Understanding the evolutionary history of a tumor, including the mutations that drive its growth, the genetic diversity within it, and the accumulation of new mutations, requires accurate variant identification, particularly at low variant allele frequency \cite{Williams2016,Bozic2016,Williams2018,Shi2018}.
+Accurate variant calling is also critical for optimizing the treatment of individual patients' disease \citep{Ding2012,Mardis2012,Chen2013,Borad2014,Findlay2016}.
+Low frequency mutations challenge current variant calling methods, because their signature in the data is difficult to distinguish from the noise introduced by Next Generation Sequencing (NGS), and this challenge increases with sequencing depth.
 
-Methods for identifying true somatic mutations - i.e. variant calling -  from NGS data are an active area of research in bioinformatics.
-The earliest widely used somatic variant callers aimed specifically at tumors, Mutect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants, setting a threshold for that score designed to balance sensitivity and specificity \citep{Koboldt2012,Cibulskis2013}.
-Subsequent research gave rise to a number of alternate variant calling strategies including haplotype based callers \citep{Garrison2012},
-joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone)\cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE)\citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and a mixture of ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC).
-All of these methods have varying levels of complexity, and some are focused on specific types of data.
-The one thing they all have in common is that they either implicitly or explicitly assume that the probability of a mutation occuring at a particular site is proportional to the overall mutation rate, and the same at every site in the genome.
+Many methods have been developed for calling somatic mutations from NGS data.
+The earliest widely used somatic variant callers developed specifically for tumors, MuTect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants and set a threshold score designed to balance sensitivity and specificity \citep{Koboldt2012,Cibulskis2013}.
+Subsequent research gave rise to a number of alternate strategies, including haplotype-based calling \citep{Garrison2012},
+joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC) \rngcomment{Citations?}.
+These methods vary in their complexity and specific focus.
+But they all implicitly or explicitly assume that the rate of mutation is uniform across the genome.
 
-Single nucleotide variants (SNV) arise in tumors at a rate and at genomic locations driven by two main processes. 
-The first is the spontaneous accumulation of mutations that occurs in all dividing tissues, and has a characteristic mutation signature that describes the probability of mutation in a given genomic context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
-The second -- and far more complex -- process is the accumulation of mutations through exposure to mutagens or degradation - via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
+The mutational processes that generate single nucleotide variants in tumors do not act uniformly across the genome.
+%Single nucleotide variants arise in tumors at a rate and at genomic locations driven by two main processes. 
+Somatic mutations accumulate spontaneously in all dividing tissues, and the local rate of mutation depends sensitively on the nucleotide context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
+Tumor cells additionally acquire mutations through exposure to mutagens or degradation, via mutation or deletion - of cellular machinery responsible for the identification and repair of damage or replication errors. 
 Many mutagens and DNA repair mechanism defects also have highly specific mutation signatures, such that they can be identified by observing the mutations in the tumor \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 The specific processes driving mutations in a particular tumor generate a tumor's unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}
 Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
@@ -465,9 +468,8 @@ zenodo for package at time of bioarxiv
 
 \section{ACKNOWLEDGEMENTS}
 
-This work was supported by the National Science Foundation via Graduate Research Fellowship DGE-1143953 to BKM and \bkmcomment{RNG NIH}.
-The authors would like to thank Professor Edward J. Bedrick for fruitful discussions about the statistical model.
-
+This work was supported by the National Science Foundation via Graduate Research Fellowship award number DGE-1143953 to BKM and by the National Institute of General Medical Sciences of the National Institutes of Health under award number R01GM127348 to RNG.
+We thank Professor Edward J. Bedrick for fruitful discussions about the statistical model.
 
 \subsubsection{Conflict of interest statement.} None declared.
 
