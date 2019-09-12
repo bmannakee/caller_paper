@@ -49,8 +49,16 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-The accumulation of somatic mutations is a hallmark of tumor development.
-
+The accumulation of somatic mutations is an inevitable consequence of tumor development.
+Most of the mutations in a tumor at time of diagnosis are present in only a small fraction of all tumor cells.
+Identification of these low frequency mutations is increasingly important as evidence has accumulated for their role in resistance, and the value of tumor heterogeneity as a biomarker.
+The identification of low frequency mutations from Next Generation Sequencing data remains challenging.
+In general the ability to reliably detect low frequency mutations increases as sequencing depth increases, yet false positive identification rates also increase with sequencing depth.
+This dynamic has historically hindered the use of sequencing depths much greater than about 150X average coverage for non-targeted sequencing such as whole exome or whole genome.
+Here we present \batcave, an algorithm that uses variant calls produced by MuTect to compute a tumor and site-specific prior probability of mutation for every potential variant, and uses this prior probability to calibrate the posterior probability for every variant.
+\batcave uses the mutation profile and allele frequency spectrum of high-confidence mutations to estimate the data generating distribution giving rise to variants.
+We show that high-confidence variant calls are sufficient to generate a good estimate of this data generating distribution, and the posterior probabilies of mutation for called variants are better calibrated than those arising from current variant calling algorithms.
+We provide an R package implementing the \batcave algorithm for use with MuTect output.
 \end{abstract}
 
 
@@ -96,7 +104,7 @@ We provide a simple implementation in R, \texttt{batcaver} that takes MuTect cal
 \section{MATERIALS AND METHODS}
 \subsection{Somatic variant calling base probability model}
 
-At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector \bkmcomment{push equation onto separate line} $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is total read depth.
+At every site in the genome with non-zero coverage, Next Generation Sequencing (NGS) produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is total read depth.
 We want to use $\mathbf{x}$ to select between competing hypotheses;
 \begin{equation}
   \label{eqn:hypothesis}
