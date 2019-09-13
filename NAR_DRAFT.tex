@@ -165,27 +165,27 @@ Eq.~\ref{eqn:full_prior} is then
                             &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C = c)}.
   \end{array}
 \end{equation}
-The first two terms on the right-hand side can be estimated from the mutation profile (Fig.~\ref{NAR-sigfig}).
+The first two terms on the right-hand side can be estimated from the observed mutation profile (Fig.~\ref{NAR-sigfig}).
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
+\rngcomment{Got here...}
 
-
-The mutation profiles in Figure \ref{NAR-sigfig} can be described compactly by the vector $\boldsymbol{\pi}$ where each element of $\boldsymbol{\pi}$ represents the proportion of all observed tumor mutations of substitution type $\mathrm{S}_{m,c}$.
-The distribution of observed substitutions $ \mathrm{p}(\mathrm{S}) $, is modeled as multinomial with parameter $ \boldsymbol{ \pi } = \{\pi_{m,c}\} $.
-In a tumor with a very large number of verified mutations $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile, but in practice we find that many elements of $\boldsymbol{\pi}$ will have $0$ or a very small number of mutations present in the tumor.
-As a result we need to model $\mathrm{p}(\mathrm{S})$ as dirichlet - multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
-
+We model the observed mutation profile $S$ (Fig.~\ref{NAR-sigfig}a-c) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
+Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
+In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
+But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
+We thus model $\mathrm{p}(\mathrm{S})$ as Dirichlet-multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
 $$
 \begin{aligned}
   \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
   \mathrm{S} \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
 \end{aligned}
 $$
-In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a-priori a mutation is equally likely in any context.
+In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a priori mutation is equally likely in any context.
 
-In order to estimate $\boldsymbol{\pi}$, we generate a subset of variants in the tumor in which we have high confidence that the variants are present, based on an initial calculation of their likelihood give the data.
-These are variants such that for any reasonable value of the site-specific prior probability of mutation, the evidence for the variant in the read data erases any doubt about the presence of the variant. 
-Let $\mathrm{D}$ be the set of high confidence variant calls -- which we define as having posterior odds greater than 10 to 1 -- and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
+To estimate $\boldsymbol{\pi}$, we identify a subset of high confidence variants, based on an initial calculation of their likelihood given the data.
+These are variants for which the evidence in the read data overwhelms any reasonable value of the site-specific prior probability of mutation.
+Let $\mathrm{D}$ be the set of high confidence variant calls, which we define as those having posterior odds greater than 10 to 1 with the site-specific prior, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
   $$
     \alpha^{\prime}_{m,c} = \alpha_{m,c} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{m,c}\}.
