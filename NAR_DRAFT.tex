@@ -83,8 +83,9 @@ The mutational processes that generate single nucleotide variants in tumors do n
 The processes of spontaneous mutation that are active in all somatic tissues depend sensitively on local nucleotide context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 Additional mutational processes are active in tumors, due to mutagen exposure or defects in DNA maintenance and repair, and these processes are also sensitive to local nucleotide context \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 The specific mutational processes active in a particular tumor generate its unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}.
-For example, Fig. \ref{NAR-sigfig} \textbf{a-c}, shows mutation profiles from several tumors.
+For example, Figure \ref{NAR-sigfig}\textbf{A} through \textbf{C}, shows mutation profiles from several tumors.
 \rngcomment{Check how NAR Genomics and Bioinformatics formats figure legends, equation references, etc.}
+\bkmcomment{Fixed in portions of text. need to change all figures to have capital letter panel labels. A and so on.}
 %Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
 Here we present an enhanced variant-calling algorithm that uses the biology of each individual tumor's mutation profile to improve identification of low allelic frequency mutations.
@@ -165,12 +166,12 @@ Eq.~\ref{eqn:full_prior} is then
                             &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C = c)}.
   \end{array}
 \end{equation}
-The first two terms on the right-hand side can be estimated from the observed mutation profile (Fig.~\ref{NAR-sigfig}).
+The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-sigfig}).
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
 \rngcomment{Got here...}
 
-We model the observed mutation profile $S$ (Fig.~\ref{NAR-sigfig}a-c) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
+We model the observed mutation profile $S$ (Figure~\ref{NAR-sigfig}\textbf{A} throught \textbf{C}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
 But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
