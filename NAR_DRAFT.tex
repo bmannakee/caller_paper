@@ -97,6 +97,7 @@ Broad adoption of our approach will enable more confident study of low allelic f
   \begin{center}
   \includegraphics{figures/signatures_only.pdf}
   \end{center}
+  \bkmcomment{tumor in F is probably normal breast plus APOBEC. Mention somewhere?}
   \caption{Tumor mutation profiles.
   In each panel, the y-axis is the proportion of total mutations in the tumor with each of the 96 substitution types shown on the x-axis.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
@@ -417,7 +418,7 @@ Deep sequencing experiments where a large random sample of uncalled potential va
 In fact, variants are best described as sequential samples from a data generating distribution represented by the mutation profile.
 Early mutations are classified with low error, while later mutations are classified with less certainty.
 We show here that sequential updating of the dirichlet-multinomial posterior converges to the true data generating distribution using the set of early mutations.
-Along with the assumption that tumor evolution is approximately neutral, this allows us to generate a tumor and site-specific that sharpens the classification and calibration of later mutations.
+Along with the assumption that tumor evolution is approximately neutral, this allows us to generate a tumor and site-specific prior that sharpens the classification and calibration of later mutations.
 Thus, \batcave is best described as an algorithm trained on early mutations.
 
 \bkmcomment{this needs more work}
