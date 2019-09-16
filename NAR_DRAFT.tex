@@ -166,7 +166,7 @@ The first two terms on the right-hand side can be estimated from the observed mu
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
 \rngcomment{Got here...}
-
+\bkmcomment{No currently published paper has numbered equations, and it is not mentioned in the guidelines. I am using their template for numbered and non-numbered equations.}
 We model the observed mutation profile $S$ (Figure~\ref{NAR-sigfig}\textbf{A} throught \textbf{C}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
@@ -219,7 +219,7 @@ The number of bases $N$ is fixed at $3\cdot10^9$ for a whole genome sequence and
 Returning to the set of high confidence mutations $\mathrm{D}$, we can set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, $f_{min}$ as the lowest, and count the number of mutations in $D$ falling between the two.
 In practice it is usually best to select a conservative value for $f_{min}$, which is strongly dependent on sequencing depth, and we include this as a parameter in the R implementation of \batcave.
 In all results presented in this paper we have set $f_{min}$ to 0.05 because we are working with very high sequencing depth.
-A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in \citet{Williams2016}.
+A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\citep{Williams2016}.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
 We make the simplifying assumption that there is no cell death, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
 Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
@@ -257,7 +257,7 @@ since $\mathrm{logit}_{10}(3\cdot10^{-6}) \approx -6$.
 
 \subsection{Tumor simulations.}
 We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
-Tumors were simulated with three different mutation profiles derived from combinations of COSMIC mutation signatures (\bkmcomment{website or citation}).
+Tumors were simulated with three different mutation profiles derived from combinations of COSMIC mutation signatures (version 2), downloaded from the COSMIC website.
 Each simulated profile includes a contribution from COSMIC mutation signature 1 which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
 The "Concentrated" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
 The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
