@@ -332,7 +332,7 @@ The mutation profile is computed from the high confidence sites, and the posteri
 The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
 We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
 In Figure~\ref{NAR-kl_fig} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
-For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the \citet{Griffith2015} leukemia is over 17000, and for our simulated data sets ranges between 1500 and 5000.
+For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
 
 
