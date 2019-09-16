@@ -285,7 +285,8 @@ and called with MuTect 1.1.7 \cite{Cibulskis2013} with the following parameters:
 
 \end{verbatim}
 \end{tiny}
-Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to {method} for prior estimation and rescoring.
+Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. 
+Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to \batcave for prior estimation and rescoring.
 
 \subsection{Real Data}
 We analyzed two real data sets, one from an acute myeloid leukemia, and one from a multi-region sequencing experiment in breast cancer \cite{Griffith2015,Shi2018}.
@@ -456,6 +457,11 @@ github for source code
 zenodo for figures, simulations
 
 zenodo for package at time of bioarxiv
+
+\section{Data Availability}
+COSMIC mutation signatures version 2 is available at \footnotesize{https://cancer.sanger.ac.uk/cosmic/signatures\_v2}.
+
+
 
 \section{ACKNOWLEDGEMENTS}
 
