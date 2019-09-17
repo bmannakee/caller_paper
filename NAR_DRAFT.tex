@@ -330,16 +330,6 @@ We use the Kullback-Leibler (KL) divergence as a measure of the distance (or ent
 In Figure~\ref{NAR-kl_fig} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
 For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
-
-\begin{figure}
-  \begin{center}
-  \includegraphics[width=.35\textwidth]{figures/kl_only.pdf}
-  \end{center}
-  \caption{KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(A)} Whole exomes and \textbf{(B)} whole genomes.
-  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.}
-\label{NAR-kl_fig}
-\end{figure}
-
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
 For each of the two types we simulated tumors with variants drawn from three different mutation profiles chosen to resemble melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse)  as described in Materials \& Methods and Figure \ref{NAR-sigfig}\textbf{C,D,E}.
@@ -408,6 +398,15 @@ As such, it is not surprising that the performance of MuTect and \batcave are si
 Deep sequencing is necessary to measure quantities such as intra-tumor heterogeneity \citep{Shi2018}, sub-clonal presence of driver and resistance alleles \cite{Griffith2015}, and the mutational landscape of cancer in general \cite{Zehir2017}.  
 As Griffith et al., 2015~\citep{Griffith2015} show, whole genome sequencing at approx. 350X average depth requires combining calls from many variant calling algorithms, and then validating these calls via ultra-deep targeted sequencing. 
 We believe that much of the need for multiple variant callers could be alleviated by improvements to the statistical model used to evaluate the evidence presented by the sequenced reads. 
+
+\begin{figure}
+  \begin{center}
+  \includegraphics[width=.35\textwidth]{figures/kl_only.pdf}
+  \end{center}
+  \caption{KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(A)} Whole exomes and \textbf{(B)} whole genomes.
+  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.}
+\label{NAR-kl_fig}
+\end{figure}
 
 \batcave is a post-call variant evalutation tool that uses MuTect output and the tumor-specific mutation profile to sharpen the posterior probability assigned to SNVs.
 We demonstrated here that \batcave improves classification accuracy in synthetic data, leading to better more accurate variant calls at any posterior probability threshold.
