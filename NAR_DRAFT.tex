@@ -83,7 +83,6 @@ Additional mutational processes are active in tumors, due to mutagen exposure or
 The specific mutational processes active in a particular tumor generate its unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}.
 For example, Figure~\ref{NAR-sigfig}, shows mutation profiles from several tumors.
 These real tumor mutation profiles show the diversity of profiles seen even within a single cancer.
-The synthetic tumor mutation profiles we generated are designed to capture this diversity, and assess the performance of \batcave across a spectrum of reasonable mutation profiles.
 %Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
 Here we present an enhanced variant-calling algorithm that uses the biology of each individual tumor's mutation profile to improve identification of low allelic frequency mutations.
@@ -263,6 +262,7 @@ Each simulated profile includes a contribution from COSMIC mutation signature 1 
 The "Concentrated" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
 The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
 The "Diffuse" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair.
+The synthetic tumor mutation profiles we generated are designed to capture the observed diversity in mutation profiles, and assess the performance of \batcave across a spectrum of reasonable mutation profiles.
 The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
 Variants were selected from a combination of the Cancer Genome Atlas (TCGA) and Pan-cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth), and whole exome (500X depth) reads were simulated from the GRCH38 reference genome using VarSim \cite{Mu2015}, and aligned with BWA \cite{Li2009a}, both with default parameters.
