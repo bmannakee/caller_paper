@@ -99,14 +99,15 @@ Broad adoption of our approach will enable more confident study of low allelic f
   \end{center}
   \bkmcomment{tumor in F is probably normal breast plus APOBEC. Mention somewhere?}
   \caption{Tumor mutation profiles.
-  In each panel, the y-axis is the proportion of total mutations in the tumor with each of the 96 substitution types shown on the x-axis.
+  In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
-  \textbf{(B)} The observed mutation profile of a breast tumor we used in our real data analysis \cite{Shi2018}.
-  \textbf{(C)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
-  \textbf{(D)} Equal proportions of signatures 1, 4, \& 5.
-  \textbf{(E)} Equal proportions of signatures 1, 3, \& 5.
-  \textbf{(F)}--\textbf{(G)} The observed mutation profile of two real breast tumors obtained from supplementary materials in Alexandrov et al., 2019 \citep{Alexandrov2019}.
-  }
+  \textbf{(B)} The observed mutation profile of a breast tumor used in our real data analysis \cite{Shi2018}.
+  \textbf{(C)}\&\textbf{(D)} The observed mutation profiles of two breast tumors \cite{Alexandrov2019}.
+  \textbf{()} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+  \textbf{()} Equal proportions of signatures 1, 4, \& 5.
+  \textbf{()} Equal proportions of signatures 1, 3, \& 5.
+  Move simulated profiles to own figure.
+   }
   \label{NAR-sigfig}
  \end{figure}
 
@@ -152,7 +153,7 @@ We next show how to estimate the quantities in Eq.~\ref{eqn:full_prior}.
 Many aspects of genomic architecture can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the tri-nucleotide context, which is known to strongly effect the prior probability of mutation \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The tri-nucleotide context of a genomic site consists of the identity of the reference base and the 3' and 5' flanking bases.
-Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot$ possible tri-nucleotide contexts $C$.
+Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
 At the focal site, a mutation $m$ can be to any of three alternate alleles.
 Indexing by the $c=\{1 \dots 32\}$ contexts and and by the $m = \{1 \dots 3\}$ alternate bases, we have 96 possible substitution types $S_{m,c}$.
 Eq.~\ref{eqn:full_prior} is then
@@ -166,113 +167,92 @@ Eq.~\ref{eqn:full_prior} is then
 The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-sigfig}).
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
-\rngcomment{Got here...}
-\bkmcomment{No currently published paper has numbered equations, and it is not mentioned in the guidelines. I am using their template for numbered and non-numbered equations.}
-We model the observed mutation profile $S$ (Figure~\ref{NAR-sigfig}\textbf{A} throught \textbf{C}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
+We model the observed mutation profile $\mathrm{S}$ (Figure~\ref{NAR-sigfig}\textbf{A}-\textbf{E}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
 But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
-We thus model $\mathrm{p}(\mathrm{S})$ as Dirichlet-multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
-$$
+We thus model the distribution of $\mathrm{S}$ as Dirichlet-multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
+\begin{equation}
 \begin{aligned}
   \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
   \mathrm{S} \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
 \end{aligned}
-$$
+\end{equation}
 In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a priori mutation is equally likely in any context.
 
 To estimate $\boldsymbol{\pi}$, we identify a subset of high confidence variants, based on an initial calculation of their likelihood given the data.
 These are variants for which the evidence in the read data overwhelms any reasonable value of the site-specific prior probability of mutation.
-Let $\mathrm{D}$ be the set of high confidence variant calls, which we define as those having posterior odds greater than 10 to 1 with the site-specific prior, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
+Let $\mathrm{D}$ be the set of high confidence variant calls, which we define as those having posterior odds greater than 10 to 1 without the site-specific prior, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
-  $$
+\begin{equation}
     \alpha^{\prime}_{m,c} = \alpha_{m,c} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{m,c}\}.
-  $$
-Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C = c \mid M,\mathrm{D})$ as
+\end{equation}
+Returning to Eq. \ref{eqn:detailed_prior}, given that a mutation has occurred, the posterior probability it occurred in context $c$ is
 \begin{equation}
   \label{eqn:post_pred}
-  $$
   \mathrm{p}(C = c \mid M,\mathrm{D}) = \frac{\sum_{m}\alpha^{\prime}_{m,C = c}}{\sum_{m,c}\alpha^{\prime}_{m,c}}.
-  $$
 \end{equation}
-The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C = c$, $p(m  \mid C = c,\mathrm{D})$ is then
+The posterior probability of mutation to allele $m$ given that a mutation has occurred in context $C = c$ is then
 \begin{equation}
   \label{eqn:to_allele}
-  $$
    \mathrm{p}(m \mid C = c,\mathrm{D}) = \frac{\alpha^{\prime}_{m,c}}{\sum_{m} \alpha^{\prime}_{m,C = c}}.
-  $$
 \end{equation}
-The remaining context dependent component in equation \ref{eqn:detailed_prior} is $p(C = c)$, the prior probability of seeing a particular tri-nucleotide context.
-We compute this as simply the proportion of all tri-nucleotide contexts with the context $C = c$ present in the target genome, which is slightly different depending on whether we are analyzing a whole genome or an exome.
-The R implementation for \batcave ships with pre-computed tables for both whole exomes and whole genomes.
+The prior probability of each particular trinucleotide context $p(C = c)$ is computed simply as the proportion of sequenced trinucleotide contexts that have context $c$.
+The R implementation of \batcave ships with pre-computed tables for both whole exomes and whole genomes.
 
-\subsection{Estimation of the mutation rate.}
-The final piece of equation \ref{eqn:detailed_prior} to specify is $p(M)$, the prior probability that a mutation will occur at a given site, which we specify as the per-base mutation rate $\mu$.
-In an exponentially growing and neutrally or nearly neutrally evolving tumor, Williams et al. 2018~\citep{Williams2018} show that the total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
+\subsection{Estimation of the mutation rate}
+The final piece of Eq. \ref{eqn:detailed_prior} is $p(M)$, the prior probability of mutation, which we specify as the per-base mutation rate $\mu$.
+In an exponentially growing and neutrally evolving tumor, branching process calculations \cite{Williams2018} show that the expected total number of mutations $\mathrm{M}$ between two allele frequencies ($f_{min}$,$f_{max}$) is
 \begin{equation}
   \label{eqn:mut_rate}
-$$
   \mathrm{M}(f_{min},f_{max}) = N\frac{\mu}{\beta}\left(\frac{1}{f_{min}} - \frac{1}{f_{max}}\right).
-$$
 \end{equation}
-
-The number of bases $N$ is fixed at $3\cdot10^9$ for a whole genome sequence and $3\cdot10^7$ for a whole exome.
-Returning to the set of high confidence mutations $\mathrm{D}$, we can set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, $f_{min}$ as the lowest, and count the number of mutations in $D$ falling between the two.
-In practice it is usually best to select a conservative value for $f_{min}$, which is strongly dependent on sequencing depth, and we include this as a parameter in the R implementation of \batcave.
-In all results presented in this paper we have set $f_{min}$ to 0.05 because we are working with very high sequencing depth.
-A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\citep{Williams2016}.
+The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
-We make the simplifying assumption that there is no cell death, so that $\beta = 1$, which for most plausible values of $\beta$ means we over-estimate $\mu$ by a small amount.
-Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
+We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+We can then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
+We can set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
+In the R implementation of \batcave, $f_{min}$ is a free parameter.
+For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
+%A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\citep{Williams2016}.
+%Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
-\subsection{The likelihood function}
-We designed \batcave to be used as a post-calling evaluation tool with MuTect.
-MuTect is particularly useful because it directly reports the log ratio of the likelihood functions for the null and alterative hypotheses in equation \ref{eqn:hypothesis} as either \textrm{TLOD} (MuTect1) or \textrm{t\_lod\_fstar} (MuTect2).
-We used MuTect 1.1.7 for all of the analysis in this paper, so the output of MuTect provides us with
-
+\subsection{Likelihood function}
+The current implementation of \batcave builds on MuTect, because MuTect reports the log ratio of the likelihood functions for the null and alternative hypotheses (Eq. \ref{eqn:hypothesis}) as \textrm{TLOD} (MuTect1) or \textrm{t\_lod\_fstar} (MuTect2).
+We used MuTect 1.1.7 for all analyses in this paper, so we have
 \begin{equation}
   \label{eqn:tlod}
-    $$
     \mathrm{TLOD} = \mathrm{log}_{10}\left(\frac{\prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu = \hat{f}}(x_i)}{\prod_{i=1}^{\mathrm{d}} \textrm{f}_{m,\nu = 0}(x_i)}\right).
-    $$
 \end{equation}
-
-The log posterior odds is the log likelihood ratio (\textrm{TLOD}) + the log prior odds, so we can compute the posterior odds in favor of the alternate hypothesis for a given substitution type as
-
+The log posterior odds is the log likelihood ratio (\textrm{TLOD}) plus the log prior odds, so the posterior odds in favor of the alternate hypothesis for a given substitution type is
 \begin{equation}
   \label{eqn:computed_posterior}
-  $$
-  \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} + \mathrm{logit}_{10}(\mathrm{p}(\mathrm{S}_{m,c}))},
-  $$
+  \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} + \mathrm{logit}_{10}(\mathrm{p}(\mathrm{S}_{m,c}))}.
 \end{equation}
-where $\mathrm{p}(\mathrm{S}_{m,c})$ is the prior probability of a substitution of type $\mathrm{S}_{m,c}$, as described in equation \ref{eqn:detailed_prior} and specified in equations \ref{eqn:post_pred} - \ref{eqn:mut_rate}.
-When comparing our posterior odds to those of MuTect in this paper, we following \citet{Cibulskis2013} in assuming a prior per-base probability of mutation of $3\cdot10^{-6}$.
-We compute the posterior odds for Mutect as
-\begin{equation}
-  \label{eqn:mutect_posterior}
-  $$
-  \frac{\mathrm{P}(m,\nu = \hat{f})}{1 - \mathrm{P}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} - 6},
-  $$
+Here $\mathrm{p}(\mathrm{S}_{m,c})$ is the prior probability of a substitution of type $\mathrm{S}_{m,c}$, as described in Eq.~\ref{eqn:detailed_prior} and specified in Eq.~\ref{eqn:post_pred}-\ref{eqn:mut_rate}.
+When comparing our posterior odds to those of MuTect, we assume a uniform per-base probability of mutation of $3\cdot10^{-6}$ \cite{Cibulskis2013}, so
+\begin{equation}  \label{eqn:mutect_posterior}
+  \frac{\mathrm{P}_\mathrm{MuTect}(m,\nu = \hat{f})}{1 - \mathrm{P}_\mathrm{MuTect}(m,\nu = \hat{f})} = 10^{\mathrm{TLOD} - 6}.
 \end{equation}
-since $\mathrm{logit}_{10}(3\cdot10^{-6}) \approx -6$.
+
+\subsection{Implementation}
+\rngcomment{Add section about code implementation. What libraries are using, etc.?}
 
 \subsection{Tumor simulations.}
-We simulated realistic variant sites and allele frequencies using a branching process to simulate neutral evolution with no death.
-Tumors were simulated with three different mutation profiles derived from combinations of COSMIC mutation signatures (version 2), downloaded from the COSMIC website.
-Each simulated profile includes a contribution from COSMIC mutation signature 1 which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
-The "Concentrated" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
-The "Intermediate" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
-The "Diffuse" profile is simulated with $\mathbf{\pi}$ set to an equal combination of the COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair.
-The simulated mutation rate was $\mu = 3\cdot10^{-6}$.
-Variants were selected from a combination of the Cancer Genome Atlas (TCGA) and Pan-cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
-Whole genome (100X depth), and whole exome (500X depth) reads were simulated from the GRCH38 reference genome using VarSim \cite{Mu2015}, and aligned with BWA \cite{Li2009a}, both with default parameters.
-Variants were spiked to create tumors with Bamsurgeon with default parameters~\citep{Ewing2015a},
-and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
-
-\begin{tiny}
+We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to simulate realistic distributions of allele frequencies.
+Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{XXX}.
+\rngcomment{Put COSMIC website as a citation.}
+Each simulated profile includes COSMIC signature 1, which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
+The "Concentrated" profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
+The "Intermediate" profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
+The "Diffuse" profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair. \rngcomment{Citations for these signature combinations.}
+Simulated variants were sampled from a combination of the Cancer Genome Atlas (TCGA) and Pan-Cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
+Whole genome (100X depth) and whole exome (500X depth) reads were simulated from the GRCh38 reference genome using VarSim \cite{Mu2015} and aligned with BWA \cite{Li2009a}, both with default parameters.
+Variants were inserted to create tumors with BAMSurgeon with default parameters~\citep{Ewing2015a} and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
+\begin{scriptsize}
 \begin{verbatim}
-
-  java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect --reference_sequence $ref_path \
+java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect \
+        --reference_sequence $ref_path \
         --dbsnp $db_snp \
         --enable_extended_output \
         --fraction_contamination 0.00 \
@@ -283,112 +263,142 @@ and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
         --input_file:tumor $tmp_tumor \
         --out $out_path/$chr.txt \
         --coverage_file $out_path/$chr.cov
-
 \end{verbatim}
-\end{tiny}
-Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. 
-Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to \batcave for prior estimation and rescoring.
+\end{scriptsize}
+Variants identified by MuTect are labelled as to whether they pass all filters, fail to pass only the the evidence threshold \textrm{tlod\_f\_star} filter, or fail to pass any other filter. 
+Variants that passed all filters or failed only \textrm{tlod\_f\_star} were then passed to \batcave for prior estimation and rescoring.
 
 \subsection{Real Data}
-We analyzed two real data sets, one from an acute myeloid leukemia, and one from a multi-region sequencing experiment in breast cancer~\cite{Griffith2015,Shi2018}.
-We downloaded the normal and primary tumor bam files generated for the whole genome sequences in Griffith et al., 2015~\citep{Griffith2015} from dbGaP accession number phs000159.v8.p4.
-Griffith et al., 2015~\citep{Griffith2015} generated a platinum set of variant calls for this primary tumor, which we obtained from supplementary materials, and used for our true positive dataset.
-The whole exome sequencing bam files generated by Shi et al., 2015~\citep{Shi2018} were downloaded from NCBI SRA no. SRP070662.
-Shi et al., 2018~\citep{Shi2018} generated a gold set of variant calls for each tumor region sequenced, which we obtained from supplementary materials and used for our true positive dataset.
-We called variants using Mutect 1.1.7 with the same parameters as described above, except that both of these data sets were originally aligned to GRCH37, and we used that reference here.
+We analyzed two real data sets, one from an acute myeloid leukemia (AML)~\cite{Griffith2015} and one from a multi-region sequencing experiment in breast cancer~\cite{Shi2018}.
+We downloaded the normal and primary whole-genome AML tumor bam files from dbGaP accession number phs000159.v8.p4.
+Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{Griffith2015}, which we used for our true positive dataset.
+We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
+Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
+We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
 
 \subsection{Calibration metric}
+The quantify the difference in calibration between MuTect and \batcave, we use the Integrated Calibration Index \cite{Austin2019}.
+Briefly, a loess-smoothed regression was fit by regressing the binary (True=1,False=0) true variant classification against the reported posterior probability for both MuTect and \batcave.
+For a perfectly calibrated caller, the regression fit would be the diagonal line $y=x$, and the Integrated Calibration Index is the average distance between the fit and that line.
 
-	We use the Integrated Calibration Index to quantify the difference between MuTect and \batcave \cite{Austin2019}.
-	Briefly, a loess-smoothed regression is fit by regressing the binary (T/F) variant classification against the reported posterior probability of a true variant for both MuTect and \batcave (Figure~\ref{NAR-wgs_fig}\textbf{A}--\textbf{B} and Table~\ref{table:01}).
-	Plotting the smoothed regression predictions against the actual predictions would result in a diagonal line, and the Integrated Calibration Index is the average distance between the loess fit and a diagonal line.
-
-  \begin{figure*}
-    \begin{center}
-    \includegraphics{figures/fig_wes.pdf}
-    \end{center}
-    \caption{Model performance.
-    \textbf{(A)} Precision-recall curves and \textbf{(B)} Receiver operating characteristic curves for 3 mutation signatures.
-    Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{(C)} the MuTect model and \textbf{(D))} the \batcave model.
-    A perfectly calibrated model would generate the diagonal line. Precision-recall curves for real data \textbf{(E)} and \textbf{(F)}.}
-  \label{NAR-wes_fig}
-  \end{figure*}
 
 \section{RESULTS}
-We designed \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
-The algorithm is effecient, processing 22,000 variants per second on a typical iMac desktop computer, which corresponds to 100 seconds to process a 500X exome and 2000 seconds for a 100X whole genome.
-MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
-\batcave takes the output from MuTect, extracts the log-likelihood ratio for each potential variant site, and uses that ratio to separate the potential sites in to high-confidence and low-confidence groups.
-The mutation profile is computed from the high confidence sites, and the posterior probability of mutation is recomputed for all sites as described in Materials and Methods.
+We implemented \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
+\batcave extracts the log-likelihood ratio for each potential variant site from the MuTect output, and then it uses that ratio to separate the potential sites in to high- and low-confidence groups.
+The mutation profile is estimated from the high confidence sites, and the posterior probability of mutation is then recomputed for all sites.
+The \batcave algorithm is inexpensive, processing 22,000 variants per second on a typical desktop computer, which corresponds to roughly 100 seconds to process a 500x exome and 2,000 seconds for a 100x whole genome.
+
+To test the performance of \batcave, we generated six different tumor/normal pairs, corresponding to 100x whole genomes and 500x whole exomes for three different mutation profiles.
+The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{XXX}\textbf{A-C}).
+We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \cite{Griffiths2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
+In both, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
 
 \begin{figure}
   \begin{center}
   \includegraphics{figures/kl_only.pdf}
   \end{center}
-  \caption{KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(A)} Whole exomes and \textbf{(B)} whole genomes.
-  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.}
+  \caption{Convergence of the site-specific prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the estimated and simulated profiles versus number of incorporated mutations, for \textbf{(A)} whole exomes and \textbf{(B)} whole genomes.
+  \rngcomment{Zoom panel B into relevant region of plot ($\sim$1000 mutations). What is notation (target || prior)?}}
 \label{NAR-kl_fig}
 \end{figure}
 
-\subsection{Convergence of the site-specific prior to the data generating distribution}
-The context-dependent prior probability of mutation, the heart of \batcave, depends on the prior converging to a good representation of the data generating distribution within the set of high-confidence mutations.
-We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
-In Figure~\ref{NAR-kl_fig} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
-For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
+\subsection{Convergence of the prior}
+To improve performance, the context-dependent prior probability of mutation must converge to a good representation of the data generating distribution within the set of high-confidence mutations.
+When applied to simulated whole exome and whole genome data, the prior converges within a few hundred mutations (Fig.~\ref{NAR-kl_fig}).
+For comparison, in our simulated data sets the number of high-confidence mutations ranges between 1500 and 5000, and for a real acute myeloid leukemia it is over 17,000~\cite{Griffith2015}.
 
+%We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
+%In Figure~\ref{NAR-kl_fig} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
+%For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
+  \begin{figure*}
+    \begin{center}
+    \includegraphics{figures/fig_wes.pdf}
+    \end{center}
+    \caption{Variant-calling performance on both simulated and real data.
+    \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation signatures.
+    \rngcomment{Make labels for \batcave and MuTect in A much bigger. Add similar labels to B.}
+    \rngcomment{Move "Synthetic 500x whole exomes" to above A\&C. Add similar label for B\&D}
+    \textbf{(C)} and \textbf{(D)} Shaded regions show distributions of posterior probabilities for tree positive variants, and the smooth line shows the loess-smoothed relationship, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, that curve would match the dashed y=x line. 
+    \rngcomment{Remove dark edges of distributions. Make diagonal line dashed.}
+    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed
+    \rngcomment{Label plots with what type of cancer they are, plus depth.}.}
+  \label{NAR-wes_fig}
+  \end{figure*}
+  
+  
+\begin{table*}[b]
+  \tableparts{%
+  \caption{Performance characteristics as measured for all data sets.}
+  \label{table:01}%
+  }{%
+  \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
+  \toprule
+  Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
+  \\
+  & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
+  \\
+  \colrule
+  100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & .117 & .287
+  \\
+  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & .118 & .214
+  \\
+  100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & .120 & .219
+  \\
+  500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
+  \\
+  500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
+  \\
+  500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
+  \\
+  real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+  \\
+  real breast \cite{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+  \\
+  \botrule
+  \end{tabular*}%
+  }
+  {$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
+ \end{table*}
 
-
-\subsection{Simulated data}
-We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
-For each of the two types we simulated tumors with variants drawn from three different mutation profiles chosen to resemble melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse)  as described in Materials \& Methods and Figure \ref{NAR-sigfig}\textbf{C,D,E}.
-These 6 simulated tumor/normal pairs were used to assess the effect of sequencing depth and mutation profile type on the results obtained from \batcave.
-
-
-
-We assessed classification performance with both the area under the ROC curve and the area under the precision-recall curve, because the classes here are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
-By both metrics \batcave outperforms MuTect (Figure~\ref{NAR-wes_fig}\textbf{A}--\textbf{B}, and Table~\ref{table:01}).
-The extent to which \batcave outperforms is dependent on both the sequencing depth and the level of concentration of the mutation signature.
+\subsection{Tests using simulated data}
+We assessed classification performance using the areas under both the receiver operating characteristic and the precision-recall curves, because the classes are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
+By both metrics \batcave outperforms MuTect (Fig.~\ref{NAR-wes_fig}\textbf{A}\&\textbf{B} and Table~\ref{table:01}).
+The extent of the performance difference is dependent on both the sequencing depth and the concentration of the mutation signature.
 Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
 
-The estimated mutation rate is approximately $3\cdot10^{-7}$ for all simulated tumors (Table~\ref{table:01}).
-We note that the effective mutation rate is lower than the simulated rate of $3\cdot10^{-6}$.
-In this case the lower effective rate is not due to normal contamination of the tumor sample, but the fact that \texttt{Bamsurgeon} has restrictions -- such as sequencing depth and quality -- that prevent 100\% of simulated variants from being inserted. 
+For all simulated tumors, the estimated mutation rate is approximately $3\cdot10^{-7}$ (Table~\ref{table:01}), which is lower than the simulated rate of $3\cdot10^{-6}$.
+This is due to restrictions with BAMSurgeon, such as sequencing depth and quality, that prevent 100\% of simulated variants from being inserted into the reads.
 
-We measured overall calibration performance using the Integrated Calibration Index (ICI) described in Methods \citep{Austin2019}.
-The ICI is a measure of the difference between predicted and observed probabilities that is weighted by the empirical density of the predicted probabilities.
-This is useful in our setting because the density of posterior probabilities tends to be strongly bi-modal.
-A large fraction of true negative variants have posterior probabilities of less than $10^{-4}$, which is a probability far below any threshold that is meaningful, we evaluate calibration only on variants with posterior probability greater than .01.
-As we can see from the comparison in Figure~\ref{NAR-wes_fig}\textbf{C}--\textbf{D}, \batcave tends to increase posterior probabilities of low probability but true variants (density curves) while decreasing the probability of low probability but false variants (density not shown).
-For 500X tumors the calibration of \batcave is better across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse (Figure \ref{NAR-wgs_fig} and Table \ref{table:01}).
-This effect is likely due to the fact that there are simply very few low probability true positive variants in tumor sequenced to 100X depth.
-As with all other metrics, the benefit of \batcave increases as the concentration of the mutation profile increases, and as sequencing depth increases.
+We also assessed the calibration of \batcave, assessing the likelihood that a potential variant with a given posterior probability is actually a true variant.
+We measured overall calibration performance using the Integrated Calibration Index (ICI) \cite{Austin2019}, which measures the difference between predicted and observed probabilities, weighted by the density of the predicted probabilities.
+This metric is particularly useful in our case, because the density of posterior probabilities is bi-modal (Fig.~\ref{NAR-wes_fig}C\&D).
+A large fraction of true negative variants have posterior probabilities less than $10^{-4}$, far below any meaningful threshold, so we evaluate calibration only on potential variants with posterior probability greater than 0.01.
+For these potential variants, \batcave tends to increase posterior probabilities of low probability but true variants (density curves in Fig.~\ref{NAR-wes_fig}C\&D) while decreasing probabilities of low probability but false variants.
+For 500X tumors, the calibration of \batcave is better than MuTect across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse (Figure \ref{NAR-wgs_fig} and Table \ref{table:01}).
+This is because that there are few low probability true positive variants in tumors sequenced to 100X depth.
+As with the other metrics, the advantage of \batcave increases with the concentration of the mutation profile the sequencing depth.
 
-Figure~\ref{NAR-ppv_fig} takes a consolidated view of classification accuracy and calibration for 500X whole exomes in the portion of the posterior probability distribution relevant to clinicians and researchers.
-For any probability between 60 and 90\% \batcave is better calibrated than Mutect.
-Essentially, for any posterior probability above 70\% MuTect has a false positive rate around 8\%, while \batcave has a false positive rate that increases as posterior probability decreases.
-The cost of this compression is recall, which is 3-5\% better than MuTect at 95\% posterior probability, and 3-7\% better at 90\%, depending on muation profile concentration.
+In practice, accurate calibration is most important for variants with high posterior probability.
+For variants with posterior probability between 60 and 90\%, \batcave is substantially better calibrated than MuTect (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
+For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as posterior probability increases.
+The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
 At any posterior probability \batcave returns a larger fraction of all positive calls than MuTect.
-Figure~\ref{NAR-ppv_wgs_fig} shows results for 100X whole genomes, where the results are similar for precision.
-Note that recall never improves because the uncalled true positive variants are below the threshold of detection for any reasonable level of false positive calls.
+%Figure~\ref{NAR-ppv_wgs_fig} shows results for 100X whole genomes, where the results are similar for precision.
 
-\subsection{Real tumor data.}
-We utilized two real data sets.
-In each, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-These are among a very small number of tumors which have been sequenced at high depth, and for which variant validation was undertaken.
-Griffith et al., 2015~\citep{Griffith2015} sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>360\mathrm{X}$, and used targeted sequencing to validate nearly 200,000 mutations.
-We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, which is line with the mutation rates generally considered normal in AML.
-The area under the precision-recall curve is essentially identical (.995 \& .996) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{E} and Table \ref{table:01}).
+\subsection{Tests using real tumor data}
+We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
+We considered only precision-recall comparisons for these data, because the validation procedure yields true positives but not comprehensive true negatives. \rngcomment{Is  a correct statement?}
 
-Shi et al., 2018~\citep{Shi2018} performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$, and validated all variants identified by three different variant calling pipelines.
-We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $3\cdot10^{-8}$, and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
+Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which would be considered normal in AML. \rngcomment{Really need a citation for this!}
+For both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
-We report only precision-recall comparisons for real tumor data because in both cases the "gold" standard data sets consist of variants that were "called" by one or more variant detection pipelines, and confirmed to be present or absent \cite{Griffith2015,Shi2018}.
-These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
-At the same time, there is no way to compute true and false negative fractions for these data sets.
-As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
+Shi et al.\ performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$ and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
+%We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}
+and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
+For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
 \begin{figure}
   \begin{center}
@@ -433,7 +443,12 @@ There are, however, many other types of \textit{genomic context} which can effec
 \bkmcomment{what to say here? Are we acknowledging a weakness, or just observing there are other types?}
 These could be very useful in computing a local or regional mutation rate, as opposed to the genome-wide but tumor-specific mutation rate used by \batcave.
 
+These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
+At the same time, there is no way to compute true and false negative fractions for these data sets.
+As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
+
 We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple model and a well-tested set of heuristic filters.
+MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
 However, the model is very general, and in principle there is no barrier to using the method with other variant callers.
 For instance Strelka2, another widely used variant caller, computes a joint posterior probability over tumor and normal genotypes where the prior probability that the tumor carries a somatic mutation at a given site is set to a constant \cite{Kim2018}.
 Modifying the algorithm to work with the Strelka statistical model would involve replacing the constant prior with a tumor and site-specific prior for each potential variant, exactly as we have done with MuTect.
@@ -467,7 +482,7 @@ COSMIC mutation signatures version 2 is available at \footnotesize{https://cance
 \section{ACKNOWLEDGEMENTS}
 
 This work was supported by the National Science Foundation via Graduate Research Fellowship award number DGE-1143953 to BKM and by the National Institute of General Medical Sciences of the National Institutes of Health under award number R01GM127348 to RNG.
-We thank Professor Edward J. Bedrick for fruitful discussions about the statistical model.
+We thank Prof.\ Edward J. Bedrick for fruitful discussions about the statistical model.
 
 \subsubsection{Conflict of interest statement.} None declared.
 
@@ -499,42 +514,6 @@ We thank Professor Edward J. Bedrick for fruitful discussions about the statisti
   Note the restricted axes to improve readability of points.}
 \label{NAR-ppv_wgs_fig}
 \end{figure}
-
-\section{Supplememtary Table}
-
-\begin{table}[b]
-  \tableparts{%
-  \caption{Performance characteristics as measured for all data sets.}
-  \label{table:01}%
-  }{%
-  \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
-  \toprule
-  Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
-  \\
-  & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
-  \\
-  \colrule
-  100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & .117 & .287
-  \\
-  100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & .118 & .214
-  \\
-  100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & .120 & .219
-  \\
-  500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
-  \\
-  500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
-  \\
-  500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
-  \\
-  \citet{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
-  \\
-  \citet{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
-  \\
-  \botrule
-  \end{tabular*}%
-  }
-  {$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
- \end{table}
 
 \end{document}
 
