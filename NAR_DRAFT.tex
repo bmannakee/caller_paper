@@ -172,21 +172,22 @@ Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutatio
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
 But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
 We thus model $\mathrm{p}(\mathrm{S})$ as Dirichlet-multinomial with pseudo-count hyper-parameter $\boldsymbol{\alpha}$, 
-$$
+\begin{equation}
 \begin{aligned}
   \boldsymbol{\pi} \mid \boldsymbol{\alpha} &\sim \textrm{Dirichlet}(\boldsymbol{\alpha}) \\
   \mathrm{S} \mid \boldsymbol{\pi} & \sim \textrm{Multinomial}(\boldsymbol{\pi}).
 \end{aligned}
-$$
+\end{equation}
 In \batcave we use the symmetric non-informative hyper-parameter $\boldsymbol{\alpha} = \boldsymbol{1}$, so a priori mutation is equally likely in any context.
 
 To estimate $\boldsymbol{\pi}$, we identify a subset of high confidence variants, based on an initial calculation of their likelihood given the data.
 These are variants for which the evidence in the read data overwhelms any reasonable value of the site-specific prior probability of mutation.
 Let $\mathrm{D}$ be the set of high confidence variant calls, which we define as those having posterior odds greater than 10 to 1 with the site-specific prior, and $\mathrm{s} \in \mathrm{D}$ be the substitution type of each mutation in $\mathrm{D}$.
 The posterior distribution of $\boldsymbol{\pi}$ is then $\mathrm{p}(\boldsymbol{\pi} \mid \mathrm{D}) \sim \textrm{Dirichlet}(\boldsymbol{\alpha^{\prime}})$ where
-  $$
+\begin{equation}
     \alpha^{\prime}_{m,c} = \alpha_{m,c} + \sum\limits_{\mathrm{s} \in \mathrm{D}} \mathrm{I}\{\mathrm{s} = \mathrm{s}_{m,c}\}.
-  $$
+\end{equation}
+
 Returning to equation \ref{eqn:detailed_prior}, we can compute the posterior predictive probability $p(C = c \mid M,\mathrm{D})$ as
 \begin{equation}
   \label{eqn:post_pred}
