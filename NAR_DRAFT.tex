@@ -166,7 +166,7 @@ The first two terms on the right-hand side can be estimated from the observed mu
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
 \rngcomment{Got here...}
-\bkmcomment{No currently published paper has numbered equations, and it is not mentioned in the guidelines. I am using their template for numbered and non-numbered equations.}
+\bkmcomment{No currently published paper has numbered equations, and it is not mentioned in the guidelines. I am using their template for numbered equations and made all equations numbered for consistency.}
 We model the observed mutation profile $S$ (Figure~\ref{NAR-sigfig}\textbf{A} throught \textbf{C}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
@@ -320,7 +320,8 @@ We called variants using Mutect 1.1.7 with the same parameters as described abov
     \caption{Model performance.
     \textbf{(A)} Precision-recall curves and \textbf{(B)} Receiver operating characteristic curves for 3 mutation signatures.
     Distribution of estimated true positive probabilities for true positive (top) and true negative (bottom) variants for \textbf{(C)} the MuTect model and \textbf{(D))} the \batcave model.
-    A perfectly calibrated model would generate the diagonal line. Precision-recall curves for real data \textbf{(E)} and \textbf{(F)}.}
+    A perfectly calibrated model would generate the diagonal line. 
+    \textbf{(E)}--\textbf{(F)} Precision-recall curves for real data.}
   \label{NAR-wes_fig}
   \end{figure*}
 
