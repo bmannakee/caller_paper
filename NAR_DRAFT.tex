@@ -289,6 +289,15 @@ and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
 Variants identified by MuTect are labelled as to whether they pass all MuTect filters, pass all filters *other* than the evidence threshold \textrm{tlod\_f\_star}, or fail to pass any filter other than \textrm{tlod\_f\_star}. 
 Variants that pass all filters or fail only \textrm{tlod\_f\_star} are then passed to \batcave for prior estimation and rescoring.
 
+\begin{figure}
+  \begin{center}
+  \includegraphics[width=.35\textwidth]{figures/kl_only.pdf}
+  \end{center}
+  \caption{KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(A)} Whole exomes and \textbf{(B)} whole genomes.
+  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.}
+\label{NAR-kl_fig}
+\end{figure}
+
 \subsection{Real Data}
 We analyzed two real data sets, one from an acute myeloid leukemia, and one from a multi-region sequencing experiment in breast cancer~\cite{Griffith2015,Shi2018}.
 We downloaded the normal and primary tumor bam files generated for the whole genome sequences in Griffith et al., 2015~\citep{Griffith2015} from dbGaP accession number phs000159.v8.p4.
@@ -329,16 +338,6 @@ The context-dependent prior probability of mutation, the heart of \batcave, depe
 We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
 In Figure~\ref{NAR-kl_fig} we order mutations by descending MuTect probability value, and compute the KL divergence between the prior after adding each mutation and the data generating distribution.
 For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
-
-
-\begin{figure}
-  \begin{center}
-  \includegraphics[width=.35\textwidth]{figures/kl_only.pdf}
-  \end{center}
-  \caption{KL divergence between the estimated profile ($\boldsymbol{\pi}$) and the simulated mutation profile for \textbf{(A)} Whole exomes and \textbf{(B)} whole genomes.
-  The estimated mutation profile converges quickly to the target as the number of mutations evaluated rises.}
-\label{NAR-kl_fig}
-\end{figure}
 
 \subsection{Simulated data}
 We generated six different tumor/normal pairs of two types, 3 each of 100X depth whole genomes and 500X whole exomes.
