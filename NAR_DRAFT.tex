@@ -397,7 +397,9 @@ At any posterior probability \batcave returns a larger fraction of all positive 
 
 \subsection{Tests using real tumor data}
 We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-We considered only precision-recall comparisons for these data, because the validation procedure yields true positives but not comprehensive true negatives. \rngcomment{Is  a correct statement?}\bkmcomment{Yes, but examine aml31 closely to make sure, and then rearrange this section to explain why.}
+Both data sets were validated by deep targeted sequencing, yielding high quality false positive data.
+However, \texttt{only} variants called by at least one variant caller were validated.
+As a result, there is no validated measure of true/false negative calls, so we considered only precision-recall comparisons for these data. \rngcomment{Is  a correct statement?}\bkmcomment{Yes, definitely true.}
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
 We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which would be considered normal in AML. \rngcomment{Really need a citation for this!}\bkmcomment{I have one, find it.}
@@ -405,7 +407,7 @@ For both MuTect and \batcave, the precision-recall curve is almost perfect for t
 
 Shi et al.\ performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$ and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}\bkmcomment{not terribly out of line with other breast cancers. find a citation. other possibilities: selection?;all lumped together?}
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}\bkmcomment{Noone, as far as I can tell has done a systematic calculation for TCGA. \cite{Williams2018} is only out in 2018. On the basis of tumor mutation burden studies there breast cancer is one of the slowest mutators, but there is no way to go from TMB to mutation rate since it depends on depth/frequency.}
 and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
 For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
