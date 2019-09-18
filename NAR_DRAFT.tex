@@ -235,6 +235,7 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 \end{equation}
 
 \subsection{Implementation}
+\bkmcomment{Used packages from bioconductor(name them), to leverage. Follow mapex example.}
 \rngcomment{Add section about code implementation. What libraries are using, etc.?}
 
 \subsection{Tumor simulations}
@@ -245,6 +246,7 @@ Each simulated profile includes COSMIC signature 1, which is found in nearly all
 The ``Concentrated'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
 The ``Intermediate'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
 The ``Diffuse'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair. \rngcomment{Citations for these signature combinations.}
+\bkmcomment{These are really from the text of the cosmic website, the citation is probably Alexandrov2015 or Alexandrov2013a}
 Simulated variants were sampled from a combination of the Cancer Genome Atlas (TCGA) and Pan-Cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth) and whole exome (500X depth) reads were simulated from the GRCh38 reference genome using VarSim \cite{Mu2015} and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were inserted to create tumors with BAMSurgeon with default parameters~\citep{Ewing2015a} and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
@@ -297,7 +299,7 @@ In both, deep sequencing and variant validation were performed with the specific
   \includegraphics{figures/kl_only.pdf}
   \end{center}
   \caption{Convergence of the site-specific prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the estimated and simulated profiles versus number of incorporated mutations, for \textbf{(A)} whole exomes and \textbf{(B)} whole genomes.
-  \rngcomment{Zoom panel B into relevant region of plot ($\sim$1000 mutations). What is notation (target || prior)?}}
+  \rngcomment{Zoom panel B into relevant region of plot ($\sim$1000 mutations). What is notation (target || prior)?}}\bkmcomment{just saw it somewhere, change to comma.}
 \label{NAR-kl_fig}
 \end{figure}
 
@@ -390,12 +392,12 @@ We tested \batcave using two data sets for which deep sequencing and variant val
 We considered only precision-recall comparisons for these data, because the validation procedure yields true positives but not comprehensive true negatives. \rngcomment{Is  a correct statement?}\bkmcomment{Yes, but examine aml31 closely to make sure, and then rearrange this section to explain why.}
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which would be considered normal in AML. \rngcomment{Really need a citation for this!}
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which would be considered normal in AML. \rngcomment{Really need a citation for this!}\bkmcomment{I have one, find it.}
 For both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
 Shi et al.\ performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$ and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}\bkmcomment{not terribly out of line with other breast cancers. find a citation. other possibilities: selection?;all lumped together?}
 and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
 For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
