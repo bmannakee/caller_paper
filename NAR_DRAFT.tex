@@ -251,10 +251,9 @@ We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to sim
 Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{XXX}.
 \rngcomment{Put COSMIC website as a citation.}
 Each simulated profile includes COSMIC signature 1, which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
-The ``Concentrated'' profile (Fig.~\ref{simsigfig}\textbf{A}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure \cite{Alexandrov2013}.
-The ``Intermediate'' profile (Fig.~\ref{simsigfig}\textbf{B}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers \cite{Alexandrov2013}.
-The ``Diffuse'' profile (Fig.~\ref{simsigfig}\textbf{C}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair \cite{Nik-Zainal2016}. \rngcomment{Citations for these signature combinations.}
-\bkmcomment{These are really from the text of the cosmic website, the citation is probably Alexandrov2015 or Alexandrov2013a}
+The ``Concentrated'' profile (Fig.~\ref{NAR-simsigfig}\textbf{A}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure \cite{Alexandrov2013}.
+The ``Intermediate'' profile (Fig.~\ref{NAR-simsigfig}\textbf{B}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers \cite{Alexandrov2013}.
+The ``Diffuse'' profile (Fig.~\ref{NAR-simsigfig}\textbf{C}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair \cite{Nik-Zainal2016}.
 Simulated variants were sampled from a combination of the Cancer Genome Atlas (TCGA) and Pan-Cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth) and whole exome (500X depth) reads were simulated from the GRCh38 reference genome using VarSim \cite{Mu2015} and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were inserted to create tumors with BAMSurgeon with default parameters~\citep{Ewing2015a} and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
