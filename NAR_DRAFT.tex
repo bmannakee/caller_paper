@@ -72,7 +72,7 @@ Low frequency mutations challenge current variant calling methods, because their
 Many methods have been developed for calling somatic mutations from NGS data.
 The earliest widely used somatic variant callers developed specifically for tumors, MuTect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants and set a threshold score designed to balance sensitivity and specificity \citep{Koboldt2012,Cibulskis2013}.
 Subsequent research gave rise to a number of alternate strategies, including haplotype-based calling \citep{Garrison2012},
-joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC) \rngcomment{Citations?}.
+joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, BAYSIC, SomaticSeq, and SNooPer) \citep{Ding2012,Cantarel2014,Fang2015,Spinella2016}.
 These methods vary in their complexity and specific focus.
 But they all implicitly or explicitly assume that the rate of mutation is constant across the genome.
 
@@ -81,7 +81,7 @@ The mutational processes that generate single nucleotide variants in tumors do n
 The processes of spontaneous mutation that are active in all somatic tissues depend sensitively on local nucleotide context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 Additional mutational processes are active in tumors, due to mutagen exposure or defects in DNA maintenance and repair, and these processes are also sensitive to local nucleotide context \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 The specific mutational processes active in a particular tumor generate its unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}.
-For example, Figure~\ref{NAR-sigfig}, shows mutation profiles from several tumors.
+For example, Figure~\ref{NAR-realsigfig}, shows mutation profiles from several tumors.
 These real tumor mutation profiles show the diversity of profiles seen even within a single cancer.
 %Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
@@ -158,10 +158,10 @@ Eq.~\ref{eqn:full_prior} is then
                             &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C = c)}.
   \end{array}
 \end{equation}
-The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-sigfig}).
+The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-realsigfig}).
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
-We model the observed mutation profile $\mathrm{S}$ (Figure~\ref{NAR-sigfig}\textbf{A}-\textbf{E}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
+We model the observed mutation profile $\mathrm{S}$ (Figure~\ref{NAR-realsigfig}\textbf{A}-\textbf{D}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
 But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
@@ -248,7 +248,7 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
  \end{figure}
 \subsection{Tumor simulations}
 We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to simulate realistic distributions of allele frequencies.
-Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{XXX}.
+Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) %\cite{XXX}.
 \rngcomment{Put COSMIC website as a citation.}
 Each simulated profile includes COSMIC signature 1, which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
 The ``Concentrated'' profile (Fig.~\ref{NAR-simsigfig}\textbf{A}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure \cite{Alexandrov2013}.
@@ -297,8 +297,8 @@ The mutation profile is estimated from the high confidence sites, and the poster
 The \batcave algorithm is inexpensive, processing 22,000 variants per second on a typical desktop computer, which corresponds to roughly 100 seconds to process a 500x exome and 2,000 seconds for a 100x whole genome.
 
 To test the performance of \batcave, we generated six different tumor/normal pairs, corresponding to 100x whole genomes and 500x whole exomes for three different mutation profiles.
-The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{XXX}\textbf{A-C}).
-We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \cite{Griffiths2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
+The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{NA-realsigfig}\textbf{A-C}).
+We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \citep{Griffith2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
 In both, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
 
 \begin{figure}
