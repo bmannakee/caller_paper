@@ -232,7 +232,7 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 
 \subsection{Implementation}
 We have implemented the \batcave algorithm as an R package (batcaver).
-The package leverages the Bioconductor packages \texttt{BSgenome}, \texttt{GenomicAlignments}, \texttt{VariantAnnotation}, and \texttt{SomaticSignatures} for fast and memory-efficient variant annotation and genomic context identification. 
+The package leverages the Bioconductor packages \textrm{BSgenome}, \textrm{GenomicAlignments}, \textrm{VariantAnnotation}, and \textrm{SomaticSignatures} for fast and memory-efficient variant annotation and genomic context identification. 
 Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
 
 \begin{figure}
@@ -250,8 +250,7 @@ Reference sequences are specified as BSgenome objects, allowing efficient access
 
 \subsection{Tumor simulations}
 We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to simulate realistic distributions of allele frequencies.
-Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) %\cite{XXX}.
-\rngcomment{Put COSMIC website as a citation.}
+Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{Cosmic_consortium}.
 Each simulated profile includes COSMIC signature 1, which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
 The ``Concentrated'' profile (Fig.~\ref{NAR-simsigfig}\textbf{A}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure \cite{Alexandrov2013}.
 The ``Intermediate'' profile (Fig.~\ref{NAR-simsigfig}\textbf{B}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers \cite{Alexandrov2013}.
