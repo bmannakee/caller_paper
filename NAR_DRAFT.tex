@@ -231,8 +231,9 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 \end{equation}
 
 \subsection{Implementation}
-\bkmcomment{Used packages from bioconductor(name them), to leverage. Follow mapex example.}
-\rngcomment{Add section about code implementation. What libraries are using, etc.?}
+We have implemented the \batcave algorithm as an R package (batcaver).
+The package leverages the Bioconductor packages \texttt{BSgenome}, \texttt{GenomicAlignments}, \texttt{VariantAnnotation}, and \texttt{SomaticSignatures} for fast and memory-efficient variant annotation and genomic context identification. 
+Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
 
 \begin{figure}
   \begin{center}
@@ -246,6 +247,7 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
    }
   \label{NAR-simsigfig}
  \end{figure}
+
 \subsection{Tumor simulations}
 We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to simulate realistic distributions of allele frequencies.
 Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) %\cite{XXX}.
