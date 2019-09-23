@@ -285,6 +285,7 @@ We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
 \rngcomment{Did MuTect fail to call anything we know is there?}
+\bkmcomment{Depends on the cutoff. This is the precision-recall curve. I can answer this for the mutect threshold in MuTect 1.1.7. Could probably answer it for the Mutect2 threshold as well.}
 
 \subsection{Calibration metric}
 The quantify the difference in calibration between MuTect and \batcave, we use the Integrated Calibration Index \cite{Austin2019}.
