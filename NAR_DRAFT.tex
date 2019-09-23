@@ -476,6 +476,8 @@ But the mutational prior can be incorporated into almost any caller with an unde
 For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a uniform probability of somatic mutation at each genomic site \cite{Kim2018}.
 Replacing that uniform probability with a context-aware prior would require editing the Strelka2 source code, but is conceptually straightforward. \rngcomment{Is this correct, or does Strelka2 output enough for us to do it post-hoc?}
 
+\rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
+
 Our current R implementation, \texttt{batcaver}, is computationally inexpensive, adding 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational costs is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
 Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational context prior.
