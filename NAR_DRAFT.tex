@@ -274,6 +274,7 @@ Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
+\rngcomment{Did MuTect fail to call anything we know is there?}
 
 \subsection{Calibration metric}
 The quantify the difference in calibration between MuTect and \batcave, we use the Integrated Calibration Index \cite{Austin2019}.
@@ -378,6 +379,15 @@ For 500X tumors, the calibration of \batcave is better than MuTect across the fu
 This is because that there are few low probability true positive variants in tumors sequenced to 100X depth.
 As with the other metrics, the advantage of \batcave increases with the concentration of the mutation profile the sequencing depth.
 
+\begin{figure}
+  \begin{center}
+  \includegraphics{figures/ppv_wes.pdf}
+  \end{center}
+  \caption{Calibration of posterior probability. 
+  For realistic thresholds, posterior probabilities are more accurately calibrated for \batcave than MuTect, no matter how concentration the mutation profile is.}
+\label{NAR-ppv_fig}
+\end{figure}
+
 In practice, accurate calibration is most important for variants with high posterior probability.
 For variants with posterior probability between 60 and 90\%, \batcave is substantially better calibrated than MuTect (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
 For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as posterior probability increases.
@@ -399,29 +409,32 @@ We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcom
 and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
 For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
-\begin{figure}
-  \begin{center}
-  \includegraphics[width=.35\textwidth]{figures/ppv_wes.pdf}
-  \end{center}
-  \caption{Model performance on 500X simulated whole exome. 
-  Positive predictive values vs. Recall for three different probability cutoffs. 
-  Note the restricted axes to improve readability of points}
-\label{NAR-ppv_fig}
-\end{figure}
 
 
 
 \section{DISCUSSION}
  
-Deep sequencing is necessary to measure quantities such as intra-tumor heterogeneity \citep{Shi2018}, sub-clonal presence of driver and resistance alleles \cite{Griffith2015}, and the mutational landscape of cancer in general \cite{Zehir2017}.  
-As Griffith et al., 2015~\citep{Griffith2015} show, whole genome sequencing at approx. 350X average depth requires combining calls from many variant calling algorithms, and then validating these calls via ultra-deep targeted sequencing. 
-We believe that much of the need for multiple variant callers could be alleviated by improvements to the statistical model used to evaluate the evidence presented by the sequenced reads. 
+\rngcomment{I worry that this bit about very high depth sequencing is going to be problematic in review, because it's not a problem we're solving. We're helping, but not making huge changes.}
+%Deep sequencing is necessary to measure intra-tumor heterogeneity \citep{Shi2018}, identify subclonal driver and resistance alleles \cite{Griffith2015}, and probe the mutational landscape of cancer in general \cite{Zehir2017}.  
+%Current approaches to very high depth next-generation sequencing \cite{Griffith2015}, however, require combining calls from multiple variant calling algorithms and then validating these calls via ultra-deep sequencing.
+%We believe that much of the need for multiple variant callers could be alleviated by improvements to the statistical model used to evaluate the evidence presented by the sequenced reads. 
 
-\batcave is a post-call variant evalutation tool that uses MuTect output and the tumor-specific mutation profile to sharpen the posterior probability assigned to SNVs.
-We demonstrated here that \batcave improves classification accuracy in synthetic data, leading to better more accurate variant calls at any posterior probability threshold.
-Importantly, \batcave is better calibrated than MuTect at relevant probability thresholds, allowing researchers and clinicians to make informed choices about the trade-off between precision and recall.
-We are unable to study calibration in real data, because complete false positive/true negative data for real data is not available. 
-Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
+\batcave is an algorithm that leverages the biology of individual tumor mutation profiles to improve identification of low allelic frequency somatic variants.
+Our current implementation is built on MuTect, one of the most widely used somatic variant callers.
+\batcave improves on the classification accuracy of MuTect in synthetic data (Fig.~\ref{NAR-wes_fig}A-D and Table~\ref{table:01}) across the entire range of recall and specificity.
+Moreover, \batcave is better calibrated than MuTect at relevant posterior probability thresholds (\ref{NAR-ppv_fig}), allowing researchers and clinicians to make informed choices about the trade-off between precision and recall.
+For real data, testing on validated calls shows that \batcave does not degrade performance for variants that are relatively easy to identify (Fig.~\ref{NAR-wes_fig}E\&F).
+The \batcave algorithm can thus be included in a wide variety of sequencing pipelines.
+
+The \batcave algorithm incorporates genomic context into the probabilistic model for variant calling.
+Our current implementation focuses on trinucleotide context, which is known to have a large effect on local mutation rates \cite{Martincorena2015,Hollstein2017}.
+There are, however, many other aspects of genomic context that can affect local mutation rates, including replication timing, expression level, and chromatin organization \cite{Buisson2019,Schuster-Bockler2012,Pleasance2010}. 
+\rngcomment{Move individual citations to the factors they support.}
+These additional forms of context could also be incorporated into the \batcave mutation prior.
+In fact, they may be simpler to incorporate than trinucleotide context, because their effect on the prior may vary less among tumors. \rngcomment{Can we back this assertion up?} 
+In the long run, we believe that incorporating more tumor biology into variant calling models will often lead to improved performance.
+
+\rngcomment{Got here...}
 
 \batcave resembles an empirical Bayes approach, but is not really empirical Bayes.
 In fact, variants are best described as sequential samples from a data generating distribution represented by the mutation profile.
@@ -437,14 +450,13 @@ The intermediate and diffuse mutation profiles are designed to represent baselin
 In fact, lung and breast tumors have heterogeneous mutation profiles with a wide range of levels of concentration.
 The Acute Myeloid Leukemia we evaluated has a particularly diffuse profile, which is common for these tumors \cite{Alexandrov2019}.
 
-The \batcave algorithm focuses on the tri-nucleotide context and substitution type, which has been shown to have a large effect on site-specific mutation rates \cite{Martincorena2015,Hollstein2017}.
-There are, however, many other types of \textit{genomic context} which can effect local mutation rates including replication timing, expression level, and chromosome organization \cite{Buisson2019,Schuster-Bockler2012,Pleasance2010}.
-\bkmcomment{what to say here? Are we acknowledging a weakness, or just observing there are other types?}
-These could be very useful in computing a local or regional mutation rate, as opposed to the genome-wide but tumor-specific mutation rate used by \batcave.
 
 These mutations are in some sense \textit{easy} to call, since at least one variant caller did in fact call them.
 At the same time, there is no way to compute true and false negative fractions for these data sets.
 As such, it is not surprising that the performance of MuTect and \batcave are similar because the universe of variants under consideration in these experiments are by definition "callable" by at least one variant detection pipeline, and MuTect is among the most sensitive and specific variant callers \cite{Griffith2015,Cibulskis2013}.
+%We are unable to study calibration in real data, because complete false positive/true negative data for real data is not available. 
+%Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
+
 
 We have chosen to implement \batcave as a post-calling algorithm for exclusive use with MuTect because MuTect presents a simple model and a well-tested set of heuristic filters.
 MuTect is widely used, has state of the art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Griffith2015}.
