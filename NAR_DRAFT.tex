@@ -72,7 +72,7 @@ Low frequency mutations challenge current variant calling methods, because their
 Many methods have been developed for calling somatic mutations from NGS data.
 The earliest widely used somatic variant callers developed specifically for tumors, MuTect1 and Varscan2, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants and set a threshold score designed to balance sensitivity and specificity \citep{Koboldt2012,Cibulskis2013}.
 Subsequent research gave rise to a number of alternate strategies, including haplotype-based calling \citep{Garrison2012},
-joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, SomaticSeq, SNooPer, and BAYSIC) \rngcomment{Citations?}.
+joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, BAYSIC, SomaticSeq, and SNooPer) \citep{Ding2012,Cantarel2014,Fang2015,Spinella2016}.
 These methods vary in their complexity and specific focus.
 But they all implicitly or explicitly assume that the rate of mutation is constant across the genome.
 
@@ -81,7 +81,7 @@ The mutational processes that generate single nucleotide variants in tumors do n
 The processes of spontaneous mutation that are active in all somatic tissues depend sensitively on local nucleotide context \citep{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}. 
 Additional mutational processes are active in tumors, due to mutagen exposure or defects in DNA maintenance and repair, and these processes are also sensitive to local nucleotide context \citep{Alexandrov2013a,Helleday2014a,Nik-Zainal2016,Kandoth2013,Alexandrov2016}.
 The specific mutational processes active in a particular tumor generate its unique mutation profile, and differences within and between tumor types are pronounced \cite{Stephens2005, Burrell2013a, Nakamura2015, Witkiewicz2015, Kumar2016}.
-For example, Figure~\ref{NAR-sigfig}, shows mutation profiles from several tumors.
+For example, Figure~\ref{NAR-realsigfig}, shows mutation profiles from several tumors.
 These real tumor mutation profiles show the diversity of profiles seen even within a single cancer.
 %Figure \ref{NAR-sigfig} \textbf{a-e} shows several examples of mutation profiles from both real and simulated tumors.
 
@@ -94,20 +94,16 @@ Broad adoption of our approach will enable more confident study of low allelic f
 
 \begin{figure}
   \begin{center}
-  \includegraphics{figures/signatures_only.pdf}
+  \includegraphics{figures/real_signatures_only.pdf}
   \end{center}
-  \bkmcomment{tumor in F is probably normal breast plus APOBEC. Mention somewhere?}
+  \bkmcomment{tumor in C is probably normal breast plus APOBEC. Mention somewhere? Fix new typo in panel B.}
   \caption{Tumor mutation profiles.
   In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
   \textbf{(B)} The observed mutation profile of a breast tumor used in our real data analysis \cite{Shi2018}.
   \textbf{(C)}\&\textbf{(D)} The observed mutation profiles of two breast tumors \cite{Alexandrov2019}.
-  \textbf{()} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
-  \textbf{()} Equal proportions of signatures 1, 4, \& 5.
-  \textbf{()} Equal proportions of signatures 1, 3, \& 5.
-  \rngcomment{Move simulated profiles to own figure.}
    }
-  \label{NAR-sigfig}
+  \label{NAR-realsigfig}
  \end{figure}
 
 \section{MATERIALS AND METHODS}
@@ -163,10 +159,10 @@ Eq.~\ref{eqn:full_prior} is then
                             &=& \mathrm{p}(m \mid C = c) \mathrm{p}(C = c \mid M)\frac{\mathrm{p}(M)}{\mathrm{p}(C = c)}.
   \end{array}
 \end{equation}
-The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-sigfig}).
+The first two terms on the right-hand side can be estimated from the observed mutation profile (Figure ~\ref{NAR-realsigfig}).
 %Here $\mathrm{p}(\mathrm{S}_{m,c})$ represents probability that a substitution of type $\mathrm{S}_{m,c}$ will occur.
 
-We model the observed mutation profile $\mathrm{S}$ (Figure~\ref{NAR-sigfig}\textbf{A}-\textbf{E}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
+We model the observed mutation profile $\mathrm{S}$ (Figure~\ref{NAR-realsigfig}\textbf{A}-\textbf{D}) as multinomial with parameter $\boldsymbol{\pi} = \{\pi_{m,c}\}$.
 Each element of $\boldsymbol{\pi}$ represents the expected proportion of mutations that are to allele $m$ and in context $c$.
 In a tumor with many high-confidence observed mutations, $\boldsymbol{\pi}$ could be estimated directly from the observed mutation profile $S$.
 But in practice many entries in $\boldsymbol{\pi}$ would then have zero weight.
@@ -235,16 +231,30 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 \end{equation}
 
 \subsection{Implementation}
-\rngcomment{Add section about code implementation. What libraries are using, etc.?}
+We have implemented the \batcave algorithm as an R package (batcaver).
+The package leverages the Bioconductor packages \textrm{BSgenome}, \textrm{GenomicAlignments}, \textrm{VariantAnnotation}, and \textrm{SomaticSignatures} for fast and memory-efficient variant annotation and genomic context identification. 
+Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
+
+\begin{figure}
+  \begin{center}
+  \includegraphics{figures/sim_signatures_only.pdf}
+  \end{center}
+  \caption{Tumor mutation profiles.
+  In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
+  \textbf{(A)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
+  \textbf{(B)} Equal proportions of signatures 1, 4, \& 5.
+  \textbf{(C)} Equal proportions of signatures 1, 3, \& 5.
+   }
+  \label{NAR-simsigfig}
+ \end{figure}
 
 \subsection{Tumor simulations}
 We used a neutral branching process with no death and $\mu=3\cdot10^{-6}$ to simulate realistic distributions of allele frequencies.
-Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{XXX}.
-\rngcomment{Put COSMIC website as a citation.}
+Tumors were simulated with three different mutation profiles composed of COSMIC mutation signatures (version 2) \cite{Cosmic_consortium}.
 Each simulated profile includes COSMIC signature 1, which is found in nearly all tumors and is associated with spontaneous cytosine deamination.
-The ``Concentrated'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure.
-The ``Intermediate'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers.
-The ``Diffuse'' profile (Fig.~\ref{XXX}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair. \rngcomment{Citations for these signature combinations.}
+The ``Concentrated'' profile (Fig.~\ref{NAR-simsigfig}\textbf{A}) is an equal combination of COSMIC signatures 1, 7, and 11, which has a large percentage of C $>$ T substitutions such as are often seen in cancers caused by UV exposure \cite{Alexandrov2013}.
+The ``Intermediate'' profile (Fig.~\ref{NAR-simsigfig}\textbf{B}) is an equal combination of COSMIC signatures 1, 4, and 5, which has been associated with tobacco carcinogens and is representative of some lung cancers \cite{Alexandrov2013}.
+The ``Diffuse'' profile (Fig.~\ref{NAR-simsigfig}\textbf{C}) is an equal combination of COSMIC signatures 1, 3, and 5, which has been associated with inactivating germline mutations in the BRCA1/2 genes leading to a deficiency in DNA double strand break repair \cite{Nik-Zainal2016}.
 Simulated variants were sampled from a combination of the Cancer Genome Atlas (TCGA) and Pan-Cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth) and whole exome (500X depth) reads were simulated from the GRCh38 reference genome using VarSim \cite{Mu2015} and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were inserted to create tumors with BAMSurgeon with default parameters~\citep{Ewing2015a} and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
@@ -289,8 +299,8 @@ The mutation profile is estimated from the high confidence sites, and the poster
 The \batcave algorithm is inexpensive, processing 22,000 variants per second on a typical desktop computer, which corresponds to roughly 100 seconds to process a 500x exome and 2,000 seconds for a 100x whole genome.
 
 To test the performance of \batcave, we generated six different tumor/normal pairs, corresponding to 100x whole genomes and 500x whole exomes for three different mutation profiles.
-The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{XXX}\textbf{A-C}).
-We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \cite{Griffiths2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
+The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{NAR-simsigfig}\textbf{A-C}).
+We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \citep{Griffith2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
 In both, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
 
 \begin{figure}
@@ -298,7 +308,7 @@ In both, deep sequencing and variant validation were performed with the specific
   \includegraphics{figures/kl_only.pdf}
   \end{center}
   \caption{Convergence of the site-specific prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the estimated and simulated profiles versus number of incorporated mutations, for \textbf{(A)} whole exomes and \textbf{(B)} whole genomes.
-  \rngcomment{Zoom panel B into relevant region of plot ($\sim$1000 mutations). What is notation (target || prior)?}}
+  }
 \label{NAR-kl_fig}
 \end{figure}
 
@@ -313,16 +323,13 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
 
   \begin{figure*}
     \begin{center}
-    \includegraphics{figures/fig_wes.pdf}
+    \includegraphics[width=\textwidth]{figures/fig_wes.pdf}
     \end{center}
     \caption{Variant-calling performance on both simulated and real data.
     \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation signatures.
-    \rngcomment{Make labels for \batcave and MuTect in A much bigger. Add similar labels to B.}
-    \rngcomment{Move "Synthetic 500x whole exomes" to above A\&C. Add similar label for B\&D}
     \textbf{(C)} and \textbf{(D)} Shaded regions show distributions of posterior probabilities for tree positive variants, and the smooth line shows the loess-smoothed relationship, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, that curve would match the dashed y=x line. 
-    \rngcomment{Remove dark edges of distributions. Make diagonal line dashed.}
-    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed
-    \rngcomment{Label plots with what type of cancer they are, plus depth.}.}
+    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed \cite{Griffith2015,Shi2018}.}
+
   \label{NAR-wes_fig}
   \end{figure*}
   
@@ -397,20 +404,19 @@ At any posterior probability \batcave returns a larger fraction of all positive 
 
 \subsection{Tests using real tumor data}
 We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-We considered only precision-recall comparisons for these data, because the validation procedure yields true positives but not comprehensive true negatives. \rngcomment{Is  a correct statement?}
+Both data sets were validated by deep targeted sequencing, yielding high quality false positive data.
+However, \texttt{only} variants called by at least one variant caller were validated.
+As a result, there is no validated measure of true/false negative calls, so we considered only precision-recall comparisons for these data. \rngcomment{Is  a correct statement?}\bkmcomment{Yes, definitely true.}
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which would be considered normal in AML. \rngcomment{Really need a citation for this!}
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is inline with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
 For both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
 Shi et al.\ performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$ and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$. \rngcomment{Any comment on this result?}\bkmcomment{Noone, as far as I can tell has done a systematic calculation for TCGA. \cite{Williams2018} is only out in 2018. On the basis of tumor mutation burden studies breast cancer is one of the slowest mutators, but there is no way to go from TMB to mutation rate since it depends on depth/frequency. The one breast cancer studied in Williams 2018 the estimate at just over 1e-7. that is a whole genome whereas ours is an exome, and theirs is deeper. My argument would be that it is not out of line with previous estimates for breast cancer and it is what the data indicates.}
 and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
 For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
-
-
-
 
 \section{DISCUSSION}
  
