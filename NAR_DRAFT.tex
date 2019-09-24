@@ -435,7 +435,7 @@ The \batcave algorithm can thus be included in a wide variety of sequencing pipe
 
 The \batcave algorithm incorporates genomic context into the probabilistic model for variant calling.
 Our current implementation focuses on trinucleotide context, which is known to have a large effect on local mutation rates \cite{Martincorena2015,Hollstein2017}.
-There are, however, many other aspects of genomic context that can affect local mutation rates, including replication timing, expression level, and chromatin organization \cite{Buisson2019,Schuster-Bockler2012,Pleasance2010}. 
+There are, however, many other aspects of genomic context that can affect local mutation rates \citep{Buisson2019}, including replication timing \citep{Stamatoyannopoulos2009}, expression level \citep{Pleasance2010}, and chromatin organization \citep{Schuster-Bockler2012}. 
 \rngcomment{Move individual citations to the factors they support.}
 These additional forms of context could also be incorporated into the \batcave mutation prior.
 In fact, they may be simpler to incorporate than trinucleotide context, because their effect on the prior may vary less among tumors. \rngcomment{Can we back this assertion up?} 
@@ -473,8 +473,8 @@ Moreover, few true negative sites are validated, so specificity is impossible to
 Our current implementation of \batcave is as a post-calling algorithm for MuTect, but the algorithm is broadly applicable.
 We chose to build \batcave off MuTect because MuTect is widely used, has state-of-the-art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Cibulskis2013,Griffith2015}.
 But the mutational prior can be incorporated into almost any caller with an underlying probabilistic model.
-For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a uniform probability of somatic mutation at each genomic site \cite{Kim2018}.
-Replacing that uniform probability with a context-aware prior would require editing the Strelka2 source code, but is conceptually straightforward. \rngcomment{Is this correct, or does Strelka2 output enough for us to do it post-hoc?}
+For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability (somatic mutation state prior) at each genomic site \cite{Kim2018}.
+Replacing that constant probability with a context-aware prior would require a more complicated manipulation of the quality scores output by Strelka than we perform for MuTect, but is conceptually straightforward. \rngcomment{Is this correct, or does Strelka2 output enough for us to do it post-hoc?}
 
 \rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
 
