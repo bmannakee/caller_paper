@@ -471,7 +471,19 @@ Replacing that constant probability with a context-aware prior would require a m
 
 \rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
 
+We focus on the calibration benefits of \batcave because calibration is important for both clinical and research communities.
+\begin{itemize}
+  \item Research/Discovery
+  \begin{itemize}
+    \item Manual review is time consuming, and the number of mutations can be overwhelming at lower frequencies. Calibration reduces wasted effort.
+    \item Drug discovery is expensive and effort must be focused. Finding common low frequency alleles is important, and having a calibrated probability for each tumor a variant is found in would be useful.
+  \end{itemize}
+  \item clinical
+  \begin{itemize}
+    \item many resistance mutations are present at low frequencies in primary tumor. If a tumor is sequenced and you can assign a probability to the mutation, it may be possible to indicate treatment with the drug for the resistance mutation simultaneous to the first line treatment. For instance if the mutation has a 80\% probabiliity of being present, yes, but if 20\% no. Balance of harm from treating for a mutation that isn't there.
+  \end{itemize}
 
+\end{itemize}
 
 
 Our current R implementation, \texttt{batcaver}, is computationally inexpensive, adding 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
