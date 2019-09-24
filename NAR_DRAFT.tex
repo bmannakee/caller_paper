@@ -443,7 +443,7 @@ In the long run, we believe that incorporating more tumor biology into variant c
 
 \batcave divides the data into two classes: high- and low-confidence variants.
 The high-confidence variants are used to estimate the mutational prior, which is then used to improve the calling of low-confidence variants.
-Statistically, this is an empirical Bayesian approach~\citep{Robbins1954}. \rngcomment{Add citations, and sharpen discussion if necessary.}
+Statistically, this is an empirical Bayesian approach~\citep{Robbins1954}, in which the high and low-confidence variants are treated as parallel experiments\citep{Morris1983,Efron2014}. 
 In general, high-confidence variants tend to have relatively high allelic frequencies, and consequently tend to have arisen early in tumor development.
 A key implicit assumption of our approach is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
 Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\citep{Rubanova2018a}, although those differences are relatively small.
