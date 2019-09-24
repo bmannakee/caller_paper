@@ -3,9 +3,10 @@
 \usepackage{color}
 \usepackage{xfrac}
 
+\usepackage{xspace}
 \newcommand{\rngcomment}[1]{{\color{red}RNG: #1}}
 \newcommand{\bkmcomment}[1]{{\color{blue}BKM: #1}}
-\newcommand{\batcave}{BATCAVE }
+\newcommand{\batcave}{BATCAVE\xspace}
 \newcommand{\beginsupplement}{%
         \clearpage
         \onecolumn
@@ -96,12 +97,12 @@ Broad adoption of our approach will enable more confident study of low allelic f
   \begin{center}
   \includegraphics{figures/real_signatures_only.pdf}
   \end{center}
-  \bkmcomment{tumor in C is probably normal breast plus APOBEC. Mention somewhere? Fix new typo in panel B.}
   \caption{Tumor mutation profiles.
   In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
   \textbf{(B)} The observed mutation profile of a breast tumor used in our real data analysis \cite{Shi2018}.
   \textbf{(C)}\&\textbf{(D)} The observed mutation profiles of two breast tumors \cite{Alexandrov2019}.
+  \rngcomment{Label cut off in panel A. Since this figure is now all real data, we can remove "real" from each internal label.}
    }
   \label{NAR-realsigfig}
  \end{figure}
@@ -258,22 +259,18 @@ The ``Diffuse'' profile (Fig.~\ref{NAR-simsigfig}\textbf{C}) is an equal combina
 Simulated variants were sampled from a combination of the Cancer Genome Atlas (TCGA) and Pan-Cancer Analysis of Whole Genomes (PCAWG) databases, which include mutations found in all types of cancer.
 Whole genome (100X depth) and whole exome (500X depth) reads were simulated from the GRCh38 reference genome using VarSim \cite{Mu2015} and aligned with BWA \cite{Li2009a}, both with default parameters.
 Variants were inserted to create tumors with BAMSurgeon with default parameters~\citep{Ewing2015a} and called with MuTect 1.1.7~\cite{Cibulskis2013} with the following parameters:
-\begin{scriptsize}
-\begin{verbatim}
-java -Xmx24g -jar $MUTECT_JAR --analysis_type MuTect \
-        --reference_sequence $ref_path \
-        --dbsnp $db_snp \
-        --enable_extended_output \
-        --fraction_contamination 0.00 \
-        --tumor_f_pretest 0.00 \
-        --initial_tumor_lod -10.00 \
-        --required_maximum_alt_allele_mapping_quality_score 1 \
-        --input_file:normal $tmp_normal \
-        --input_file:tumor $tmp_tumor \
-        --out $out_path/$chr.txt \
-        --coverage_file $out_path/$chr.cov
-\end{verbatim}
-\end{scriptsize}
+\texttt{\small java -Xmx24g -jar \$MUTECT\_JAR --analysis\_type MuTect 
+        --reference\_sequence \$ref\_path 
+        --dbsnp \$db\_snp 
+        --enable\_extended\_output 
+        --fraction\_contamination 0.00 
+        --tumor\_f\_pretest 0.00 
+        --initial\_tumor\_lod -10.00 
+        --required\_maximum\_alt\_allele\_mapping\_quality\_score 1 
+        --input\_file:normal \$tmp\_normal 
+        --input\_file:tumor \$tmp\_tumor 
+        --out \$out\_path/\$chr.txt 
+        --coverage\_file \$out\_path/\$chr.cov}.
 Variants identified by MuTect are labelled as to whether they pass all filters, fail to pass only the the evidence threshold \textrm{tlod\_f\_star} filter, or fail to pass any other filter. 
 Variants that passed all filters or failed only \textrm{tlod\_f\_star} were then passed to \batcave for prior estimation and rescoring.
 
@@ -329,8 +326,9 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
     \caption{Variant-calling performance on both simulated and real data.
     \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation signatures.
     \textbf{(C)} and \textbf{(D)} Shaded regions show distributions of posterior probabilities for tree positive variants, and the smooth line shows the loess-smoothed relationship, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, that curve would match the dashed y=x line. 
-    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed \cite{Griffith2015,Shi2018}.}
-
+    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed \cite{Griffith2015,Shi2018}.
+    \rngcomment{Wasting a ton of vertical space now. Remove extraneous whitespace throughout. For panels A,B,E\&F, make \batcave curve thicker, so it's visible from behind the MuTect curve.}
+}
   \label{NAR-wes_fig}
   \end{figure*}
   
@@ -405,9 +403,9 @@ At any posterior probability \batcave returns a larger fraction of all positive 
 
 \subsection{Tests using real tumor data}
 We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-Both data sets were validated by deep targeted sequencing, yielding high quality false positive data.
-However, \texttt{only} variants called by at least one variant caller were validated.
-As a result, there is no validated measure of true/false negative calls, so we considered only precision-recall comparisons for these data. \rngcomment{Is  a correct statement?}\bkmcomment{Yes, definitely true.}
+Both data sets were validated by deep targeted sequencing, yielding high quality true and false positive data.
+However, only variants called by at least one variant caller were validated.
+As a result, there is no validated measure of true or false negative calls, so we considered only precision-recall comparisons for these data.
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
 We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is inline with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
