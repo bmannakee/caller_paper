@@ -230,8 +230,8 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 
 \subsection{Implementation}
 We have implemented the \batcave algorithm as an R package (batcaver).
-The package leverages the Bioconductor packages \textrm{BSgenome}, \textrm{GenomicAlignments}, \textrm{VariantAnnotation}, and \textrm{SomaticSignatures} for fast and memory-efficient variant annotation and genomic context identification.
-Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.  \rngcomment{Add citations to all tools that have them.}
+The package leverages the Bioconductor packages \textrm{BSgenome} \citep{Pages2019}, \textrm{GenomicAlignments} \citep{Lawrence2013}, \textrm{VariantAnnotation} \citep{Obenchain2014}, and \textrm{SomaticSignatures} \citep{Gehring2015} fast and memory-efficient variant annotation and genomic context identification.
+Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
 
 \begin{figure}
   \begin{center}
