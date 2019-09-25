@@ -73,8 +73,7 @@ Low frequency mutations challenge current variant calling methods, because their
 Many methods have been developed for calling somatic mutations from NGS data.
 The earliest widely used somatic variant callers developed specifically for tumors, MuTect1~\cite{Cibulskis2013} and Varscan2~\cite{Koboldt2012}, used a combination of heuristic filtering and a model of sequencing errors to identify and score potential variants and set a threshold score designed to balance sensitivity and specificity.
 Subsequent research gave rise to a number of alternate strategies, including haplotype-based calling \citep{Garrison2012},
-joint genotype analysis (SomaticSniper, JointSNVMix2, Seurat, and CaVEMan,MuClone) \cite{Larson2012,Roth2012a,Christoforides2013,Jones2016,Dorri2019}, allele frequency-based analysis (Strelka, MuTect, LoFreq, EBCall, deepSNV, LoLoPicker, and MuSE) \citep{Saunders2012,Wilm2012,Shiraishi2013b,Gerstung2012,Carrot-Zhang2017,Fan2016}, and ensemble and deep learning methods (MutationSeq, BAYSIC, SomaticSeq, and SNooPer) \citep{Ding2012,Cantarel2014,Fang2015,Spinella2016}.
-\rngcomment{Connect citations to individual tools. (See MuTect1 and Varscan2 examples earlier in paragraph.}
+joint genotype analysis (SomaticSniper \citep{Larson2012}, JointSNVMix2 \citep{Roth2012a}, Seurat \citep{Christoforides2013}, CaVEMan \citep{Jones2016}, and MuClone \citep{Dorri2019}), allele frequency-based analysis (Strelka \citep{Saunders2012}, LoFreq \citep{Wilm2012}, EBCall \citep{Shiraishi2013b}, deepSNV \citep{Gerstung2012}, LoLoPicker \citep{Carrot-Zhang2017}, and MuSE \citep{Fan2016}), and ensemble and deep learning methods (MutationSeq \citep{Ding2012}, BAYSIC \citep{Cantarel2014}, SomaticSeq \citep{Fang2015}, and SNooPer \citep{Spinella2016}).
 These methods vary in their complexity and specific focus.
 But they all implicitly or explicitly assume that the rate of mutation is uniform across the genome.
 
