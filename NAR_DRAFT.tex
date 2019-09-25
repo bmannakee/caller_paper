@@ -286,8 +286,7 @@ We called variants using Mutect 1.1.7 as in our simulations, except that both th
 To quantify the difference in calibration between MuTect and \batcave, we use the Integrated Calibration Index \cite{Austin2019}.
 Briefly, a loess-smoothed regression was fit by regressing the binary (True=1, False=0) true variant classification against the reported posterior probability for both MuTect and \batcave.
 For a perfectly calibrated caller, the regression fit would be the diagonal line $y=x$. 
-The Integrated Calibration Index is the average distance between the fit and that line.
-\rngcomment{This can't be true, otherwise perfect calibration would be ICI=1... What is it?}
+The Integrated Calibration Index is a weighted average of the absolute distance between the calibration curve and the diagonal line of perfect calibration.
 
 \section{RESULTS}
 We implemented \batcave as a post-call variant evaluation algorithm to be used with MuTect (Versions 1.1.7 or $>$2.0) \cite{Cibulskis2013}.
