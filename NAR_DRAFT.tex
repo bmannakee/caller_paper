@@ -279,7 +279,7 @@ We downloaded the normal and primary whole-genome AML tumor bam files from dbGaP
 Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{Griffith2015}, which we used for our true positive dataset.
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-\rngcomment{What are we doing about the multi-regional nature of this data? Are we combining across regions somehow?}
+We ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
 
 \subsection{Calibration metric}
