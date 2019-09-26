@@ -474,6 +474,9 @@ In the clinic, identified variants act as biomarkers for susceptibility to targe
 \bkmcomment{I mean by "risk models", if you can assign a probability of the mutation being present you can make informed tradeoffs between likelihood of benefit and risk of harm for a particular targeted therapy.}
 A properly calibrated model implies a known rate of false positives.
 One reason why tumors are not routinely sequenced to high depth is that as sequencing depth increases, false positive rate increases without bound \citep{Cibulskis2013}.
+The International Cancer Genome Consortium recommends that catalogues of somatic mutation target a true positive rate of 95\%, and an acquisition rate of 80\% of all mutations present in a sample \texttt{https://icgc.org/icgc/goals-structure-policies-guidelines/e8-genome-analyses}.
+Assuming a sample size of 1 million cells, and a per-base mutation rate of $3 \dot 10^{-8}$, implies 10 million mutations per sample in a neutrally evolving tumor.
+A naive application of Eqn. \ref{eqn:mut_rate} implies a minimum variant allele frequency of \bkmcomment{calculate this, will be very low.}, requiring sequencing depths far in excess of current standards.
 Proper calibration will allow deeper sequencing without ballooning false positive rates.
 
 \bkmcomment{begin needed paragraph above.}
