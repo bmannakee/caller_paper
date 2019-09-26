@@ -293,10 +293,10 @@ The mutation profile is estimated from the high confidence sites, and the poster
 The \batcave algorithm is inexpensive, processing 22,000 variants per second on a typical desktop computer, which corresponds to roughly 100 seconds to process a 500X exome and 2,000 seconds for a 100X whole genome.
 
 To test the performance of \batcave, we generated six different tumor/normal pairs, corresponding to 100X whole genomes and 500X whole exomes for three different mutation profiles.
-The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{NAR-simsigfig}\textbf{A-C}).
+The three mutation profiles were chosen to resemble a melanoma (concentrated), a lung cancer (intermediate), and a BRCA-driven breast cancer (diffuse) (Fig.~\ref{NAR-simsigfig}).
 We also tested \batcave using two real cancer data sets, a whole-genome Acute Myeloid Leukemia (AML) \citep{Griffith2015} and a whole-exome multi-region breast cancer \cite{Shi2018}.
 In both, deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-Because our focus is on evaluating the statistical calling model, we compute all metrics using only those potential variants that pass MuTect's heuristic filters.
+Because our focus is on evaluating the statistical calling model, we computed all test metrics using only those potential variants that passed MuTect's heuristic filters and entered the statistical model.
 
 \begin{figure}
   \begin{center}
@@ -307,10 +307,8 @@ Because our focus is on evaluating the statistical calling model, we compute all
 \label{NAR-kl_fig}
 \end{figure}
 
-% XXX: RNG stopped here...
-
 \subsection{Convergence of the prior}
-To improve performance, the context-dependent prior probability of mutation must converge to a good representation of the data generating distribution within the set of high-confidence mutations.
+To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
 When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}).
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
@@ -323,9 +321,10 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
     \includegraphics[width=\textwidth]{figures/fig_wes.pdf}
     \end{center}
     \caption{Variant-calling performance on both simulated and real data.
-    \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation signatures.
+    \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation profiles.
     \textbf{(C)} and \textbf{(D)} Shaded regions show distributions of posterior probabilities for tree positive variants, and the smooth line shows the loess-smoothed relationship, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, that curve would match the dashed y=x line. 
     \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed \cite{Griffith2015,Shi2018}.
+    \rngcomment{Make \batcave lines thin, MuTect lines thick, and put MuTect in back in all comparison plots.}
 }
   \label{NAR-wes_fig}
   \end{figure*}
@@ -333,12 +332,12 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   
 \begin{table*}[b]
   \tableparts{%
-  \caption{Performance characteristics as measured for all data sets.}
+  \caption{Variant calling metrics for all data sets.}
   \label{table:01}%
   }{%
-  \begin{tabular*}{\textwidth}{@{}lllllllll@{}}
+  \begin{tabular}{lllllllllll}
   \toprule
-  Depth & Mutation profile & $\mu$ & AUROC & & AUPRC & & ICI & 
+  Scenario & Mutation profile & $\mu$ & \multicolumn{2}{c}{AUROC} & \multicolumn{2}{c}{AUPRC} & \multicolumn{2}{c}{ICI} 
   \\
   & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
   \\
@@ -360,73 +359,72 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   real breast \cite{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
   \\
   \botrule
-  \end{tabular*}%
+  \end{tabular}%
   }
-  {$\mu$ = per-base mutation rate, AUROC/AUPRC = area under ROC/PRC curve, ICI = Integrated calibration index.}
+  {$\mu$ = per-base mutation rate, AUROC/AUPRC = Area Under Receiver Operating Characteristic / Precision-Recall Curve, ICI = Integrated Calibration Index. Smaller values of ICI are superior.}
  \end{table*}
 
 \subsection{Tests using simulated data}
 We assessed classification performance using the areas under both the receiver operating characteristic and the precision-recall curves, because the classes are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
-By both metrics \batcave outperforms MuTect (Fig.~\ref{NAR-wes_fig}\textbf{A}\&\textbf{B} and Table~\ref{table:01}).
-The extent of the performance difference is dependent on both the sequencing depth and the concentration of the mutation signature.
-Deeper sequencing and more concentrated mutation signatures increase the performance advantage of \batcave. 
+By both metrics \batcave outperforms MuTect (Fig.~\ref{NAR-wes_fig}A\&B, Fig.~\ref{NAR-wgs_fig}A\&B, and Table~\ref{table:01}).
+The extent of the performance difference is dependent on both the sequencing depth and the concentration of the mutation profile.
+Deeper sequencing and more concentrated mutation profiles increase the performance advantage of \batcave. 
 
 For all simulated tumors, the estimated mutation rate is approximately $3\cdot10^{-7}$ (Table~\ref{table:01}), which is lower than the simulated rate of $3\cdot10^{-6}$.
-This is due to restrictions with BAMSurgeon, such as sequencing depth and quality, that prevent 100\% of simulated variants from being inserted into the reads.
+This is likely due to restrictions within BAMSurgeon, such as sequencing depth and quality, that prevent 100\% of simulated variants from being inserted into the reads.
 
-We also assessed the calibration of \batcave, assessing the likelihood that a potential variant with a given posterior probability is actually a true variant.
-We measured overall calibration performance using the Integrated Calibration Index (ICI) \cite{Austin2019}, which measures the difference between predicted and observed probabilities, weighted by the density of the predicted probabilities.
-This metric is particularly useful in our case, because the density of posterior probabilities is bi-modal (Fig.~\ref{NAR-wes_fig}C\&D).
-A large fraction of true negative variants have posterior probabilities less than $10^{-4}$, far below any meaningful threshold, so we evaluate calibration only on potential variants with posterior probability greater than 0.01.
-For these potential variants, \batcave tends to increase posterior probabilities of low probability but true variants (density curves in Fig.~\ref{NAR-wes_fig}C\&D) while decreasing probabilities of low probability but false variants.
-For 500X tumors, the calibration of \batcave is better than MuTect across the full spectrum of posterior probabilities, while for 100X whole genomes the calibration is slightly worse (Figure \ref{NAR-wgs_fig} and Table \ref{table:01}).
-This is because that there are few low probability true positive variants in tumors sequenced to 100X depth.
-As with the other metrics, the advantage of \batcave increases with the concentration of the mutation profile the sequencing depth.
+We also assessed calibration, the likelihood that a potential variant with a given posterior probability is actually a true variant.
+We measured overall calibration performance using the Integrated Calibration Index (ICI) \cite{Austin2019}, which integrates the difference between predicted and observed probabilities, weighted by the density of the predicted probabilities.
+This metric is particularly useful in our case, because the density of posterior probabilities is bi-modal (Fig.~\ref{NAR-wes_fig}C\&D and~\ref{NAR-wgs_fig}C\&D).
+A large fraction of true negative variants have posterior probabilities less than $10^{-4}$, far below any meaningful threshold, so we evaluated calibration only on potential variants with posterior probability greater than 0.01.
+For these potential variants, \batcave tends to increase posterior probabilities of low probability but true variants (density curves in Fig.~\ref{NAR-wes_fig}C\&D and~\ref{NAR-wgs_fig}C\&D) while decreasing probabilities of low probability but false variants.
+For 500X exomes, the calibration of \batcave is better than MuTect across the full spectrum of posterior probabilities (Figure \ref{NAR-wes_fig} and Table \ref{table:01}).
+For 100X whole genomes, the calibration of \batcave is slightly worse (Figure \ref{NAR-wgs_fig} and Table \ref{table:01}), likely because there are few low probability true positive variants in tumors sequenced to 100X depth. 
+As with the other metrics, the advantage of \batcave increases with the concentration of the mutation profile and the sequencing depth.
 
 \begin{figure}
   \begin{center}
   \includegraphics{figures/ppv_wes.pdf}
   \end{center}
-  \caption{Calibration of posterior probability. 
-  For realistic thresholds, posterior probabilities are more accurately calibrated for \batcave than MuTect, no matter how concentration the mutation profile is.}
+  \caption{Calibration of posterior probability for 500X exomes. 
+  For realistic thresholds, posterior probabilities are more accurately calibrated for \batcave than MuTect, no matter the concentration of the mutation profile.
+  \rngcomment{Need to be careful about what is represented here. Here precision and recall are for all variants \textbf{above} the threshold, correct?}
+  }
 \label{NAR-ppv_fig}
 \end{figure}
 
 In practice, accurate calibration is most important for variants with high posterior probability.
 For variants with posterior probability between 60 and 90\%, \batcave is substantially better calibrated than MuTect (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
-For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as posterior probability increases.
+For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as the posterior probability increases.
 The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
-At any posterior probability \batcave returns a larger fraction of all positive calls than MuTect.
+At any posterior probability \batcave returns a larger fraction of all positive calls than MuTect. \rngcomment{What does this mean?}
 %Figure~\ref{NAR-ppv_wgs_fig} shows results for 100X whole genomes, where the results are similar for precision.
 
 \subsection{Tests using real tumor data}
-We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the specific purpose of evaluating tumor variant calling pipelines.
-Both data sets were validated by deep targeted sequencing, yielding high quality true and false positive data.
+We tested \batcave using two data sets for which deep sequencing and variant validation were performed with the express purpose of evaluating tumor variant calling pipelines, yielding high quality true and false positive data~\cite{Griffith2015,Shi2018}.
 However, only variants called by at least one variant caller were validated.
-As a result, there is no validated measure of true or false negative calls, so we considered only precision-recall comparisons for these data.
+As a result, there are no validated true or false negative calls, so we considered only precision-recall comparisons for these data.
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is inline with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
+We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
 For both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
-Shi et al.\ performed multi-region whole exome sequencing on 6 individual breast tumors to a mean target sequencing depth of $160\mathrm{X}$ and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
+Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated an average per-base mutation rate for these tumor regions of $4\cdot10^{-8}$, which is within the range of observed mutation rates for breast cancers \citep{Alexandrov2019}, and in line with the low number of validated somatic mutations present in these tumors.
-and the area under the precision-recall curve is identical (.972) for MuTect and \batcave (Figure~\ref{NAR-wes_fig}\textbf{F} and Table \ref{table:01}).
+We estimated an average per-base mutation rate for these tumor regions of $4\cdot10^{-8}$, which is consistent with observed mutation rates for breast cancers \citep{Alexandrov2019} and with the low number of validated somatic mutations.
 For the validated variants, MuTect and \batcave yield almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
 \section{DISCUSSION}
  
-\rngcomment{I worry that this bit about very high depth sequencing is going to be problematic in review, because it's not a problem we're solving. We're helping, but not making huge changes.}
 %Deep sequencing is necessary to measure intra-tumor heterogeneity \citep{Shi2018}, identify subclonal driver and resistance alleles \cite{Griffith2015}, and probe the mutational landscape of cancer in general \cite{Zehir2017}.  
 %Current approaches to very high depth next-generation sequencing \cite{Griffith2015}, however, require combining calls from multiple variant calling algorithms and then validating these calls via ultra-deep sequencing.
 %We believe that much of the need for multiple variant callers could be alleviated by improvements to the statistical model used to evaluate the evidence presented by the sequenced reads. 
 
 \batcave is an algorithm that leverages the biology of individual tumor mutation profiles to improve identification of low allelic frequency somatic variants.
 Our implementation is built on MuTect, one of the most widely used somatic variant callers.
-\batcave improves on the classification accuracy of MuTect in synthetic data (Fig.~\ref{NAR-wes_fig}A-D and Table~\ref{table:01}) across the entire range of recall and specificity.
-Moreover, \batcave is better calibrated than MuTect at relevant posterior probability thresholds (\ref{NAR-ppv_fig}), allowing researchers and clinicians to make informed choices about the trade-off between precision and recall.
-For real data, testing on validated calls shows that \batcave does not degrade performance for variants that are relatively easy to identify (Fig.~\ref{NAR-wes_fig}E\&F).
+\batcave improves on the classification accuracy of MuTect in synthetic data (Fig.~\ref{NAR-wes_fig}A-D,  \ref{NAR-wgs_fig}, and Table~\ref{table:01}) across the entire range of recall and specificity.
+Moreover, \batcave is better calibrated than MuTect at relevant posterior probability thresholds (Fig.~\ref{NAR-ppv_fig} and~\ref{NAR-ppv_wgs_fig}), allowing researchers and clinicians to make informed choices about the trade-off between precision and recall.
+For real data, testing on validated calls shows that \batcave does not degrade performance for variants that are relatively easy to identify (Fig.~\ref{NAR-wes_fig}E\&F and Table~\ref{table:01}).
 The \batcave algorithm can thus be included in a wide variety of sequencing pipelines.
 
 The \batcave algorithm incorporates genomic context into the probabilistic model for variant calling.
@@ -435,7 +433,6 @@ There are, however, many other aspects of genomic context that can affect local 
 Some of these, such as replication timing and chromatin organization, could be incorporated into the \batcave mutation prior by observing the empirical distribution of mutations in the human germline \cite{Hodgkinson2011}.
 Others, such as expression level, could be tumor-specific, but would require information not available in the variant calls to compute.
 In the long run, we believe that incorporating more tumor biology into variant calling models will often lead to improved performance.
-
 
 \batcave divides the data into two classes: high- and low-confidence variants.
 The high-confidence variants are used to estimate the mutational prior, which is then used to improve the calling of low-confidence variants.
@@ -524,7 +521,7 @@ We thank Prof.\ Edward J. Bedrick for fruitful discussions about the statistical
   \includegraphics[width=\textwidth]{figures/fig_wgs.png}
   \end{center}
   \caption{Model performance on 100X simulated whole genome.
-  \textbf{(A)} Precision recall curves and \textbf{(B)} Reciever operating characteristic curves for 3 mutation signatures.
+  \textbf{(A)} Precision recall curves and \textbf{(B)} Reciever operating characteristic curves for 3 mutation profiles.
   Distribution of estimated true positive probabilities for true positive  variants for \textbf{(C)} the MuTect model and \textbf{(D))} the \batcave model.
   A perfectly calibrated model would generate the diagonal line.}
 \label{NAR-wgs_fig}
