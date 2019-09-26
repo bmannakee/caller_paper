@@ -467,20 +467,16 @@ Replacing that constant probability with a context-aware prior would require a m
 
 \rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
 
-We focus on the calibration benefits of \batcave because calibration is important for both clinical and research communities.
-\begin{itemize}
-  \item Research/Discovery
-  \begin{itemize}
-    \item Manual review is time consuming, and the number of mutations can be overwhelming at lower frequencies. Calibration reduces wasted effort.
-    \item Drug discovery is expensive and effort must be focused. Finding common low frequency alleles is important, and having a calibrated probability for each tumor a variant is found in would be useful.
-  \end{itemize}
-  \item clinical
-  \begin{itemize}
-    \item many resistance mutations are present at low frequencies in primary tumor. If a tumor is sequenced and you can assign a probability to the mutation, it may be possible to indicate treatment with the drug for the resistance mutation simultaneous to the first line treatment. For instance if the mutation has a 80\% probabiliity of being present, yes, but if 20\% no. Balance of harm from treating for a mutation that isn't there.
-  \end{itemize}
+The improved calibration of \batcave provides several advantages.
+Cancer genomics for research and drug discovery is an important yet costly endeavour, and manual review of variants is often required to limit the number of false leads followed.
+Improved calibration allows researchers to select a tolerable false positive rate, and focus efforts on a set of variants with known probability of being present.
+In the clinic, identified variants act as biomarkers for susceptibility to targeted drugs, and well calibrated probabilities facilitate the use of risk models in the choice of treatment rather than an all or nothing approach.
+\bkmcomment{I mean by "risk models", if you can assign a probability of the mutation being present you can make informed tradeoffs between likelihood of benefit and risk of harm for a particular targeted therapy.}
+A properly calibrated model implies a known rate of false positives.
+One reason why tumors are not routinely sequenced to high depth is that as sequencing depth increases, false positive rate increases without bound \citep{Cibulskis2013}.
+Proper calibration will allow deeper sequencing without ballooning false positive rates.
 
-\end{itemize}
-\bkmcomment{begin needed paragraph above}
+\bkmcomment{begin needed paragraph above.}
 
 Our current R implementation, \texttt{batcaver}, is computationally inexpensive, adding 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational costs is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
