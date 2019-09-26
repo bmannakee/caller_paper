@@ -427,12 +427,33 @@ Moreover, \batcave is better calibrated than MuTect at relevant posterior probab
 For real data, testing on validated calls shows that \batcave does not degrade performance for variants that are relatively easy to identify (Fig.~\ref{NAR-wes_fig}E\&F and Table~\ref{table:01}).
 The \batcave algorithm can thus be included in a wide variety of sequencing pipelines.
 
+We evaluated \batcave with simulated tumors with three different mutation profiles and two real tumors.
+The simulated diffuse and intermediate profiles (Fig.~\ref{NAR-simsigfig}A\&B) represent baseline profiles of lung and breast tumors, respectively.
+And the concentrated profile (Fig.~\ref{NAR-simsigfig}C) represents a tumor driven by a particular mutational process, such as UV exposure.
+But mutational profiles are highly heterogeneous, so concentrated profiles can be found in any tumor type (e.g., Fig.~\ref{NAR-realsigfig}C).
+The two real data sets we considered are among the few for which extensive validation of variant calls has been performed~\cite{Griffith2015, Shi2018}.
+They happen, however, to have diffuse mutation profiles (Fig.~\ref{NAR-realsigfig}A\&B), which reduces the expected advantage of \batcave over MuTect (Table~\ref{table:01}).
+A more fundamental challenge of using these real data for testing callers is that only a subset of potential variants are validated.
+This subset tends to be relatively easy to call, so both MuTect and \batcave have almost perfect precision and recall (Fig.~\ref{NAR-wes_fig} and Table~\ref{table:01}).
+Moreover, few true negative sites are validated, so specificity and calibration are impossible to calculate.
+Deep sequencing experiments that validate random samples of uncalled potential variants would give much-needed insight into the differences among statistical models in variant calling.
+
+Our current implementation of \batcave is as a post-calling algorithm for MuTect, but the algorithm is broadly applicable.
+We chose to build \batcave off MuTect because MuTect is widely used, has state-of-the-art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Cibulskis2013,Griffith2015}.
+But the mutational prior can be incorporated into almost any caller with an underlying probabilistic model.
+For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability at each genomic site \cite{Kim2018}.
+Replacing that constant probability with a mutational prior would require a more complicated manipulation of the quality scores output by Strelka than for MuTect but is conceptually straightforward.
+
+The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
+The majority of the computational costs is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
+Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational prior.
+
 The \batcave algorithm incorporates genomic context into the probabilistic model for variant calling.
 Our current implementation focuses on trinucleotide context, which is known to have a large effect on local mutation rates \cite{Martincorena2015,Hollstein2017}.
 There are, however, many other aspects of genomic context that can affect local mutation rates \citep{Buisson2019}, including replication timing \citep{Stamatoyannopoulos2009}, expression level \citep{Pleasance2010}, and chromatin organization \citep{Schuster-Bockler2012}. 
-Some of these, such as replication timing and chromatin organization, could be incorporated into the \batcave mutation prior by observing the empirical distribution of mutations in the human germline \cite{Hodgkinson2011}.
+Some of these, such as replication timing and chromatin organization, could be incorporated into the \batcave mutational prior using the empirical distribution of mutations in the human germline \cite{Hodgkinson2011}.
 Others, such as expression level, could be tumor-specific, but would require information not available in the variant calls to compute.
-In the long run, we believe that incorporating more tumor biology into variant calling models will often lead to improved performance.
+In the long run, we believe that incorporating more tumor biology into variant calling models will continue to improve performance.
 
 \batcave divides the data into two classes: high- and low-confidence variants.
 The high-confidence variants are used to estimate the mutational prior, which is then used to improve the calling of low-confidence variants.
@@ -443,27 +464,7 @@ Recent studies have found differences in mutational profiles among variants of d
 A potential extension of the \batcave algorithm is process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
 
-
-We evaluated \batcave with simulated tumors with three different mutation profiles and two real tumors.
-The simulated diffuse and intermediate profiles (Fig.~\ref{NAR-simsigfig}A\&B) represent baseline profiles of lung and breast tumors, respectively, which the concentrated profile (Fig.~\ref{NAR-simsigfig}C) represents a tumor driven by a particular mutational process, such as UV exposure.
-But mutational profiles are highly heterogeneous, so that concentrated profiles can be found in any tumor type (e.g., Fig.~\ref{NAR-realsigfig}C).
-The two real data sets we considered are among the very few for which extensive validation of variant calls has been performed~\cite{Griffith2015, Shi2018}.
-They happen, however, to have relatively flat mutation profiles (Fig.~\ref{NAR-realsigfig}A\&B), which reduces the expected advantage of \batcave over MuTect (Table~\ref{table:01}).
-A more fundamental challenge of using these real data for testing callers is that only a subset of potential variants are validated.
-This subset tends to be relatively easy to call, so both MuTect and \batcave have almost perfect precision and recall (Fig.~\ref{NAR-wes_fig} and Table~\ref{table:01}).
-Moreover, few true negative sites are validated, so specificity is impossible to calculate.
-
-%We are unable to study calibration in real data, because complete false positive/true negative data for real data is not available. 
-%Deep sequencing experiments where a large random sample of uncalled potential variants, as well as a random sample of variant with no reads at all present, would give much-needed insight into the differences in statistical models in variant calling.
-
-Our current implementation of \batcave is as a post-calling algorithm for MuTect, but the algorithm is broadly applicable.
-We chose to build \batcave off MuTect because MuTect is widely used, has state-of-the-art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Cibulskis2013,Griffith2015}.
-But the mutational prior can be incorporated into almost any caller with an underlying probabilistic model.
-For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability (somatic mutation state prior) at each genomic site \cite{Kim2018}.
-Replacing that constant probability with a context-aware prior would require a more complicated manipulation of the quality scores output by Strelka than we perform for MuTect, but is conceptually straightforward.
-
 \rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
-
 The improved calibration of \batcave provides several advantages.
 Cancer genomics for research and drug discovery is an important yet costly endeavour, and manual review of variants is often required to limit the number of false leads followed.
 Improved calibration allows researchers to select a tolerable false positive rate, and focus efforts on a set of variants with known probability of being present.
@@ -476,19 +477,11 @@ Assuming a sample size of 1 million cells, and a per-base mutation rate of $3 \d
 A naive application of Eqn. \ref{eqn:mut_rate} implies a minimum variant allele frequency of \bkmcomment{calculate this, will be very low.}, requiring sequencing depths far in excess of current standards.
 Proper calibration will allow deeper sequencing without ballooning false positive rates.
 
-\bkmcomment{begin needed paragraph above.}
-
-Our current R implementation, \texttt{batcaver}, is computationally inexpensive, adding 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
-The majority of the computational costs is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
-Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational context prior.
-
 Our results show that adding a mutational context prior substantially improves probabilistic variant calling, particularly for tumors with concentrated profiles.
 Improved variant calling increases the benefit-to-cost ratio of deep sequencing in both research and clinical applications.
 Moreover, \batcave proves to be a better calibrated caller than vanilla MuTect (Fig.~\ref{NAR-ppv_fig}).
 Different users will prefer different tradeoffs in terms of precision and recall, which can be more accurately made with \batcave.
 Our R implementation, \texttt{batcaver}, can be easily incorporated into any MuTect-based pipeline, and the mutational profile algorithm can be incorporated into many other callers.
-
-\rngcomment{Need to rearrange Discussion logically...}
 
 % \section{CONCLUSION}
 % \bkmcomment{I looked at a bunch of NAR methods papers, and none include a conclusions section, so I moved it to the last paragraph of discussion.}
