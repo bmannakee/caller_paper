@@ -393,7 +393,8 @@ As with the other metrics, the advantage of \batcave increases with the concentr
 \label{NAR-ppv_fig}
 \end{figure}
 
-In practice, accurate calibration is most important for variants with high posterior probability.
+In practice, variant calling is a decision problem, in which a threshold must be selected above which we accept a variant call.
+The proper threshold is ideally a choice the user makes based on their particular needs.
 For variants with posterior probability between 60 and 90\%, \batcave is substantially better calibrated than MuTect (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
 For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as the posterior probability increases.
 The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
