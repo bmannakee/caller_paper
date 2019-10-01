@@ -392,17 +392,16 @@ As with the other metrics, the advantage of \batcave increases with the concentr
 \label{NAR-ppv_fig}
 \end{figure}
 
-\bkmcomment{I think there is a reasonable wording here in terms of positive predictive value.
-Think of the threshold as the posterior class probability above which we set all probabilities to 1, and below to zero?
-Getting better below but I still need to think harder.}
-In practice, variant calling is a decision problem, in which a threshold score must be selected above which a variant call is made.
+In practice, variant calling is a classification problem, in which a threshold score must be selected above which a variant call is made.
 The proper threshold is ideally a choice the user makes based on their particular needs, which often balance precision with recall.
-\batcave provides posterior probabilities that are well calibrated when averaged not only across the whole range of possible probabilities, but in particular at higher probability ranges applicable in most situations.
-For posterior probability thresholds between 60 and 90\%, \batcave exhibits substantially better average calibration than MuTect (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
-As a result, \batcave posterior probabilities provide a useful way to select tumor-specific thresholds. 
+The posterior probability estimates provided by \batcave allow the user to select a tumor-specific threshold.
+For posterior probability thresholds between 60 and 90\%, \batcave exhibits positive predictive values that are relatively close to the threshold (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
+In other words, selecting a minimum posterior probability creates a classifier with positive predictive value close to that threshold.
+On the other hand, the posterior probabilities from MuTect provide a poor estimate of positive predictive value (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
 For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as the posterior probability increases.
-%The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
+As a result, \batcave posterior probabilities provide a useful way to select tumor-specific thresholds. 
 At any posterior probability threshold \batcave has recall better than MuTect.
+%The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
 %Figure~\ref{NAR-ppv_wgs_fig} shows results for 100X whole genomes, where the results are similar for precision.
 
 \subsection{Tests using real tumor data}
