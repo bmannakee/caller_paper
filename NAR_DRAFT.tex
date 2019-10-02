@@ -307,7 +307,8 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \label{NAR-kl_fig}
 \end{figure}
 
-\subsection{Convergence of the prior}
+\subsection{Tests using simulated data}
+
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
 When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}).
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
@@ -363,7 +364,6 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   {$\mu$ = per-base mutation rate, AUROC/AUPRC = Area Under Receiver Operating Characteristic / Precision-Recall Curve, ICI = Integrated Calibration Index. Smaller values of ICI are superior.}
  \end{table*}
 
-\subsection{Tests using simulated data}
 We assessed classification performance using the areas under both the receiver operating characteristic and the precision-recall curves, because the classes are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
 By both metrics \batcave outperforms MuTect (Fig.~\ref{NAR-wes_fig}A\&B, Fig.~\ref{NAR-wgs_fig}A\&B, and Table~\ref{table:01}).
 The extent of the performance difference is dependent on both the sequencing depth and the concentration of the mutation profile.
@@ -391,15 +391,13 @@ As with the other metrics, the advantage of \batcave increases with the concentr
 \label{NAR-ppv_fig}
 \end{figure}
 
-In practice, variant calling is a classification problem, in which a threshold score must be selected above which a variant call is made.
-The proper threshold is ideally a choice the user makes based on their particular needs, which often balance precision with recall.
-The posterior probability estimates provided by \batcave allow the user to select a tumor-specific threshold.
-For posterior probability thresholds between 60 and 90\%, \batcave exhibits positive predictive values that are relatively close to the threshold (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
-In other words, selecting a minimum posterior probability creates a classifier with positive predictive value close to that threshold.
-On the other hand, the posterior probabilities from MuTect provide a poor estimate of positive predictive value (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
-For any posterior probability above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as the posterior probability increases.
-As a result, \batcave posterior probabilities provide a useful way to select tumor-specific thresholds. 
-At any posterior probability threshold \batcave has recall better than MuTect.
+In practice, variant callers are typically used with a threshold score above which a variant is called.
+The user's choice of threshold ideally meets their need to balance precision and recall; accurate posterior probability estimates enable an informed choice.
+For posterior probability thresholds between 60 and 90\%, the precision of \batcave calls is similar to the chosen threshold (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
+For this range of thresholds, however, the posterior probabilities from MuTect poorly predict precision (Fig.~\ref{NAR-ppv_fig}\&\ref{NAR-ppv_wgs_fig}).
+For any posterior probability threshold above 70\%, MuTect has a false positive rate of roughly 8\%, whereas \batcave has a false positive rate that decreases as the threshold increases.
+The cost of MuTect's compressed range of posterior probabilities is recall; at any posterior probability threshold \batcave has recall better than MuTect.
+Consequently, \batcave posterior probabilities are more informative than MuTect's with regard to choosing a calling threshold.
 %The cost of MuTect's compression is recall, which is 3-5\% worse than \batcave at 95\% posterior probability, and 3-7\% worse at 90\%, depending on mutation profile concentration.
 %Figure~\ref{NAR-ppv_wgs_fig} shows results for 100X whole genomes, where the results are similar for precision.
 
@@ -441,6 +439,15 @@ This subset tends to be relatively easy to call, so both MuTect and \batcave hav
 Moreover, few true negative sites are validated, so specificity and calibration are impossible to calculate.
 Deep sequencing experiments that validate random samples of uncalled potential variants would give much-needed insight into the differences among statistical models in variant calling.
 
+The improved calibration of \batcave posterior probabilities compared to MuTect provides several advantages.
+In practice, called variants are often manually reviewed to further reduce false positives \cite{XXX}. \rngcomment{Citations needed throughout.}
+Improved calibration enables users to focus review on the most questionable variants.
+In the clinic, identified variants act as biomarkers for susceptibility to targeted drugs \cite{XXX}.
+Well-calibrated posterior probabilities facilitate the use of probabilistic risk models in the choice of treatment \cite{XXX}, rather than an all or nothing approach.
+For research purposes, the International Cancer Genome Consortium recommends that catalogs of somatic mutations target a precision of 95\% and a recall of 80\% \cite{XXX}.
+\rngcomment{Put in real citation... https://icgc.org/icgc/goals-structure-policies-guidelines/e8-genome-analyses}
+Achieving this goal while minimizing cost demands well-calibrated posterior probabilities.
+
 Our current implementation of \batcave is as a post-calling algorithm for MuTect, but the algorithm is broadly applicable.
 We chose to build \batcave off MuTect because MuTect is widely used, has state-of-the-art sensitivity and specificity, and includes numerous heuristic filters and alignment adjustments that reduce the prevalence of sequencing errors in results \cite{Cibulskis2013,Griffith2015}.
 But the mutational prior can be incorporated into almost any caller with an underlying probabilistic model.
@@ -467,19 +474,6 @@ Recent studies have found differences in mutational profiles among variants of d
 A potential extension of the \batcave algorithm is process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
 
-\rngcomment{Need paragraph in discussion emphasizing importance of calibration.}
-The improved calibration of \batcave provides several advantages, including a tumor-specific means to select a threshold for positive classification that exhibits interpretable positive predictive value properties.
-Cancer genomics for research and drug discovery is an important yet costly endeavour, and manual review of variants is often required to limit the number of false leads followed.
-Improved calibration allows researchers to select a tolerable false positive rate, and focus efforts on a set of variants with known probability of being present.
-In the clinic, identified variants act as biomarkers for susceptibility to targeted drugs, and well calibrated probabilities facilitate the use of risk models in the choice of treatment rather than an all or nothing approach.
-\bkmcomment{I mean by "risk models", if you can assign a probability of the mutation being present you can make informed tradeoffs between likelihood of benefit and risk of harm for a particular targeted therapy.}
-A properly calibrated model implies a known rate of false positives.
-One reason why tumors are not routinely sequenced to high depth is that as sequencing depth increases, false positive rate increases without bound \citep{Cibulskis2013}.
-The International Cancer Genome Consortium recommends that catalogues of somatic mutation target a true positive rate of 95\%, and an acquisition rate of 80\% of all mutations present in a sample \texttt{https://icgc.org/icgc/goals-structure-policies-guidelines/e8-genome-analyses}.
-Assuming a sample size of 1 million cells, and a per-base mutation rate of $3 \dot 10^{-8}$, implies 10 million mutations per sample in a neutrally evolving tumor.
-A naive application of Eqn. \ref{eqn:mut_rate} implies a minimum variant allele frequency of around .00001, requiring sequencing depths far in excess of current practice.
-Proper calibration will allow deeper sequencing without ballooning false positive rates.
-\bkmcomment{we can talk about what should actually survive from this previous section. I like the specific example but may be too wordy here. One of the things I have tried to do is establish that ppv qualities arise from superior calibration, and that allows the use of calibration as short hand here in the discussion. This may not be well done.}
 
 Our results show that adding a mutational context prior substantially improves probabilistic variant calling, particularly for tumors with concentrated profiles.
 Improved variant calling increases the benefit-to-cost ratio of deep sequencing in both research and clinical applications.
