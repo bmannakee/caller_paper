@@ -440,12 +440,11 @@ Moreover, few true negative sites are validated, so specificity and calibration 
 Deep sequencing experiments that validate random samples of uncalled potential variants would give much-needed insight into the differences among statistical models in variant calling.
 
 The improved calibration of \batcave posterior probabilities compared to MuTect provides several advantages.
-In practice, called variants are often manually reviewed to further reduce false positives \cite{XXX}. \rngcomment{Citations needed throughout.}
+In practice, called variants are often manually reviewed to further reduce false positives \cite{Barnell2019}.
 Improved calibration enables users to focus review on the most questionable variants.
-In the clinic, identified variants act as biomarkers for susceptibility to targeted drugs \cite{XXX}.
-Well-calibrated posterior probabilities facilitate the use of probabilistic risk models in the choice of treatment \cite{XXX}, rather than an all or nothing approach.
-For research purposes, the International Cancer Genome Consortium recommends that catalogs of somatic mutations target a precision of 95\% and a recall of 80\% \cite{XXX}.
-\rngcomment{Put in real citation... https://icgc.org/icgc/goals-structure-policies-guidelines/e8-genome-analyses}
+In the clinic, identified variants act as biomarkers for susceptibility to targeted drugs \cite{Boutros2015a}.
+%Well-calibrated posterior probabilities facilitate the use of probabilistic risk models in the choice of treatment \cite{XXX}, rather than an all or nothing approach.
+For research purposes, the International Cancer Genome Consortium recommends that catalogs of somatic mutations target a precision of 95\% and a recall of 80\% \cite{Icgc}.
 Achieving this goal while minimizing cost demands well-calibrated posterior probabilities.
 
 Our current implementation of \batcave is as a post-calling algorithm for MuTect, but the algorithm is broadly applicable.
@@ -488,6 +487,7 @@ Our R implementation, \texttt{batcaver}, can be easily incorporated into any MuT
 
 The \texttt{batcaver} R package can be downloaded or installed from \texttt{github.com/bmannakee/batcaver}
 The version of \texttt{batcaver} used to generate results, and all analysis code have been preserved on Zenodo \texttt{https://doi.org/10.5281/zenodo.3471715}
+Python code used to generate simulated tumors has been preserved on Zenodo \texttt{https://doi.org/10.5281/zenodo.3471741}
 
 
 \section{Data Availability}
