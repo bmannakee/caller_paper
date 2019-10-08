@@ -50,15 +50,15 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-Identifying somatic mutations withins tumors is key to understanding treatment resistance, patient prognosis, and tumor evolution.
-Mutations at low allelic frequency, which are carried by only a portion of cells within a tumor, are particularly difficult to detect.
-Many algorithms have been developed to identify such mutations, but none models a key aspect of tumor biology.
+Detecting somatic mutations withins tumors is key to understanding treatment resistance, patient prognosis, and tumor evolution.
+Mutations at low allelic frequency, those present in only a small portion of tumor cells, are particularly difficult to detect.
+Many algorithms have been developed to detect such mutations, but none models a key aspect of tumor biology.
 Namely, every tumor has its own profile of mutation types that it tends to generate.
-We present \batcave (Bayesian Analysis Tools for Context-Aware Variant Evaluation), an algorithm that first learns the tumor mutational profile and mutation rate then uses it as a prior for evaluating potential mutations.
-We also present an R implementation of the algorithm that is built on the popular somatic variant caller MuTect.
-Using simulations, we show that adding the \batcave algorithm to MuTect improves variant identification.
-It also improves the calibration of posterior probabilities, enabling a more principled tradeoff between precision and recall.
-Lastly, we show that \batcave also performs well on real data.
+We present \batcave (Bayesian Analysis Tools for Context-Aware Variant Evaluation), an algorithm that first learns the individual tumor mutational profile and mutation rate then uses them in a prior for evaluating potential mutations.
+We also present an R implementation of the algorithm, built on the popular caller MuTect.
+Using simulations, we show that adding the \batcave algorithm to MuTect improves variant detection.
+It also improves the calibration of posterior probabilities, enabling more principled tradeoff between precision and recall.
+We also show that \batcave performs well on real data.
 Our implementation is computationally inexpensive and straightforward to incorporate into existing MuTect pipelines.
 More broadly, the algorithm can be added to other variant callers, and it can be extended to include additional biological features that affect mutation generation.
 \end{abstract}
