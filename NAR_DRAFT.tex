@@ -94,11 +94,10 @@ Our algorithm is simple and computationally inexpensive, and it can be integrate
 Broad adoption of our approach will enable more confident study of low allelic frequency mutations in tumors in both research and clinical settings.
 
 \begin{figure}
-  \begin{center}
+\centering
   \includegraphics{figures/real_signatures_only.pdf}
-  \end{center}
-  \caption{Tumor mutation profiles.
-  In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
+  \caption{Real tumor mutation profiles.
+  In each panel, the x-axis corresponds to each of the 96 possible mutation types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
   \textbf{(B)} The observed mutation profile of a breast tumor used in our real data analysis \cite{Shi2018}.
   \textbf{(C)}\&\textbf{(D)} The observed mutation profiles of two additional breast tumors \cite{Alexandrov2019}.
@@ -111,13 +110,11 @@ Broad adoption of our approach will enable more confident study of low allelic f
 
 At every site in the genome with non-zero coverage, Next Generation Sequencing produces a vector $\mathbf{x}  = (\{b_i\},\{q_i\}), i = 1\dots \mathrm{d}$ of base calls and their associated quality scores, where $\mathrm{d}$ is local read depth.
 Variant callers use the data $\mathbf{x}$ to choose between competing hypotheses:
-\begin{equation}
+\begin{gather}
   \label{eqn:hypothesis}
-  \begin{array}{l}
     \mathbf{H_0}:\quad \textrm{Alt allele} = m;\quad\nu = 0\\
     \mathbf{H_1}:\quad \textrm{Alt allele} = m;\quad\nu = \hat{f}.
-  \end{array}
-\end{equation}
+\end{gather}
 Here $m$ is any of the 3 possible alternate non-reference bases and $\nu$ is the variant allele frequency.
 The maximum likelihood estimate of $\nu$ is simply $\hat{f}$, the number of variant reads divided by the local read depth.
 The posterior probability of a given hypothesis, $\mathrm{P}(m,\nu)$, is the product of the likelihood of the data given that hypothesis and the prior probability of that hypothesis. 
@@ -235,11 +232,10 @@ The package leverages the Bioconductor packages \textrm{BSgenome} \citep{Pages20
 Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
 
 \begin{figure}
-  \begin{center}
+\centering
   \includegraphics{figures/sim_signatures_only.pdf}
-  \end{center}
-  \caption{Tumor mutation profiles.
-  In each panel, the x-axis corresponds to each of the 96 possible substitution types, and the y-axis is the proportion of total mutations of each type.
+  \caption{Simulated tumor mutation profiles.
+As in Fig.~\ref{NAR-realsigfig}, in each panel the x-axis corresponds to each of the 96 possible mutation types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
   \textbf{(B)} Equal proportions of signatures 1, 4, \& 5.
   \textbf{(C)} Equal proportions of signatures 1, 3, \& 5.
@@ -300,10 +296,9 @@ In both, deep sequencing and variant validation were performed with the specific
 Because our focus is on evaluating the statistical calling model, we computed all test metrics using only those potential variants that passed MuTect's heuristic filters and entered the statistical model.
 
 \begin{figure}
-  \begin{center}
+\centering
   \includegraphics{figures/kl_only.pdf}
-  \end{center}
-  \caption{Convergence of the site-specific prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the simulated and estimated profiles versus number of incorporated mutations for whole exomes. Convergence for whole genomes is similar.
+  \caption{Convergence of the mutational prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the simulated and estimated profiles versus number of incorporated mutations for whole exomes. Convergence for whole genomes is similar.
   }
 \label{NAR-kl_fig}
 \end{figure}
@@ -319,13 +314,12 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
 %For both whole exome and whole genome the prior converges to the data generating distribution easily within the number of available high-confidence mutations, which for the leukemia~\citep{Griffith2015} is over 17000, and for our simulated data sets ranges between 1500 and 5000.
 
   \begin{figure*}
-    \begin{center}
+\centering
     \includegraphics[width=\textwidth]{figures/fig_wes.pdf}
-    \end{center}
-    \caption{Variant-calling performance on both simulated and real data.
+    \caption{Variant-calling performance on  simulated and real data. Throughout, MuTect results are plotted with gray lines and \batcave results with black lines.
     \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation profiles.
-    \textbf{(C)} and \textbf{(D)} Shaded regions show distributions of posterior probabilities for tree positive variants, and the smooth line shows the loess-smoothed relationship, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, that curve would match the dashed y=x line. 
-    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial validation was performed \cite{Griffith2015,Shi2018}.
+    \textbf{(C)} and \textbf{(D)} Calibration plots. Shaded regions show distributions of posterior probabilities for true positive variants, and smooth lines show loess-smoothed relationships, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, those curves would match the dashed y=x line. 
+    \textbf{(E)} and \textbf{(F)} Precision-recall curves for real data in which substantial mutation validation was performed \cite{Griffith2015,Shi2018}.
 }
   \label{NAR-wes_fig}
   \end{figure*}
@@ -383,11 +377,11 @@ For 100X whole genomes, the calibration of \batcave is slightly worse (Figure \r
 As with the other metrics, the advantage of \batcave increases with the concentration of the mutation profile and the sequencing depth.
 
 \begin{figure}
-  \begin{center}
+\centering
   \includegraphics{figures/ppv_wes.pdf}
-  \end{center}
-  \caption{Performance of various posterior probability thresholds in 500X exomes. 
-  For realistic posterior probability thresholds,  \batcave has a positive predictive value that is better calibrated than MuTect, no matter the concentration of the mutation profile.
+  \caption{Posterior probability calibration for realistic calling thresholds, for 500X exomes.
+  Plotted is precision and recall for variants identified using various realistic posterior probability thresholds.
+At these thresholds, the precision of \batcave is much closer to the given threshold than MuTect, no matter the concentration of the mutation profile.
   }
 \label{NAR-ppv_fig}
 \end{figure}
@@ -510,13 +504,9 @@ This material is based upon High Performance Computing (HPC) resources supported
 \section{Supplememtary Figures}
 
 \begin{figure}[b]
-  \begin{center}
+\centering
   \includegraphics[width=\textwidth]{figures/fig_wgs.png}
-  \end{center}
-  \caption{Model performance on 100X simulated whole genome.
-  \textbf{(A)} Precision recall curves and \textbf{(B)} Reciever operating characteristic curves for 3 mutation profiles.
-  Distribution of estimated true positive probabilities for true positive  variants for \textbf{(C)} the MuTect model and \textbf{(D))} the \batcave model.
-  A perfectly calibrated model would generate the diagonal line.}
+  \caption{Variant-calling performance on  simulated 100X whole genomes. As in Fig.~\ref{NAR-wes_fig}A-D, but for 100X whole genomes.}
 \label{NAR-wgs_fig}
 \end{figure}
 
@@ -524,12 +514,9 @@ This material is based upon High Performance Computing (HPC) resources supported
 
 \clearpage
 \begin{figure}
-  \begin{center}
+\centering
   \includegraphics{figures/ppv_wgs.pdf}
-  \end{center}
-  \caption{Model performance on 100X simulated whole genome. 
-  Precision vs. Recall for five different probability cutoffs. 
-  Note the restricted axes to improve readability of points.}
+  \caption{Posterior probability calibration for realistic calling thresholds, for 100X whole genomes. As in Fig.~\ref{NAR-ppv_fig}, but for 100X whole genomes.}
 \label{NAR-ppv_wgs_fig}
 \end{figure}
 
