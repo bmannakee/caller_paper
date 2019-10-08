@@ -26,7 +26,7 @@
 
 \begin{document}
 
-\title{\batcave: Bayesian Analysis Tools for Context-Aware Variant Evaluation}
+\title{\batcave: Calling somatic mutations with a tumor- and site-specific prior}
 
 \author{%
 Brian K. Mannakee\,$^{1}$ and
@@ -50,16 +50,17 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-%The accumulation of somatic mutations is an inevitable consequence of tumor development.
-Most of the mutations in a tumor at time of diagnosis are present in only a small fraction of all tumor cells.
-Identification of these low frequency mutations is increasingly important as evidence has accumulated for their role in treatment resistance, and the value of tumor heterogeneity as a diagnostic biomarker.
-The ability to reliably detect low frequency mutations increases as sequencing depth increases, yet false positive identification rates also increase with sequencing depth.
-% This dynamic has historically hindered the use of sequencing depths much greater than about 150X average coverage for non-targeted sequencing such as whole exome or whole genome.
-Here we present \batcave, an algorithm that uses variant calls produced by MuTect to compute a tumor and site-specific prior probability of mutation for every potential variant, and uses this prior probability to calibrate the posterior probability for every variant.
-\batcave uses the mutation profile and allele frequency spectrum of high-confidence mutations to estimate the data generating distribution giving rise to variants.
-We show that high-confidence variant calls are sufficient to generate a good estimate of this data generating distribution, and the posterior probabilies of mutation for called variants are better calibrated than those arising from current variant calling algorithms.
-The algorithm performs consistently as sequencing depth increases, enabling deeper sequencing and identification of lower frequency variants while providing well calibrated false positive rate expectations.
-We provide an R package implementing the \batcave algorithm for use with MuTect output.
+Identifying somatic mutations withins tumors is key to understanding treatment resistance, patient prognosis, and tumor evolution.
+Mutations at low allelic frequency, which are carried by only a portion of cells within a tumor, are particularly difficult to detect.
+Many algorithms have been developed to identify such mutations, but none models a key aspect of tumor biology.
+Namely, every tumor has its own profile of mutation types that it tends to generate.
+We present \batcave (Bayesian Analysis Tools for Context-Aware Variant Evaluation), an algorithm that first learns the tumor mutational profile and then uses it as a prior for evaluating potential mutations.
+We also present an R implementation of the algorithm that is built on the popular somatic variant caller MuTect.
+Using simulations, we show that adding the \batcave algorithm to MuTect improves variant identification.
+It also improves the calibration of posterior probabilities, enabling a more principled tradeoff between precision and recall.
+Lastly, we show that \batcave also performs well on real data.
+Our implementation is computationally inexpensive and straightforward to incorporate into existing MuTect pipelines.
+More broadly, the algorithm can be added to other variant callers, and it can be extend to include additional biological features that affect mutation generation.
 \end{abstract}
 
 
