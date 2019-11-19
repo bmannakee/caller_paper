@@ -71,7 +71,7 @@ Still, the 500x whole exome case does indicate that BATCAVE is better at identif
 In Rubanova et al ( https://www.biorxiv.org/content/10.1101/260471v4.full), it is argued that there are changes in mutational signatures over time in cancers. While Mannakee and Gutenkunst mention this work, they should further comment on whether such changes in mutational signatures over time are small enough to be explained by the BATCAVER concept of re-evaluating mutations based on p-value.
 \begin{response}
 \RNG{Going to be difficult, depending on biology to offer specific guidance about the size of the change. Rather, we now do a goodness-of-fit test and warn the user if it looks like it's violated.}
-\BKM{Not entirely sure I understand this. We could detect a change above. Whether it matters or not is a complex interplay between depth and selection. For late changes most mutations with that signature will be below the threshold of detection. For an early mutation all of the marginal (low frequency) variants will be from the signature.}
+\BKM{We could detect a change above. Whether it matters or not is a complex interplay between depth and selection. For late changes most mutations with that signature will be below the threshold of detection. For an early mutation all of the marginal (low frequency) variants will be from the signature.}
 \end{response}
 
 Minor
