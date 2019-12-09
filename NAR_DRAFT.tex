@@ -145,8 +145,10 @@ We next show how to estimate the quantities in Eq.~\ref{eqn:full_prior}.
 Many aspects of genomic architecture can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the trinucleotide context, which is known to strongly affect the prior probability of single-nucleotide mutation \cite{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The trinucleotide context of a genomic site consists of the identity of the reference base and the 3' and 5' flanking bases.
-Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
-At the focal site, a mutation $m$ can be to any of three alternate alleles.
+\bkmcomment{There are six classes of base substitution -- C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all substitutions are referred to by the pyrimidine of the mutated Watson - Crick base pair).
+This results in a total of 32 ($4\times 2 \times 4$) reference contexts and 3 alternate bases per reference base.}
+%Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
+%At the focal site, a mutation $m$ can be to any of three alternate alleles.
 Indexing by the $c=\{1 \dots 32\}$ contexts and by the $m = \{1 \dots 3\}$ alternate bases, we have 96 possible substitution types $S_{m,c}$.
 Eq.~\ref{eqn:full_prior} is then
 \begin{equation}
@@ -200,11 +202,19 @@ In an exponentially growing and neutrally evolving tumor, branching process calc
 \end{equation}
 The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
+\bkmcomment{We make two simplifying assumptions here.
+First, we assume no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+Second, we assume 100\% tumor purity.
+MuTect provides a user-specified parameter allowing the user to provide an estimate of tumor purity, and downsamples reads to adjust allele frequencies accoridingly.
+We encourage users to take advantage of the MuTect contamination correction where appropriate.
+In the case of uncorrected contamination, actual allele frequencies will be higher than those observed, and the observed count of variants with allele frequencies between the min and max allele frequencies will be lower than the true count leading to an under-estimate of the mutation rate.
+}
 We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
 In the R implementation of \batcave, $f_{min}$ is a free parameter.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
+
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
@@ -307,7 +317,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \subsection{Tests using simulated data}
 
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
-When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}).
+When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), \bkmcomment{and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.}.
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
 %We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
@@ -465,7 +475,9 @@ The high-confidence variants are used to estimate the mutational prior and mutat
 Statistically, this is an empirical Bayesian approach~\cite{Robbins1954}, in which the high and low-confidence variants are treated as parallel experiments \cite{Morris1983,Efron2014}. 
 In general, high-confidence variants tend to have relatively high allelic frequencies, and consequently tend to have arisen early in tumor development.
 An  implicit assumption of our approach is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
-Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\cite{Rubanova2018a}, although those differences are relatively small.
+Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\cite{Rubanova2018a}, and although in general those differences are relatively small, they can be significant in some cases.
+\bkmcomment{We provide the user with the ability to output a file with the contents of the estimated mutation profile as each high-confidence variant is evaluated.
+In cases where the user suspects a shift in mutational process, we encourage using this file to verify that the final mutation profile is representative of the processes active at low frequency.}
 A potential extension of the \batcave algorithm is to process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
 
