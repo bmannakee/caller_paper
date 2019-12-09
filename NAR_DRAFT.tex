@@ -200,11 +200,19 @@ In an exponentially growing and neutrally evolving tumor, branching process calc
 \end{equation}
 The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
+\bkmcomment{We make two simplifying assumptions here.
+First, we assume no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+Second, we assume 100\% tumor purity.
+MuTect provides a user-specified parameter allowing the user to provide an estimate of tumor purity, and downsamples reads to adjust allele frequencies accoridingly.
+We encourage users to take advantage of the MuTect contamination correction where appropriate.
+In the case of uncorrected contamination, actual allele frequencies will be higher than those observed, and the observed count of variants with allele frequencies between the min and max allele frequencies will be lower than the true count leading to an under-estimate of the mutation rate.
+}
 We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
 In the R implementation of \batcave, $f_{min}$ is a free parameter.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
+
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
@@ -307,7 +315,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \subsection{Tests using simulated data}
 
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
-When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}).
+When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), \bkmcomment{and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.}.
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
 %We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
