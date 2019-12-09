@@ -145,8 +145,10 @@ We next show how to estimate the quantities in Eq.~\ref{eqn:full_prior}.
 Many aspects of genomic architecture can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the trinucleotide context, which is known to strongly affect the prior probability of single-nucleotide mutation \cite{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The trinucleotide context of a genomic site consists of the identity of the reference base and the 3' and 5' flanking bases.
-Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
-At the focal site, a mutation $m$ can be to any of three alternate alleles.
+\bkmcomment{There are six classes of base substitution -- C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all substitutions are referred to by the pyrimidine of the mutated Watson–Crick base pair).
+This results in a total of 32 ($4\times 2 \times 4$) reference contexts and 3 alternate bases per reference base.}
+%Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
+%At the focal site, a mutation $m$ can be to any of three alternate alleles.
 Indexing by the $c=\{1 \dots 32\}$ contexts and by the $m = \{1 \dots 3\}$ alternate bases, we have 96 possible substitution types $S_{m,c}$.
 Eq.~\ref{eqn:full_prior} is then
 \begin{equation}
