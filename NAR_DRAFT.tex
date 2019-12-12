@@ -445,6 +445,8 @@ This subset tends to be relatively easy to call, so both MuTect and \batcave hav
 Moreover, few true negative sites are validated, so specificity and calibration are impossible to calculate.
 Deep sequencing experiments that validate random samples of uncalled potential variants would give much-needed insight into the differences among statistical models in variant calling.
 
+\rngcomment{Assumption of uniform prior with $\nu$. Standard (cite MuTect). Also distinguish between calling individual mutations and inferring distribution of allele frequencies, like ANGSD.}
+
 The improved calibration of \batcave posterior probabilities compared to MuTect provides several advantages.
 In practice, called variants are often manually reviewed to further reduce false positives \cite{Barnell2019}.
 Improved calibration enables users to focus review on the most questionable variants.
