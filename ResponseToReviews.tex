@@ -104,8 +104,15 @@ Mannakee et al have developed a tool called BATCAVE for calling mutations from s
 
 2. In case of multi-region sequencing data, used for studying spatial intra-tumor heterogeneity, usually the existing tools estimate very high levels of heterogeneity. I suppose this is because they are being very stringent in terms of calling mutations especially the ones with low vafs. In that case the people end up using other tools like bamreadcount etc. to check status of these mutations in the bam files and re-estimate the extent of heterogeneity. It will be important to see how BATCAVE performs in such datasets.
 \begin{response}
-\RNG{Unclear to me whether we should dodge this. We could say explicitly accounting for multiregional samples is out-of-scope, and add it to the discussion. Although we did do something like that for our breast cancer analysis.}
-\BKM{One of the reasons we made the algorithm is to try to provide a more sensitive means for identifying low frequency alleles so that these types of measures are more accurate. The multi-region sample we got simply isn't deep enough for us to figure out whether we would change the heterogeneity calls. There are not enough callable low frequency variants. Which is why our performance is identical. I am unaware of any deeper data sets, and think simulating them is beyond the scope.}
+We agree that multi-region data are increasingly important.
+In fact, the breast cancer data we test on come from a multi-region study. 
+Because we built BATCAVE on top of the single-sample caller MuTect, we called variants independently across the samples in that study, and BATCAVE performed well.
+Unfortunately, the sequencing in that study is not deep enough to rigorously evaluate how estimates of heterogeneity would change with and without BATCAVE.
+
+More broadly, the BATCAVE algorithm could be implemented in a multi-regional caller that takes explicit advantage of the relationship between samples.
+But such an implementation is beyond the scope of the current manuscript.
+
+We have added a new paragraph in Discussion regarding multi-region samples, to address these issues.
 \end{response}
 
 3. Do the mutation signatures (example smoking signatures in lung cancer or UV signatures in melanoma) still appear in the more stringent BATCAVE set of mutations?
