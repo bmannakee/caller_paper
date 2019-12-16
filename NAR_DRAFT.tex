@@ -467,6 +467,13 @@ By favoring low-frequency and thus typically low-evidence variants, a nonuniform
 Note however, that if the goal were not to best identify individual variants, but rather to best estimate the distribution of variant allele frequencies within the tumor, then a nonuniform frequency prior would be appropriate \cite{Nielsen2012}.
 }
 
+\rngcomment{
+To estimate the tumor mutation rate, \batcave uses a model of the distribution of variant allele frequencies  generated during exponential growth (Eq.~\ref{eqn:mut_rate}).
+Mutations that change copy number might distort the empirical allele frequency distribution, biasing the estimate.
+But substantially biasing the estimate would require copy number changes in a large number of genomic regions.
+Nevertheless, a potential extension of the \batcave algorithm would be to incorporate external copy number calls in order to adjust allele frequencies before estimating the mutation rate.
+}
+
 The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational cost is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
 Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational prior.

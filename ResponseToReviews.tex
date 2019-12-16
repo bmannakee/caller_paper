@@ -86,8 +86,10 @@ Corrected
 
 Equation 11: This equation is not correct if there is subclonal copy number evolution that changes the distribution of mutations above the allele frequency threshold. The authors should more clearly state this assumption.
 \begin{response}
-\RNG{Revise to include assumption, and think in general about copy number changes. How does a standard MuTect pipeline handle this?}
-\BKM{Will do. MuTect doesn't make copy number calls, and doesn't adjust allele frequency I don't think. They basically ignore it. I think a change large enough to have a real effect here would be more of a change in ploidy.}
+The reviewer is correct, although a large number of copy number changes would be necessary to substantially bias the estimated mutation rate.
+Potential future work could incorporate external copy number calls to improve the estimate of the point mutation rate.
+
+We discuss this issue in a new paragraph in Discussion.
 \end{response}
 
 \section*{Reviewer 2}
