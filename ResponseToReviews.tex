@@ -117,8 +117,12 @@ We have added a new paragraph in Discussion regarding multi-region samples, to a
 
 3. Do the mutation signatures (example smoking signatures in lung cancer or UV signatures in melanoma) still appear in the more stringent BATCAVE set of mutations?
 \begin{response}
-\RNG{Not exactly sure what the reviewer is asking here, but should be easy to check. It will certainly still appear in simulations. Not sure about the real data analyses. But we can check when we add our test as to whether the distribution has changed.}
-\BKM{I am not entirely sure. Perhaps he is asking if we decomposed the final "prior" multinomial parameters to see if we get the same signatures back out? We don't because as we observed in the work I was doing with Setayesh that the tools like deconstructSigs are bad. We know that we converge to the simulated distribution and we know that the simulated distribution is a equal linear combination of the 3 signatures we describe.}
+In our real and simulated test cases, the mutational profile changes little between high- and low-confidence sets of mutations.
+In fact, we have added a statistical test for profile change, in response to other review comments.
+
+Approaches such as deconstructSigs can decompose an individual sample's mutational profile into a set of mutation signatures corresponding to different processes.
+In practice, however, we have found these approaches to be relatively unstable.
+Therefore, we do not believe it will be illuminating to apply them in the present manuscript.
 \end{response}
 
 \end{document}
