@@ -445,8 +445,6 @@ This subset tends to be relatively easy to call, so both MuTect and \batcave hav
 Moreover, few true negative sites are validated, so specificity and calibration are impossible to calculate.
 Deep sequencing experiments that validate random samples of uncalled potential variants would give much-needed insight into the differences among statistical models in variant calling.
 
-\rngcomment{Assumption of uniform prior with $\nu$. Standard (cite MuTect). Also distinguish between calling individual mutations and inferring distribution of allele frequencies, like ANGSD.}
-
 The improved calibration of \batcave posterior probabilities compared to MuTect provides several advantages.
 In practice, called variants are often manually reviewed to further reduce false positives \cite{Barnell2019}.
 Improved calibration enables users to focus review on the most questionable variants.
@@ -460,6 +458,14 @@ We chose to build \batcave off MuTect because MuTect is widely used, has state-o
 But the mutational prior can be incorporated into almost any caller with an underlying probabilistic model.
 For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability at each genomic site \cite{Kim2018}.
 Replacing that constant probability with a mutational prior would require a more complicated manipulation of the quality scores output by Strelka than for MuTect, but it is conceptually straightforward.
+
+\rngcomment{
+Following MuTect \cite{Cibulskis2013}, \batcave assumes a uniform prior on the variant allele frequency.
+In general, low-frequency variants are expected to be more common than high-frequency variants.
+Nevertheless, the uniform frequency prior is appropriate when the goal is to make the best call possible at each potential variant site.
+By favoring low-frequency and thus typically low-evidence variants, a nonuniform prior would increase the false positive rate.
+Note however, that if the goal were not to best identify individual variants, but rather to best estimate the distribution of variant allele frequencies within the tumor, then a nonuniform frequency prior would be appropriate \cite{Nielsen2012}.
+}
 
 The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational cost is associated with extracting the trinucleotide context for each potential variant site from the reference genome.

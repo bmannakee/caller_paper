@@ -64,8 +64,12 @@ Mannakee and Gutenkunst present BATCAVE, an algorithm that first estimates the t
 
 Still, the 500x whole exome case does indicate that BATCAVE is better at identifying low frequency variants and thus can better reveal intratumoral heterogeneity, an important area of inquiry in cancer. Interestingly, the AUROC values for both MuTect and BATCAVE have room for improvement for the 500x whole exome case (Table 1). I suggest the authors further investigate how to improve the AUROC values. For example, in equation 4, it is unclear why the authors assume $\nu$ be uniformly distributed. Although this is also an assumption of MuTect, the BATCAVE approach inherently distinguishes mutations by allele frequency – since log-likelihood is closely associated to AF.  Perhaps a model in which $\nu$ follows a decreasing distribution vs. AF (e.g. in concordance with a model of a growing tumor) would yield better AUROC values.  
 \begin{response}
-\RNG{We've thought about this... Didn't we decide that it didn't make sense, because we'd just be overweighting low-frequency variants? I can think more about it.}
-\BKM{We thought about it and I actually implemented a version. What happened is that for the distribution I think is indicated the correction was far too strong, like you said it overweights low frequency variants. I will also think about ways to do this.}
+A uniform prior over $\nu$ is appropriate when the goal is to make the best possible call at each potential variant site.
+Conceptually, before examining the read data we have no information about the allele frequency at any individual site.
+Practically, a nonuniform prior would favor low-frequency and thus typically low-evidence sites, increasing the false positive rate.
+If our goal were to best estimate the distribution of variant allele frequencies in the tumor, then a nonuniform $\nu$ would indeed be important.
+
+We discuss this issue in a new paragraph in Discussion.
 \end{response}
 
 In Rubanova et al ( https://www.biorxiv.org/content/10.1101/260471v4.full), it is argued that there are changes in mutational signatures over time in cancers. While Mannakee and Gutenkunst mention this work, they should further comment on whether such changes in mutational signatures over time are small enough to be explained by the BATCAVER concept of re-evaluating mutations based on p-value.
