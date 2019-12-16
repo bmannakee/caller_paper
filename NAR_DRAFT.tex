@@ -202,17 +202,12 @@ In an exponentially growing and neutrally evolving tumor, branching process calc
 \end{equation}
 The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
-\bkmcomment{We make two simplifying assumptions here.
-First, we assume no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
-Second, we assume 100\% tumor purity.
-MuTect provides a user-specified parameter allowing the user to provide an estimate of tumor purity, and downsamples reads to adjust allele frequencies accoridingly.
-We encourage users to take advantage of the MuTect contamination correction where appropriate.
-In the case of uncorrected contamination, actual allele frequencies will be higher than those observed, and the observed count of variants with allele frequencies between the min and max allele frequencies will be lower than the true count leading to an under-estimate of the mutation rate.
-}
-%We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+\bkmcomment{Low tumor purity can result in a distribution of reported allele frequencies that differs from the true distribution.
+We suggest in cases where an estimate of tumor purity is known, such as when using the GATK 4 best practices pipeline, providing it to batcaver.}
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
-In the R implementation of \batcave, $f_{min}$ is a free parameter.
+In the R implementation of \batcave, $f_{min}$ and tumor_purity are free parameters.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
 
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
