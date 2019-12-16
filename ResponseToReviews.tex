@@ -47,8 +47,8 @@ Stressing on some of the points raised by the reviewers, I would suggest you inc
 
 Related to this, there is probably a minimum number of high-confidence mutations that are required by BATCAVE to produce reliable results. As with the previous point, ideally the batcaver should address or warn the user if the assumptions are violated.
 \begin{response}
-\RNG{Good idea, should be an easy check. Easiest way would be to count high-confidence mutations. More sophisticated approach would be to evaluate the convergence of the prior, using something like K-L distance.}
-\BKM{This makes sense to me. We could pick some sensible threshold and note the allele frequency at which it is crossed.}
+Our simulation studies suggest that a few hundred high-confidence mutations are enough to reliably infer even a sharply peaked mutation profile (Fig. 3).
+We have modified \texttt{batcaver} so that it now emits a warning if there are fewer than 500 high-confidence mutations in a sample.
 \end{response}
 
 Lastly, as correctly pointed out by the second reviewer, the sequencing coverage only makes sense in the context of the purity of the samples and this information should be provided to the reader.

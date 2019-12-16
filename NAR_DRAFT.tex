@@ -317,7 +317,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \subsection{Tests using simulated data}
 
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
-When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), \bkmcomment{and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.}.
+When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
 %We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
