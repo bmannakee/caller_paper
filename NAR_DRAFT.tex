@@ -202,18 +202,15 @@ In an exponentially growing and neutrally evolving tumor, branching process calc
 \end{equation}
 The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
-\bkmcomment{We make two simplifying assumptions here.
-First, we assume no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
-Second, we assume 100\% tumor purity.
-MuTect provides a user-specified parameter allowing the user to provide an estimate of tumor purity, and downsamples reads to adjust allele frequencies accoridingly.
-We encourage users to take advantage of the MuTect contamination correction where appropriate.
-In the case of uncorrected contamination, actual allele frequencies will be higher than those observed, and the observed count of variants with allele frequencies between the min and max allele frequencies will be lower than the true count leading to an under-estimate of the mutation rate.
-}
-%We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
 In the R implementation of \batcave, $f_{min}$ is a free parameter.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
+\rngcomment{Note that sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
+To account for this, our implementation of BATCAVE takes as input an estimated sample purity $p$.
+All estimated allele frequencies are then multiplied by a factor of $1/p$ before being used in Eq.~\ref{eqn:mut_rate}.
+}
 
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
@@ -296,8 +293,10 @@ We analyzed two real data sets, one from an acute myeloid leukemia (AML)~\cite{G
 We downloaded the normal and primary whole-genome AML tumor bam files from dbGaP accession number phs000159.v8.p4.
 Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{Griffith2015}, which we used for our true positive dataset.
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
+\rngcomment{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.}
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-For these multi-region data, we ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
+For these multi-region data, we \rngcomment{used the XXX samples} and ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
+\rngcomment{Shi et al.\ estimated sample purities of between XXX and XXX, so we set the purities each sample to XXX.}
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
 
 
@@ -429,7 +428,6 @@ Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost
 
 
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
-\rngcomment{Brian: Add purity estimate, if in paper.}
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 We estimated an average per-base mutation rate for these tumor regions of $4\cdot10^{-8}$, which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
 For the validated variants, MuTect and \batcave yielded almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})

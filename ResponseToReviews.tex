@@ -59,8 +59,18 @@ We have modified \texttt{batcaver} so that it now emits a warning if there are f
 
 Lastly, as correctly pointed out by the second reviewer, the sequencing coverage only makes sense in the context of the purity of the samples and this information should be provided to the reader.
 \begin{response}
-\RNG{Brian: Can you think about this in the context of what MuTect already does?}
-\BKM{Mutect has a parameter for contamination/purity if known. I could add a parameter default=0, and write a message to stdout with the value used. There are various methods for estimating purity.}
+The direct effect of contamination by normal cells on the BATCAVE algorithm is to bias the estimated allele frequencies that are inputs to Eq.~11 for estimating the overall mutation rate.
+This bias can be simply corrected given an estimate of tumor purity.
+We have thus added a \texttt{--tumor\_purity} option to \texttt{batcaver}.
+When this is enabled, the estimated allele frequencies will be appropriately adjusted before applying Eq.~11.
+See new text in Methods for details.
+
+We also reanalyzed our real data examples, using purity estimates from the original publications.
+\RNG{
+The effect of accounting for tumor purity was to...
+We have updated the text, Table~1, and Fig.~4E\&F to reflect these new results.
+}
+ 
 \end{response}
 
 
@@ -105,8 +115,9 @@ Mannakee et al have developed a tool called BATCAVE for calling mutations from s
 
 1. Does BATCAVE accounts for tumor purity estimates while calling mutations?
 \begin{response}
-\RNG{Brian: How does MuTect handle this?}
-\BKM{We do not. MuTect has a parameter for this, I will check exactly what it does.}
+We neglected to account for the effect of tumor purity on mutation rate estimation from Eq.~11.
+We have corrected this omission.
+Please see our response to the Associate Editor's comment for details.
 \end{response}
 
 2. In case of multi-region sequencing data, used for studying spatial intra-tumor heterogeneity, usually the existing tools estimate very high levels of heterogeneity. I suppose this is because they are being very stringent in terms of calling mutations especially the ones with low vafs. In that case the people end up using other tools like bamreadcount etc. to check status of these mutations in the bam files and re-estimate the extent of heterogeneity. It will be important to see how BATCAVE performs in such datasets.
