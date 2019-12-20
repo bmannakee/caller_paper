@@ -241,7 +241,7 @@ Reference sequences are specified as BSgenome objects, allowing efficient access
 \rngcomment{
 An assumption of the \batcave algorithm is that the mutation profile of low-confidence mutations is similar to that of the high-confidence mutations from which the prior is inferred.
 To test this assumption, \texttt{batcaver} performs a statistical hypothesis test comparing these two mutation profiles \cite{Plunkett2019}.
-If the two profiles differ at a significance threshold of $\alpha=XXX$, \texttt{batcaver} issues a warning and outputs the profiles.
+If the two profiles differ at a significance threshold of $\alpha=0.05$, \texttt{batcaver} issues a warning and outputs the profiles.
 %The user can then assess them and follow-up on any biologically interesting differences.
 }
 
@@ -296,7 +296,7 @@ We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI
 \rngcomment{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.}
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
 For these multi-region data, we analyzed the three biological replicates from each of six tumors, running \batcave separately on each of the eighteen, and combined results to generate precision-recall curves.
-\rngcomment{Shi et al.\ estimated sample purities of between XXX and XXX, so we set the purities each sample to XXX.}
+\rngcomment{Shi et al.\ estimated sample purities of between 26\% and 80\%, and we used these estimates in \texttt{batcaver}.}
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCrh37, so we used that reference.
 
 
@@ -582,41 +582,41 @@ This material is based upon High Performance Computing (HPC) resources supported
   Sample & Purity estimate (\%) & Mutation rate estimate 
   \\
   \colrule
-  Case 1 biorep A & 53.8 & 3.6e-7 
+  Case 1 biorep A & 53.8 & 9.27e-7 
   \\
-  Case 1 biorep B & 46.3 & 3.2e-7 
+  Case 1 biorep B & 46.3 & 8.4e-7 
   \\
-  Case 1 biorep C & 26.0 & 3.2e-7 
+  Case 1 biorep C & 26.0 & 1.02e-6 
   \\
-  Case 2 biorep A & 40.0 & 3.6e-7 
+  Case 2 biorep A & 40.0 & 1.07e-6 
   \\
-  Case 2 biorep B & 32.3 & 3.6e-7 
+  Case 2 biorep B & 32.3 & 1.04e-7 
   \\
-  Case 2 biorep C & .4(*) & 3.6e-7 & 
+  Case 2 biorep C & 40(*) & 9.56e-7
   \\
-  Case 3 biorep A & 56.4 & 3.6e-8 
+  Case 3 biorep A & 56.4 & 8.7e-7
   \\
-  Case 3 biorep B & 72.8 & 7e-7 
+  Case 3 biorep B & 72.8 & 7.37e-7 
   \\
-  Case 3 biorep C & 64.9 & 7e-7 
+  Case 3 biorep C & 64.9 & 4.3e-7 
   \\
-  Case 4 biorep A & 60.4 & 7e-7 
+  Case 4 biorep A & 60.4 & 8.75e-7 
   \\
-  Case 4 biorep B & 61.7 & 7e-7 
+  Case 4 biorep B & 61.7 & 7.91e-7 
   \\
-  Case 4 biorep C & 57.6 & 7e-7 
+  Case 4 biorep C & 57.6 & 8.14e-7 
   \\
-  Case 5 biorep A & 78.7 & 7e-7 
+  Case 5 biorep A & 78.7 & 5.7e-7 
   \\
-  Case 5 biorep B & 76.7 & 7e-7 
+  Case 5 biorep B & 76.7 & 5.8e-7 
   \\
-  Case 5 biorep C & 80.8 & 7e-7 
+  Case 5 biorep C & 80.8 & 1.8e-7 
   \\
-  Case 6 biorep A & 47.8 & 7e-7 
+  Case 6 biorep A & 47.8 & 2.77e-7 
   \\
-  Case 6 biorep B & 49.4 & 7e-7 
+  Case 6 biorep B & 49.4 & 4.08e-7 
   \\
-  Case 6 biorep C & 52.9 & 7e-7 
+  Case 6 biorep C & 52.9 & 4.37e-7 
   \\
   \botrule
   \end{tabular}%
