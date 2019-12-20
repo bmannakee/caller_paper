@@ -369,7 +369,7 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   \\
   real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
   \\
-  real breast \cite{Shi2018} & Actual & 7e-7 & -- & -- & .972 & .972 & -- & --
+  real breast \cite{Shi2018} & Actual & 6.6e-7 & -- & -- & .972 & .972 & -- & --
   \\
   \botrule
   \end{tabular}%
@@ -430,6 +430,7 @@ Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost
 
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
+\rngcomment{Need to update!}
 We estimated an average per-base mutation rate for these tumor regions of $4\cdot10^{-8}$, which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
 For the validated variants, MuTect and \batcave yielded almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
@@ -583,29 +584,29 @@ This material is based upon High Performance Computing (HPC) resources supported
   Sample & Purity estimate (\%) & Mutation rate estimate 
   \\
   \colrule
-  Case 1 biorep A & 53.8 & 9.27e-7 
+  Case 1 biorep A & 53.8 & 9.3e-7 
   \\
   Case 1 biorep B & 46.3 & 8.4e-7 
   \\
-  Case 1 biorep C & 26.0 & 1.02e-6 
+  Case 1 biorep C & 26.0 & 1.0e-6 
   \\
-  Case 2 biorep A & 40.0 & 1.07e-6 
+  Case 2 biorep A & 40.0 & 1.1e-6 
   \\
-  Case 2 biorep B & 32.3 & 1.04e-7 
+  Case 2 biorep B & 32.3 & 1.0e-7 
   \\
-  Case 2 biorep C & 40(*) & 9.56e-7
+  Case 2 biorep C & 40(*) & 1.0e-6
   \\
   Case 3 biorep A & 56.4 & 8.7e-7
   \\
-  Case 3 biorep B & 72.8 & 7.37e-7 
+  Case 3 biorep B & 72.8 & 7.4e-7 
   \\
   Case 3 biorep C & 64.9 & 4.3e-7 
   \\
-  Case 4 biorep A & 60.4 & 8.75e-7 
+  Case 4 biorep A & 60.4 & 8.8e-7 
   \\
-  Case 4 biorep B & 61.7 & 7.91e-7 
+  Case 4 biorep B & 61.7 & 7.9e-7 
   \\
-  Case 4 biorep C & 57.6 & 8.14e-7 
+  Case 4 biorep C & 57.6 & 8.1e-7 
   \\
   Case 5 biorep A & 78.7 & 5.7e-7 
   \\
@@ -613,16 +614,16 @@ This material is based upon High Performance Computing (HPC) resources supported
   \\
   Case 5 biorep C & 80.8 & 1.8e-7 
   \\
-  Case 6 biorep A & 47.8 & 2.77e-7 
+  Case 6 biorep A & 47.8 & 2.8e-7 
   \\
-  Case 6 biorep B & 49.4 & 4.08e-7 
+  Case 6 biorep B & 49.4 & 4.1e-7 
   \\
-  Case 6 biorep C & 52.9 & 4.37e-7 
+  Case 6 biorep C & 52.9 & 4.4e-7 
   \\
   \botrule
   \end{tabular}%
   }
-  {Shi et al. did not provide an estimate of purity for Case 2 biorep C. We chose .4 because it is similar to the other biological replicates from this sample.}
+  {Shi et al. did not estimate purity for Case 2 biorep C. We chose 40\% purity, based on the other biological replicates from this case.}
 \end{table*}
 
 \end{document}
