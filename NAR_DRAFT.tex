@@ -297,7 +297,7 @@ We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
 For these multi-region data, we \rngcomment{used the XXX samples} and ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
 \rngcomment{Shi et al.\ estimated sample purities of between XXX and XXX, so we set the purities each sample to XXX.}
-We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
+We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCrh37, so we used that reference.
 
 
 \section{RESULTS}
@@ -368,7 +368,7 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   \\
   real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
   \\
-  real breast \cite{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+  real breast \cite{Shi2018} & Actual & 7e-7 & -- & -- & .972 & .972 & -- & --
   \\
   \botrule
   \end{tabular}%
