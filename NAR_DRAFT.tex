@@ -204,13 +204,14 @@ The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for 
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
 We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
+\rngcomment{Sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
+To account for this, our implementation of BATCAVE takes as input an estimated sample purity $p_{ur}$.
+All estimated allele frequencies are then multiplied by a factor of $1/p_{ur}$ before being used in Eq.~\ref{eqn:mut_rate}.}
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
-In the R implementation of \batcave, $f_{min}$ and tumor_purity are free parameters.
+In the R implementation of \batcave, $f_{min}$ and $p_{ur}$ are free parameters.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
-\rngcomment{Note that sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
-To account for this, our implementation of BATCAVE takes as input an estimated sample purity $p$.
-All estimated allele frequencies are then multiplied by a factor of $1/p$ before being used in Eq.~\ref{eqn:mut_rate}.
-}
+For our simulated data analyses, we set $p_{ur}=1$, and for our real data analyses, we set $p_{ur}$ to the estimated purity.
+
 
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
@@ -295,7 +296,7 @@ Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
 \rngcomment{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.}
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-For these multi-region data, we analyzed the three biological replicates from each of six tumors, running \batcave separately on each of the eighteen, and combined results to generate precision-recall curves.
+For these multi-region data, we analyzed the three biological replicates from each of six tumors (Table~\ref{table:01}), running \batcave separately on each of the eighteen samples, and we combined results to generate precision-recall curves.
 \rngcomment{Shi et al.\ estimated sample purities of between 26\% and 80\%, and we used these estimates in \texttt{batcaver}.}
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCrh37, so we used that reference.
 
@@ -574,7 +575,7 @@ This material is based upon High Performance Computing (HPC) resources supported
 
 \begin{table*}[b]
   \tableparts{%
-  \caption{Sample summary for Shi et al.}
+  \caption{Sample summary for Shi et al. (2018)}
   \label{table:01}%
   }{%
   \begin{tabular}{lll}
