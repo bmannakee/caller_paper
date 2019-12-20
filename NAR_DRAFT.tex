@@ -295,7 +295,7 @@ Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
 \rngcomment{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.}
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-For these multi-region data, we \rngcomment{used the XXX samples} and ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
+For these multi-region data, we analyzed the three biological replicates from each of six tumors, running \batcave separately on each of the eighteen, and combined results to generate precision-recall curves.
 \rngcomment{Shi et al.\ estimated sample purities of between XXX and XXX, so we set the purities each sample to XXX.}
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCrh37, so we used that reference.
 
@@ -569,6 +569,60 @@ This material is based upon High Performance Computing (HPC) resources supported
   \caption{Mutation profiles of high-confidence and low-confidence mutations in the AML data.}
 \label{fig:AML_profiles}
 \end{figure}
+
+\section{Supplementary tables}
+
+\begin{table*}[b]
+  \tableparts{%
+  \caption{Sample summary for Shi et al.}
+  \label{table:01}%
+  }{%
+  \begin{tabular}{lll}
+  \toprule
+  Sample & Purity estimate (\%) & Mutation rate estimate 
+  \\
+  \colrule
+  Case 1 biorep A & 53.8 & 3.6e-7 
+  \\
+  Case 1 biorep B & 46.3 & 3.2e-7 
+  \\
+  Case 1 biorep C & 26.0 & 3.2e-7 
+  \\
+  Case 2 biorep A & 40.0 & 3.6e-7 
+  \\
+  Case 2 biorep B & 32.3 & 3.6e-7 
+  \\
+  Case 2 biorep C & .4(*) & 3.6e-7 & 
+  \\
+  Case 3 biorep A & 56.4 & 3.6e-8 
+  \\
+  Case 3 biorep B & 72.8 & 7e-7 
+  \\
+  Case 3 biorep C & 64.9 & 7e-7 
+  \\
+  Case 4 biorep A & 60.4 & 7e-7 
+  \\
+  Case 4 biorep B & 61.7 & 7e-7 
+  \\
+  Case 4 biorep C & 57.6 & 7e-7 
+  \\
+  Case 5 biorep A & 78.7 & 7e-7 
+  \\
+  Case 5 biorep B & 76.7 & 7e-7 
+  \\
+  Case 5 biorep C & 80.8 & 7e-7 
+  \\
+  Case 6 biorep A & 47.8 & 7e-7 
+  \\
+  Case 6 biorep B & 49.4 & 7e-7 
+  \\
+  Case 6 biorep C & 52.9 & 7e-7 
+  \\
+  \botrule
+  \end{tabular}%
+  }
+  {Shi et al. did not provide an estimate of purity for Case 2 biorep C. We chose .4 because it is similar to the other biological replicates from this sample.}
+\end{table*}
 
 \end{document}
 
