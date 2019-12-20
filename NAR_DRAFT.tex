@@ -145,7 +145,7 @@ We next show how to estimate the quantities in Eq.~\ref{eqn:full_prior}.
 Many aspects of genomic architecture can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the trinucleotide context, which is known to strongly affect the prior probability of single-nucleotide mutation \cite{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The trinucleotide context of a genomic site consists of the identity of the reference base and the 3' and 5' flanking bases.
-\bkmcomment{There are six classes of base substitution -- C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all substitutions are referred to by the pyrimidine of the mutated Watson - Crick base pair).
+\rngcomment{There are six classes of base substitution: C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all referred to by the pyrimidine of the mutated Watson-Crick pair).
 This results in a total of 32 ($4\times 2 \times 4$) reference contexts and 3 alternate bases per reference base.}
 %Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
 %At the focal site, a mutation $m$ can be to any of three alternate alleles.
@@ -312,7 +312,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \subsection{Tests using simulated data}
 
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
-When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), \bkmcomment{and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.}.
+When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
 %We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
@@ -454,6 +454,30 @@ But the mutational prior can be incorporated into almost any caller with an unde
 For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability at each genomic site \cite{Kim2018}.
 Replacing that constant probability with a mutational prior would require a more complicated manipulation of the quality scores output by Strelka than for MuTect, but it is conceptually straightforward.
 
+\rngcomment{
+Following MuTect \cite{Cibulskis2013}, \batcave assumes a uniform prior on the variant allele frequency.
+In general, low-frequency variants are expected to be more common than high-frequency variants.
+Nevertheless, the uniform frequency prior is appropriate when the goal is to make the best call possible at each potential variant site.
+By favoring low-frequency and thus typically low-evidence variants, a nonuniform prior would increase the false positive rate.
+Note however, that if the goal were not to best identify individual variants, but rather to best estimate the distribution of variant allele frequencies within the tumor, then a nonuniform frequency prior would be appropriate~\cite{Nielsen2012}.
+}
+
+\rngcomment{
+To estimate the tumor mutation rate, \batcave uses a model of the distribution of variant allele frequencies  generated during exponential growth (Eq.~\ref{eqn:mut_rate}).
+Mutations that change copy number might distort the empirical allele frequency distribution, biasing the estimate.
+But substantially biasing the estimate would require copy number changes in a large number of genomic regions.
+Nevertheless, a potential extension of the \batcave algorithm would be to incorporate external copy number calls in order to adjust allele frequencies before estimating the mutation rate.
+}
+
+\rngcomment{
+Sequencing multiple regions of the same tumor is of growing interest for understanding tumor heterogeneity and evolution \cite{McGranahan2017}.
+In fact, the breast cancer data we analyze came from a multi-region study~\cite{Shi2018}.
+We called variants independently across samples, because MuTect only considers a single sample at a time.
+But calling variants jointly across samples could substantially increase sensitivity.
+In the future, the \batcave algorithm could be integrated into a multi-sample caller such as MultiSNV~\cite{Josephidou2015}.
+In that case, an optimal implementation would likely exploit the relationship between mutational priors in related samples.
+}
+
 The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational cost is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
 Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational prior.
@@ -475,8 +499,13 @@ Recent studies have found differences in mutational profiles among variants of d
 In cases where the user suspects a shift in mutational process, we encourage using this file to verify that the final mutation profile is representative of the processes active at low frequency.}
 A potential extension of the \batcave algorithm is to process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
+<<<<<<< HEAD
 \bkmcomment{We use properties of the allele frequency distribution of high-confidence mutations to estimate the mutation rate in a tumor, and copy number alterations can distort the allele frequency distribution.
 While copy number alterations in a large number of genomic regions would be required to significantly affect the estimate of mutation rate, an additional extension of the \batcave algorithm could be to incorporate external copy number calls in order to adjust allele frequencies.}
+=======
+
+
+>>>>>>> f78702712046ef087a065c393a85e3ad5fa961f4
 Our results show that adding a mutational prior substantially improves probabilistic variant calling, particularly for tumors with concentrated profiles.
 Improved variant calling increases the benefit-to-cost ratio of deep sequencing in both research and clinical applications.
 Moreover, \batcave proves to be a better calibrated caller than vanilla MuTect (Fig.~\ref{NAR-ppv_fig}).
