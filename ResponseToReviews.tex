@@ -41,8 +41,14 @@ University of Arizona
 
 Stressing on some of the points raised by the reviewers, I would suggest you include more details about the assumption and limitations of BATCAVE. In particular, the possibility of changes of mutational signatures over time can be quite striking in some cases, especially if the original tumour is driven by very specific mutagens like UV light or tobacco smoke. Ideally, the software should try to correct for these cases or at least warn the user about a possible shift in signatures/contexts.
 \begin{response}
-\RNG{Correcting for context shifts beyond the scope of the current manuscript. But warning about it is a very good idea. Simple check, do a goodness-of-fit test on called the low-confidence mutations. What is the p-value for their profile versus the high-confidence? (A $\chi^2$ test may not be appropriate here, since many entries may have small numbers. This preprint suggests potential improvements: https://arxiv.org/abs/1711.05524.)}
-\BKM{This looks quite easy to implement. Testing is another question. One thing we don't have right now is simulations where the signature changes appreciably, but we do have the infrastructure to do it.}
+As we noted in the Discussion, BATCAVE does assume that the mutation profile is similar between mutations that are high-confidence (tend to be earlier) and low-confidence (tend to be later).
+Modeling potential changes in the profile is beyond the scope of the current manuscript, but warning the user if such a shift exists is a great idea.
+We have thus implemented a statistical test as to whether the mutation profile from the high-confidence mutations differs significantly from the low-confidence mutations.
+If this test detects a difference, BATCAVE warns the user and outputs both profiles, so the user can assess the degree of difference and follow-up on any potential biological implications.
+
+When we reanalyzed our test data using this new approach, we did detect a profile shift in the AML data.
+Note that even with this shift, BATCAVE still performs better than MuTect on the validated mutations (although both perform extremely well).
+\RNG{The biology of the shift is...}
 \end{response}
 
 Related to this, there is probably a minimum number of high-confidence mutations that are required by BATCAVE to produce reliable results. As with the previous point, ideally the batcaver should address or warn the user if the assumptions are violated.
@@ -53,8 +59,18 @@ We have modified \texttt{batcaver} so that it now emits a warning if there are f
 
 Lastly, as correctly pointed out by the second reviewer, the sequencing coverage only makes sense in the context of the purity of the samples and this information should be provided to the reader.
 \begin{response}
-\RNG{Brian: Can you think about this in the context of what MuTect already does?}
-\BKM{Mutect has a parameter for contamination/purity if known. I could add a parameter default=0, and write a message to stdout with the value used. There are various methods for estimating purity.}
+The direct effect of contamination by normal cells on the BATCAVE algorithm is to bias the estimated allele frequencies that are inputs to Eq.~11 for estimating the overall mutation rate.
+This bias can be simply corrected given an estimate of tumor purity.
+We have thus added a \texttt{--tumor\_purity} option to \texttt{batcaver}.
+When this is enabled, the estimated allele frequencies will be appropriately adjusted before applying Eq.~11.
+See new text in Methods for details.
+
+We also reanalyzed our real data examples, using purity estimates from the original publications.
+\RNG{
+The effect of accounting for tumor purity was to...
+We have updated the text, Table~1, and Fig.~4E\&F to reflect these new results.
+}
+ 
 \end{response}
 
 
@@ -74,8 +90,9 @@ We discuss this issue in a new paragraph in Discussion.
 
 In Rubanova et al ( https://www.biorxiv.org/content/10.1101/260471v4.full), it is argued that there are changes in mutational signatures over time in cancers. While Mannakee and Gutenkunst mention this work, they should further comment on whether such changes in mutational signatures over time are small enough to be explained by the BATCAVER concept of re-evaluating mutations based on p-value.
 \begin{response}
-\RNG{Going to be difficult, depending on biology to offer specific guidance about the size of the change. Rather, we now do a goodness-of-fit test and warn the user if it looks like it's violated.}
-\BKM{We could detect a change above. Whether it matters or not is a complex interplay between depth and selection. For late changes most mutations with that signature will be below the threshold of detection. For an early mutation all of the marginal (low frequency) variants will be from the signature.}
+We cannot comment generally on the magnitude of mutation profile changes, because this is an developing area of research.
+But to protect users, we have implemented a new statistical test to detect changes in mutation profiles between high- and low-confidence mutations.
+See our response to the Associate Editor for more details.
 \end{response}
 
 Minor
@@ -98,8 +115,9 @@ Mannakee et al have developed a tool called BATCAVE for calling mutations from s
 
 1. Does BATCAVE accounts for tumor purity estimates while calling mutations?
 \begin{response}
-\RNG{Brian: How does MuTect handle this?}
-\BKM{We do not. MuTect has a parameter for this, I will check exactly what it does.}
+We neglected to account for the effect of tumor purity on mutation rate estimation from Eq.~11.
+We have corrected this omission.
+Please see our response to the Associate Editor's comment for details.
 \end{response}
 
 2. In case of multi-region sequencing data, used for studying spatial intra-tumor heterogeneity, usually the existing tools estimate very high levels of heterogeneity. I suppose this is because they are being very stringent in terms of calling mutations especially the ones with low vafs. In that case the people end up using other tools like bamreadcount etc. to check status of these mutations in the bam files and re-estimate the extent of heterogeneity. It will be important to see how BATCAVE performs in such datasets.

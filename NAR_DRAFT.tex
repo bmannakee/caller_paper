@@ -203,12 +203,19 @@ In an exponentially growing and neutrally evolving tumor, branching process calc
 The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for a whole exome.
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
 We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
+<<<<<<< HEAD
 \bkmcomment{Low tumor purity can result in a distribution of reported allele frequencies that differs from the true distribution.
 We suggest in cases where an estimate of tumor purity is known, such as when using the GATK 4 best practices pipeline, providing it to batcaver.}
+=======
+>>>>>>> 4b6e3dcccabbecee903702b2cc4dcdf58f3b11ad
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
 We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
 In the R implementation of \batcave, $f_{min}$ and tumor_purity are free parameters.
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
+\rngcomment{Note that sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
+To account for this, our implementation of BATCAVE takes as input an estimated sample purity $p$.
+All estimated allele frequencies are then multiplied by a factor of $1/p$ before being used in Eq.~\ref{eqn:mut_rate}.
+}
 
 %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
@@ -232,9 +239,16 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 \end{equation}
 
 \subsection{Implementation}
-We have implemented the \batcave algorithm as an R package \texttt{batcaver}.
+We have implemented the \batcave algorithm as an R package called \texttt{batcaver}.
 The package leverages the Bioconductor packages \textrm{BSgenome} \cite{Pages2019}, \textrm{GenomicAlignments} \cite{Lawrence2013}, \textrm{VariantAnnotation} \cite{Obenchain2014}, and \textrm{SomaticSignatures} \cite{Gehring2015} for fast and memory-efficient variant annotation and genomic context identification.
 Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
+
+\rngcomment{
+An assumption of the \batcave algorithm is that the mutation profile of low-confidence mutations is similar to that of the high-confidence mutations from which the prior is inferred.
+To test this assumption, \texttt{batcaver} performs a statistical hypothesis test comparing these two mutation profiles \cite{Plunkett2019}.
+If the two profiles differ at a significance threshold of $\alpha=XXX$, \texttt{batcaver} issues a warning and outputs the profiles.
+%The user can then assess them and follow-up on any biologically interesting differences.
+}
 
 \begin{figure}
 \centering
@@ -284,8 +298,10 @@ We analyzed two real data sets, one from an acute myeloid leukemia (AML)~\cite{G
 We downloaded the normal and primary whole-genome AML tumor bam files from dbGaP accession number phs000159.v8.p4.
 Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{Griffith2015}, which we used for our true positive dataset.
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
+\rngcomment{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.}
 Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-For these multi-region data, we ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
+For these multi-region data, we \rngcomment{used the XXX samples} and ran \batcave separately on each sequenced region and combined results to generate precision-recall curves.
+\rngcomment{Shi et al.\ estimated sample purities of between XXX and XXX, so we set the purities each sample to XXX.}
 We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCr37, so we used that reference.
 
 
@@ -409,7 +425,12 @@ As a result, there are no validated true or false negative calls, so we consider
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
 We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
-For both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
+\rngcomment{
+For this tumor, the mutation profiles of high- and low-confidence mutations differ ($p \sim 10^{-12}$).
+The low-confidence mutation profile contains additional spikes of mutations corresponding to XXX (Fig.~\ref{fig:AML_profiles}).
+}
+Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
+
 
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
@@ -493,10 +514,11 @@ In the long run, we believe that incorporating more tumor biology into variant c
 The high-confidence variants are used to estimate the mutational prior and mutation rate, which are then used to improve the calling of low-confidence variants.
 Statistically, this is an empirical Bayesian approach~\cite{Robbins1954}, in which the high and low-confidence variants are treated as parallel experiments \cite{Morris1983,Efron2014}. 
 In general, high-confidence variants tend to have relatively high allelic frequencies, and consequently tend to have arisen early in tumor development.
-An  implicit assumption of our approach is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
+
+An  implicit assumption of \batcave is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
 Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\cite{Rubanova2018a}, and although in general those differences are relatively small, they can be significant in some cases.
-\bkmcomment{We provide the user with the ability to output a file with the contents of the estimated mutation profile as each high-confidence variant is evaluated.
-In cases where the user suspects a shift in mutational process, we encourage using this file to verify that the final mutation profile is representative of the processes active at low frequency.}
+\rngcomment{Our \texttt{batcaver} software warns the user if the high- and low-confidence mutational profiles are statistically different.
+It also outputs those profiles, so the user can assess whether the difference will substantially affect their results.} 
 A potential extension of the \batcave algorithm is to process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
 <<<<<<< HEAD
@@ -511,9 +533,6 @@ Improved variant calling increases the benefit-to-cost ratio of deep sequencing 
 Moreover, \batcave proves to be a better calibrated caller than vanilla MuTect (Fig.~\ref{NAR-ppv_fig}).
 Different users will prefer different tradeoffs in terms of precision and recall, which can be more accurately made with \batcave.
 Our R implementation, \texttt{batcaver}, can be easily incorporated into any MuTect-based pipeline, and the mutational profile algorithm can be incorporated into many other callers.
-
-% \section{CONCLUSION}
-% \bkmcomment{I looked at a bunch of NAR methods papers, and none include a conclusions section, so I moved it to the last paragraph of discussion.}
 
 \section{Software Availability}
 
@@ -552,6 +571,13 @@ This material is based upon High Performance Computing (HPC) resources supported
   \includegraphics{figures/ppv_wgs.pdf}
   \caption{Posterior probability calibration for realistic calling thresholds, for 100X whole genomes. As in Fig.~\ref{NAR-ppv_fig}, but for 100X whole genomes.}
 \label{NAR-ppv_wgs_fig}
+\end{figure}
+
+\begin{figure} [H]
+\centering
+  %\includegraphics{XXX}
+  \caption{Mutation profiles of high-confidence and low-confidence mutations in the AML data.}
+\label{fig:AML_profiles}
 \end{figure}
 
 \end{document}
