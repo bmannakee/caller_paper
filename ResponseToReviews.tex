@@ -47,8 +47,7 @@ We have thus implemented a statistical test as to whether the mutation profile f
 If this test detects a difference, BATCAVE warns the user and outputs both profiles, so the user can assess the degree of difference and follow-up on any potential biological implications.
 
 When we reanalyzed our test data using this new approach, we did detect a profile shift in the AML data.
-Note that even with this shift, BATCAVE still performs better than MuTect on the validated mutations (although both perform extremely well).
-\RNG{The biology of the shift is...}
+Nevertheless, BATCAVE still performed extremely well.
 \end{response}
 
 Related to this, there is probably a minimum number of high-confidence mutations that are required by BATCAVE to produce reliable results. As with the previous point, ideally the batcaver should address or warn the user if the assumptions are violated.
@@ -66,10 +65,8 @@ When this is enabled, the estimated allele frequencies will be appropriately adj
 See new text in Methods for details.
 
 We also reanalyzed our real data examples, using purity estimates from the original publications.
-\RNG{
-The effect of accounting for tumor purity was to...
+Accounting for tumor purity changed the quantitative results only slightly, and did not change the qualitative conclusions.
 We have updated the text, Table~1, and Fig.~4E\&F to reflect these new results.
-}
  
 \end{response}
 

@@ -420,10 +420,10 @@ However, only variants called by at least one variant caller were validated.
 As a result, there are no validated true or false negative calls, so we considered only precision-recall comparisons for these data.
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
-We estimated a per-base mutation rate for this tumor of $4\cdot10^{-8}$, which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
+We estimated a per-base mutation rate for this tumor of $3.6\times10^{-8}$, which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
 \rngcomment{
 For this tumor, the mutation profiles of high- and low-confidence mutations differ ($p \sim 10^{-12}$).
-The low-confidence mutation profile contains additional spikes of mutations corresponding to XXX (Fig.~\ref{fig:AML_profiles}).
+The low-confidence mutation profile contains additional spikes of mutations corresponding to five substitution types (Fig.~\ref{fig:AML_profiles}).
 }
 Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
@@ -431,7 +431,7 @@ Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
 \rngcomment{Need to update!}
-We estimated an average per-base mutation rate for these tumor regions of $4\cdot10^{-8}$, which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
+We estimated an average per-base mutation rate for these tumor regions of $6.6\times10^{-7}$, which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
 For the validated variants, MuTect and \batcave yielded almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
 \section{DISCUSSION}
@@ -571,6 +571,8 @@ This material is based upon High Performance Computing (HPC) resources supported
   \caption{Mutation profiles of A) high-confidence and B) low-confidence mutations in the AML data.}
 \label{fig:AML_profiles}
 \end{figure}
+
+\clearpage
 
 \section{Supplementary tables}
 
