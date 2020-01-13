@@ -1,4 +1,7 @@
 \documentclass[a4,center,fleqn]{NAR}
+%DIF LATEXDIFF DIFFERENCE FILE
+%DIF DEL NAR_DRAFT_FirstSubmission.tex   Fri Jan 10 15:17:31 2020
+%DIF ADD NAR_DRAFT.tex                   Fri Jan 10 15:20:18 2020
 \bibliographystyle{NAR-natbib}
 \usepackage{color}
 \usepackage{xfrac}
@@ -23,6 +26,25 @@
 \jissue{12}
 
 \articlesubtype{Genomics and Bioinformatics}
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}}                      %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
 
 \begin{document}
 
@@ -145,11 +167,13 @@ We next show how to estimate the quantities in Eq.~\ref{eqn:full_prior}.
 Many aspects of genomic architecture can affect the somatic mutation rate at multiple scales \cite{Buisson2019}.
 Here we focus on a small-scale feature, the trinucleotide context, which is known to strongly affect the prior probability of single-nucleotide mutation \cite{Nik-Zainal2012a,Alexandrov2015,Lee-Six2018}.
 The trinucleotide context of a genomic site consists of the identity of the reference base and the 3' and 5' flanking bases.
-There are six classes of base substitution: C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all referred to by the pyrimidine of the mutated Watson-Crick pair).
+\DIFdelbegin \DIFdel{Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
+At the focal site, a mutation $m$ can be to any of three alternate alleles.
+}\DIFdelend \DIFaddbegin \DIFadd{There are six classes of base substitution: C$>$A, C$>$G, C$>$T, T$>$A, T$>$C, T$>$G (all referred to by the pyrimidine of the mutated Watson-Crick pair).
 This results in a total of 32 ($4\times 2 \times 4$) reference contexts and 3 alternate bases per reference base.
-%Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
-%At the focal site, a mutation $m$ can be to any of three alternate alleles.
-Indexing by the $c=\{1 \dots 32\}$ contexts and by the $m = \{1 \dots 3\}$ alternate bases, we have 96 possible substitution types $S_{m,c}$.
+%DIF > Folding the central base to the pyrimidines, there are two possible bases at the focal site, and there are four possible bases 3' and 5' of the focal site, yielding $2 \cdot 4 \cdot 4$ possible tri-nucleotide contexts $C$.
+%DIF > At the focal site, a mutation $m$ can be to any of three alternate alleles.
+}\DIFaddend Indexing by the $c=\{1 \dots 32\}$ contexts and by the $m = \{1 \dots 3\}$ alternate bases, we have 96 possible substitution types $S_{m,c}$.
 Eq.~\ref{eqn:full_prior} is then
 \begin{equation}
   \label{eqn:detailed_prior}
@@ -204,16 +228,17 @@ The number of bases $N$ is $3\cdot10^9$ for a whole genome and $3\cdot10^7$ for 
 The quantity $\mu/\beta$ is the effective mutation rate, where $\beta$ is the fraction of cell divisions that lead to two surviving lineages.
 We make the simplifying assumption that there is no cell death ($\beta = 1$), so we somewhat over-estimate $\mu$.
 We then estimate $\mu$ by counting observed high-confidence mutations between allele frequencies $f_{min}$ and $f_{max}$.
-Sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
+\DIFaddbegin \DIFadd{Sample contamination by normal cells can result in underestimation of tumor mutation allele frequencies.
 To account for this, our implementation of BATCAVE takes as input an estimated sample purity $p_{ur}$.
 All estimated allele frequencies are then multiplied by a factor of $1/p_{ur}$ before being used in Eq.~\ref{eqn:mut_rate}.
-We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
-In the R implementation of \batcave, $f_{min}$ and $p_{ur}$ are free parameters.
+}\DIFaddend We set $f_{max}$ to be the largest allele frequency in $\mathrm{D}$, but we must choose $f_{min}$ conservatively, depending on sequencing depth.
+In the R implementation of \batcave, $f_{min}$ \DIFdelbegin \DIFdel{is a free parameter}\DIFdelend \DIFaddbegin \DIFadd{and $p_{ur}$ are free parameters}\DIFaddend .
 For this paper, we set $f_{min} = 0.05$, because we are working at high depth.
-For our simulated data analyses, we set $p_{ur}=1$, and for our real data analyses, we set $p_{ur}$ to the estimated purity.
+\DIFaddbegin \DIFadd{For our simulated data analyses, we set $p_{ur}=1$, and for our real data analyses, we set $p_{ur}$ to the estimated purity.
+}
 
 
-%A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
+\DIFaddend %A value 0.12 for $f_{min}$ at lower sequencing depth is suggested in Williams et al., 2016~\cite{Williams2016}.
 %Equation \ref{eqn:mut_rate} then allows us to estimate $\mathrm{p}(M) = \mu$, and we have a complete tumor-specific specification of the site-specific prior probability of mutation.
 
 \subsection{Likelihood function}
@@ -235,16 +260,19 @@ When comparing our posterior odds to those of MuTect, we assume a uniform per-ba
 \end{equation}
 
 \subsection{Implementation}
-We have implemented the \batcave algorithm as an R package called \texttt{batcaver}.
+We have implemented the \batcave algorithm as an R package \DIFaddbegin \DIFadd{called }\DIFaddend \texttt{batcaver}.
 The package leverages the Bioconductor packages \textrm{BSgenome} \cite{Pages2019}, \textrm{GenomicAlignments} \cite{Lawrence2013}, \textrm{VariantAnnotation} \cite{Obenchain2014}, and \textrm{SomaticSignatures} \cite{Gehring2015} for fast and memory-efficient variant annotation and genomic context identification.
 Reference sequences are specified as BSgenome objects, allowing efficient access to genomic context information.
 
-An assumption of the \batcave algorithm is that the mutation profile of low-confidence mutations is similar to that of the high-confidence mutations from which the prior is inferred.
-To test this assumption, \texttt{batcaver} performs a statistical hypothesis test comparing these two mutation profiles \cite{Plunkett2019}.
-If the two profiles differ at a significance threshold of $\alpha=0.05$, \texttt{batcaver} issues a warning and outputs the profiles.
-%The user can then assess them and follow-up on any biologically interesting differences.
+\DIFaddbegin \DIFadd{An assumption of the }\batcave \DIFadd{algorithm is that the mutation profile of low-confidence mutations is similar to that of the high-confidence mutations from which the prior is inferred.
+To test this assumption, }\texttt{\DIFadd{batcaver}} \DIFadd{performs a statistical hypothesis test comparing these two mutation profiles \mbox{%DIFAUXCMD
+\cite{Plunkett2019}}\hspace{0pt}%DIFAUXCMD
+.
+If the two profiles differ at a significance threshold of $\alpha=0.05$, }\texttt{\DIFadd{batcaver}} \DIFadd{issues a warning and outputs the profiles.
+%DIF > The user can then assess them and follow-up on any biologically interesting differences.
+}
 
-\begin{figure}
+\DIFaddend \begin{figure}
 \centering
   \includegraphics{figures/sim_signatures_only.pdf}
   \caption{Simulated tumor mutation profiles.
@@ -292,11 +320,11 @@ We analyzed two real data sets, one from an acute myeloid leukemia (AML)~\cite{G
 We downloaded the normal and primary whole-genome AML tumor bam files from dbGaP accession number phs000159.v8.p4.
 Griffith et al.\ generated a platinum set of variant calls for this tumor~\cite{Griffith2015}, which we used for our true positive dataset.
 We downloaded the normal and tumor whole-exome breast cancer bam files from NCBI Sequence Read Archive accession SRP070662.
-Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in \texttt{batcaver}.
-Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
-For these multi-region data, we analyzed the three biological replicates from each of six tumors (Table~\ref{table:01}), running \batcave separately on each of the eighteen samples, and we combined results to generate precision-recall curves.
-Shi et al.\ estimated sample purities of between 26\% and 80\%, and we used these estimates in \texttt{batcaver}.
-We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to GRCh37, so we used that reference.
+\DIFaddbegin \DIFadd{Griffith et al.\ estimated the purity of their primary sample to be 90.7\%, and we used this value for tumor purity in }\texttt{\DIFadd{batcaver}}\DIFadd{.
+}\DIFaddend Shi et al.\ generated a gold set of variant calls for each tumor region sequenced~\cite{Shi2018}, which we used for our true positive dataset.
+For these multi-region data, we \DIFdelbegin \DIFdel{ran }\DIFdelend \DIFaddbegin \DIFadd{analyzed the three biological replicates from each of six tumors (Table~\ref{table:01}), running }\DIFaddend \batcave separately on each \DIFdelbegin \DIFdel{sequenced region and }\DIFdelend \DIFaddbegin \DIFadd{of the eighteen samples, and we }\DIFaddend combined results to generate precision-recall curves.
+\DIFaddbegin \DIFadd{Shi et al.\ estimated sample purities of between 26\% and 80\%, and we used these estimates in }\texttt{\DIFadd{batcaver}}\DIFadd{.
+}\DIFaddend We called variants using Mutect 1.1.7 as in our simulations, except that both these data sets were originally aligned to \DIFdelbegin \DIFdel{GRCr37}\DIFdelend \DIFaddbegin \DIFadd{GRCh37}\DIFaddend , so we used that reference.
 
 
 \section{RESULTS}
@@ -322,7 +350,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 \subsection{Tests using simulated data}
 
 To improve variant identification, the context-dependent prior probability of mutation must converge to an accurate representation of the data generating distribution within the set of high-confidence mutations.
-When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig}), and the \texttt{batcaver} package emits a warning if there are fewer than 500 high-confidence mutations.
+When applied to simulated data, the prior converged within a few hundred mutations (Fig.~\ref{NAR-kl_fig})\DIFaddbegin \DIFadd{, and the }\texttt{\DIFadd{batcaver}} \DIFadd{package emits a warning if there are fewer than 500 high-confidence mutations}\DIFaddend .
 For comparison, in our simulated data sets the number of high-confidence mutations ranged between 1,500 and 5,000, and in the real AML we test on it is over 17,000~\cite{Griffith2015}.
 
 %We use the Kullback-Leibler (KL) divergence as a measure of the distance (or entropy difference) between the estimated prior and the actual simulated data generating distribution.
@@ -339,10 +367,42 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
 }
   \label{NAR-wes_fig}
   \end{figure*}
-  
+
   
 \begin{table*}[b]
-  \tableparts{%
+  \DIFdelbeginFL %DIFDELCMD < \tableparts{%
+%DIFDELCMD <   \caption{Variant calling metrics for all data sets.}
+%DIFDELCMD <   %DIFDELCMD < \label{table:01}%%%
+%
+%DIFDELCMD <   }{%
+%DIFDELCMD <   \begin{tabular}{lllllllllll}
+%DIFDELCMD <   \toprule
+%DIFDELCMD <   Scenario & Mutation profile & $\mu$ & \multicolumn{2}{c}{AUROC} & \multicolumn{2}{c}{AUPRC} & \multicolumn{2}{c}{ICI} 
+%DIFDELCMD <   \\
+%DIFDELCMD <   & & (estimated) & MuTect & \batcave & MuTect & \batcave & MuTect & \batcave
+%DIFDELCMD <   \\
+%DIFDELCMD <   \colrule
+%DIFDELCMD <   100X whole genome & Concentrated & 3.6e-7 & .987 & .993 & .972 & .975 & .117 & .287
+%DIFDELCMD <   \\
+%DIFDELCMD <   100X whole genome & Intermediate & 3.2e-7 & .987 & .989 & .972 & .973 & .118 & .214
+%DIFDELCMD <   \\
+%DIFDELCMD <   100X whole genome & Diffuse & 3.2e-7 & .988 & .989 & .971 & .973 & .120 & .219
+%DIFDELCMD <   \\
+%DIFDELCMD <   500X whole exome & Concentrated & 3.6e-7 & .848 & .929 & .674 & .758 & .138 & .109
+%DIFDELCMD <   \\
+%DIFDELCMD <   500X whole exome & Intermediate & 3.6e-7 & .847 & .881 & .677 & .706 & .108 & .112 
+%DIFDELCMD <   \\
+%DIFDELCMD <   500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
+%DIFDELCMD <   \\
+%DIFDELCMD <   real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .995 & .996 & -- & --
+%DIFDELCMD <   \\
+%DIFDELCMD <   real breast \cite{Shi2018} & Actual & 3.6e-8 & -- & -- & .972 & .972 & -- & --
+%DIFDELCMD <   \\
+%DIFDELCMD <   \botrule
+%DIFDELCMD <   \end{tabular}%
+%DIFDELCMD <   }
+%DIFDELCMD <   %%%
+\DIFdelendFL \DIFaddbeginFL \tableparts{%
   \caption{Variant calling metrics for all data sets.}
   \label{table:01}%
   }{%
@@ -365,14 +425,14 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   \\
   500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
   \\
-  real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .996 & .988 & -- & --
+  real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .988 & .996 & -- & --
   \\
-  real breast \cite{Shi2018} & Actual & 6.6e-7 & -- & -- & .972 & .968 & -- & --
+  real breast \cite{Shi2018} & Actual & 6.6e-7 & -- & -- & .968 & .972 & -- & --
   \\
   \botrule
   \end{tabular}%
   }
-  {$\mu$ = per-base mutation rate, AUROC/AUPRC = Area Under Receiver Operating Characteristic / Precision-Recall Curve, ICI = Integrated Calibration Index. Smaller values of ICI are superior.}
+  \DIFaddendFL {$\mu$ = per-base mutation rate, AUROC/AUPRC = Area Under Receiver Operating Characteristic / Precision-Recall Curve, ICI = Integrated Calibration Index. Smaller values of ICI are superior.}
  \end{table*}
 
 We assessed classification performance using the areas under both the receiver operating characteristic and the precision-recall curves, because the classes are unbalanced (approximately 5 to 1 ratio of false to true variants in our simulated data).
@@ -418,19 +478,19 @@ However, only variants called by at least one variant caller were validated.
 As a result, there are no validated true or false negative calls, so we considered only precision-recall comparisons for these data.
 
 Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) primary tumor to a depth of $>$360X and used targeted sequencing to validate nearly 200,000 mutations~\cite{Griffith2015}.
-We estimated a per-base mutation rate for this tumor of $3.6\times10^{-8}$, which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
-For this tumor, the mutation profiles of high- and low-confidence mutations differ ($p \sim 10^{-12}$).
+We estimated a per-base mutation rate for this tumor of \DIFdelbegin \DIFdel{$4\cdot10^{-8}$}\DIFdelend \DIFaddbegin \DIFadd{$3.6\times10^{-8}$}\DIFaddend , which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
+For \DIFaddbegin \DIFadd{this tumor, the mutation profiles of high- and low-confidence mutations differ ($p \sim 10^{-12}$).
 The low-confidence mutation profile contains additional spikes of mutations corresponding to five substitution types (Fig.~\ref{fig:AML_profiles}).
-Nevertheless, for both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
+Nevertheless, for }\DIFaddend both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
 
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.
 %We downloaded aligned reads for this tumor, and called variants with MuTect 1.1.7 as described in Materials \& Methods.
-We estimated an average per-base mutation rate for these tumor regions of $6.6\times10^{-7}$, which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
+We estimated an average per-base mutation rate for these tumor regions of \DIFdelbegin \DIFdel{$4\cdot10^{-8}$}\DIFdelend \DIFaddbegin \DIFadd{$6.6\times10^{-7}$}\DIFaddend , which is consistent with observed mutation rates for breast cancers \cite{Alexandrov2019} and with the low number of validated somatic mutations.
 For the validated variants, MuTect and \batcave yielded almost identical precision-recall curves (Fig.~\ref{NAR-wes_fig}F and Table~\ref{table:01})
 
 \section{DISCUSSION}
- 
+
 %Deep sequencing is necessary to measure intra-tumor heterogeneity \cite{Shi2018}, identify subclonal driver and resistance alleles \cite{Griffith2015}, and probe the mutational landscape of cancer in general \cite{Zehir2017}.  
 %Current approaches to very high depth next-generation sequencing \cite{Griffith2015}, however, require combining calls from multiple variant calling algorithms and then validating these calls via ultra-deep sequencing.
 %We believe that much of the need for multiple variant callers could be alleviated by improvements to the statistical model used to evaluate the evidence presented by the sequenced reads. 
@@ -467,25 +527,38 @@ But the mutational prior can be incorporated into almost any caller with an unde
 For example, Strelka2 computes a joint posterior probability over tumor and normal genotypes, assuming a constant somatic mutation probability at each genomic site \cite{Kim2018}.
 Replacing that constant probability with a mutational prior would require a more complicated manipulation of the quality scores output by Strelka than for MuTect, but it is conceptually straightforward.
 
-Following MuTect \cite{Cibulskis2013}, \batcave assumes a uniform prior on the variant allele frequency.
+\DIFaddbegin \DIFadd{Following MuTect \mbox{%DIFAUXCMD
+\cite{Cibulskis2013}}\hspace{0pt}%DIFAUXCMD
+, }\batcave \DIFadd{assumes a uniform prior on the variant allele frequency.
 In general, low-frequency variants are expected to be more common than high-frequency variants.
 Nevertheless, the uniform frequency prior is appropriate when the goal is to make the best call possible at each potential variant site.
 By favoring low-frequency and thus typically low-evidence variants, a nonuniform prior would increase the false positive rate.
-Note however, that if the goal were not to best identify individual variants, but rather to best estimate the distribution of variant allele frequencies within the tumor, then a nonuniform frequency prior would be appropriate~\cite{Nielsen2012}.
+Note however, that if the goal were not to best identify individual variants, but rather to best estimate the distribution of variant allele frequencies within the tumor, then a nonuniform frequency prior would be appropriate~\mbox{%DIFAUXCMD
+\cite{Nielsen2012}}\hspace{0pt}%DIFAUXCMD
+.
+}
 
-To estimate the tumor mutation rate, \batcave uses a model of the distribution of variant allele frequencies  generated during exponential growth (Eq.~\ref{eqn:mut_rate}).
+\DIFadd{To estimate the tumor mutation rate, }\batcave \DIFadd{uses a model of the distribution of variant allele frequencies  generated during exponential growth (Eq.~\ref{eqn:mut_rate}).
 Mutations that change copy number might distort the empirical allele frequency distribution, biasing the estimate.
 But substantially biasing the estimate would require copy number changes in a large number of genomic regions.
-Nevertheless, a potential extension of the \batcave algorithm would be to incorporate external copy number calls in order to adjust allele frequencies before estimating the mutation rate.
+Nevertheless, a potential extension of the }\batcave \DIFadd{algorithm would be to incorporate external copy number calls in order to adjust allele frequencies before estimating the mutation rate.
+}
 
-Sequencing multiple regions of the same tumor is of growing interest for understanding tumor heterogeneity and evolution \cite{McGranahan2017}.
-In fact, the breast cancer data we analyze came from a multi-region study~\cite{Shi2018}.
+\DIFadd{Sequencing multiple regions of the same tumor is of growing interest for understanding tumor heterogeneity and evolution \mbox{%DIFAUXCMD
+\cite{McGranahan2017}}\hspace{0pt}%DIFAUXCMD
+.
+In fact, the breast cancer data we analyze came from a multi-region study~\mbox{%DIFAUXCMD
+\cite{Shi2018}}\hspace{0pt}%DIFAUXCMD
+.
 We called variants independently across samples, because MuTect only considers a single sample at a time.
 But calling variants jointly across samples could substantially increase sensitivity.
-In the future, the \batcave algorithm could be integrated into a multi-sample caller such as MultiSNV~\cite{Josephidou2015}.
+In the future, the }\batcave \DIFadd{algorithm could be integrated into a multi-sample caller such as MultiSNV~\mbox{%DIFAUXCMD
+\cite{Josephidou2015}}\hspace{0pt}%DIFAUXCMD
+.
 In that case, an optimal implementation would likely exploit the relationship between mutational priors in related samples.
+}
 
-The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
+\DIFaddend The \batcave algorithm is computationally inexpensive; our current implementation adds 1 second per 22,000 variants evaluated to a standard GATK best-practices variant calling pipeline.
 The majority of the computational cost is associated with extracting the trinucleotide context for each potential variant site from the reference genome.
 Since most callers are already walking the reference genome during the calling process, extracting the trinucleotide context simultaneously would virtually eliminate the computational cost of implementing a mutational prior.
 
@@ -500,12 +573,14 @@ In the long run, we believe that incorporating more tumor biology into variant c
 The high-confidence variants are used to estimate the mutational prior and mutation rate, which are then used to improve the calling of low-confidence variants.
 Statistically, this is an empirical Bayesian approach~\cite{Robbins1954}, in which the high and low-confidence variants are treated as parallel experiments \cite{Morris1983,Efron2014}. 
 In general, high-confidence variants tend to have relatively high allelic frequencies, and consequently tend to have arisen early in tumor development.
+\DIFaddbegin 
 
-An  implicit assumption of \batcave is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
-Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\cite{Rubanova2018a}, and although in general those differences are relatively small, they can be significant in some cases.
-Our \texttt{batcaver} software warns the user if the high- and low-confidence mutational profiles are statistically different.
+\DIFaddend An  implicit assumption of \DIFdelbegin \DIFdel{our approach }\DIFdelend \DIFaddbegin \batcave \DIFaddend is that the mutational process does not change between high- and low-confidence variants, implying that the mutational profile of the tumor is temporally constant.
+Recent studies have found differences in mutational profiles among variants of different allelic frequencies~\cite{Rubanova2018a}, \DIFdelbegin \DIFdel{although }\DIFdelend \DIFaddbegin \DIFadd{and although in general }\DIFaddend those differences are relatively small\DIFdelbegin \DIFdel{.
+}\DIFdelend \DIFaddbegin \DIFadd{, they can be significant in some cases.
+Our }\texttt{\DIFadd{batcaver}} \DIFadd{software warns the user if the high- and low-confidence mutational profiles are statistically different.
 It also outputs those profiles, so the user can assess whether the difference will substantially affect their results.
-A potential extension of the \batcave algorithm is to process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
+}\DIFaddend A potential extension of the \batcave algorithm is to process potential variants in order of descending allelic frequency and to update the estimated mutational prior as the algorithm proceeds.
 This approach might increase sensitivity to low-frequency variants generated by recently-arisen mutational processes, at the cost of potentially increasing sensitivity to patterns of sequencing error.
 
 
@@ -515,7 +590,12 @@ Moreover, \batcave proves to be a better calibrated caller than vanilla MuTect (
 Different users will prefer different tradeoffs in terms of precision and recall, which can be more accurately made with \batcave.
 Our R implementation, \texttt{batcaver}, can be easily incorporated into any MuTect-based pipeline, and the mutational profile algorithm can be incorporated into many other callers.
 
-\section{Software Availability}
+%DIF <  \section{CONCLUSION}
+%DIF <  \bkmcomment{I looked at a bunch of NAR methods papers, and none include a conclusions section, so I moved it to the last paragraph of discussion.}
+\DIFdelbegin %DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdelend \section{Software Availability}
 
 The \texttt{batcaver} R package can be downloaded or installed from \texttt{http://github.com/bmannakee/batcaver}
 The version of \texttt{batcaver} used to generate results and all analysis code have been preserved on Zenodo \texttt{https://doi.org/10.5281/zenodo.3471715}
@@ -553,17 +633,18 @@ This material is based upon High Performance Computing (HPC) resources supported
   \caption{Posterior probability calibration for realistic calling thresholds, for 100X whole genomes. As in Fig.~\ref{NAR-ppv_fig}, but for 100X whole genomes.}
 \label{NAR-ppv_wgs_fig}
 \end{figure}
+\DIFaddbegin 
 
 \begin{figure} [H]
 \centering
   \includegraphics[width=\textwidth]{figures/aml_sig_comp.pdf}
-  \caption{Mutation profiles of A) high-confidence and B) low-confidence mutations in the AML data.}
+  \caption{\DIFaddFL{Mutation profiles of A) high-confidence and B) low-confidence mutations in the AML data.}}
 \label{fig:AML_profiles}
 \end{figure}
 
 \clearpage
 
-\section{Supplementary tables}
+\section{\DIFadd{Supplementary tables}}
 
 \begin{table*}[h]
   \tableparts{%
@@ -614,8 +695,9 @@ This material is based upon High Performance Computing (HPC) resources supported
   \botrule
   \end{tabular}%
   }
-  {Shi et al. did not estimate purity for Case 2 biorep C. We chose 40\% purity, based on the other biological replicates from this case.}
+  {\DIFaddFL{Shi et al. did not estimate purity for Case 2 biorep C. We chose 40\% purity, based on the other biological replicates from this case.}}
 \end{table*}
+\DIFaddend 
 
 \end{document}
 
