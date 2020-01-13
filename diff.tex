@@ -1,7 +1,7 @@
 \documentclass[a4,center,fleqn]{NAR}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL NAR_DRAFT_FirstSubmission.tex   Fri Jan 10 15:17:31 2020
-%DIF ADD NAR_DRAFT.tex                   Fri Jan 10 15:20:18 2020
+%DIF ADD NAR_DRAFT.tex                   Mon Jan 13 10:53:14 2020
 \bibliographystyle{NAR-natbib}
 \usepackage{color}
 \usepackage{xfrac}
@@ -19,11 +19,19 @@
         \renewcommand{\thefigure}{S\arabic{figure}}%
      }
 % Enter dates of publication
-\copyrightyear{2008}
-\pubdate{31 July 2009}
-\pubyear{2009}
-\jvolume{37}
-\jissue{12}
+%DIF 19-23c19-23
+%DIF < \copyrightyear{2008}
+%DIF < \pubdate{31 July 2009}
+%DIF < \pubyear{2009}
+%DIF < \jvolume{37}
+%DIF < \jissue{12}
+%DIF -------
+\copyrightyear{x} %DIF > 
+\pubdate{x} %DIF > 
+\pubyear{x} %DIF > 
+\jvolume{x} %DIF > 
+\jissue{x} %DIF > 
+%DIF -------
 
 \articlesubtype{Genomics and Bioinformatics}
 %DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
@@ -425,9 +433,9 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
   \\
   500X whole exome & Diffuse & 3.6e-7 & .850 & .873 & .676 & .698 & .105 & .116
   \\
-  real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .988 & .996 & -- & --
+  real AML \cite{Griffith2015} & Actual & 3.6e-8 & -- & -- & .996 & .988 & -- & --
   \\
-  real breast \cite{Shi2018} & Actual & 6.6e-7 & -- & -- & .968 & .972 & -- & --
+  real breast \cite{Shi2018} & Actual & 6.6e-7 & -- & -- & .972 & .968 & -- & --
   \\
   \botrule
   \end{tabular}%
@@ -481,7 +489,7 @@ Griffith et al.\ sequenced the whole genome of an acute myeloid leukemia (AML) p
 We estimated a per-base mutation rate for this tumor of \DIFdelbegin \DIFdel{$4\cdot10^{-8}$}\DIFdelend \DIFaddbegin \DIFadd{$3.6\times10^{-8}$}\DIFaddend , which is consistent with previous estimates of AML mutation rates \cite{Griffith2015,Williams2018}.
 For \DIFaddbegin \DIFadd{this tumor, the mutation profiles of high- and low-confidence mutations differ ($p \sim 10^{-12}$).
 The low-confidence mutation profile contains additional spikes of mutations corresponding to five substitution types (Fig.~\ref{fig:AML_profiles}).
-Nevertheless, for }\DIFaddend both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (.995 \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
+Nevertheless, for }\DIFaddend both MuTect and \batcave, the precision-recall curve is almost perfect for the validated variants (\DIFdelbegin \DIFdel{.995 }\DIFdelend \DIFaddbegin \DIFadd{.988 }\DIFaddend \& .996 area under the curve) (Fig.~\ref{NAR-wes_fig}E and Table~\ref{table:01}).
 
 
 Shi et al.\ performed multi-region whole exome sequencing on six individual breast tumors to a mean target sequencing depth of 160X and validated all variants identified by three different variant calling pipelines~\cite{Shi2018}.

@@ -28,7 +28,7 @@
 
 \noindent Dear Professor Herrero,
 
-We appreciate the opportunity to revise our manuscript for publication in \emph{NAR Genomics and Bioinformatics}, and we thank you and the reviewers for the quality of the reviews. Below we respond in italics to the reviewers' concerns.
+We appreciate the opportunity to revise our manuscript for publication in \emph{NAR Genomics and Bioinformatics}, and we thank you and the reviewers for the quality of the reviews. Below we respond in italics to the concerns of yourself and the reviewers. To aid re-review, we have included a manuscript with changes highlighted in the resubmission.
 
 \noindent Sincerely,\\
 \includegraphics{signature}\\
@@ -46,13 +46,13 @@ Modeling potential changes in the profile is beyond the scope of the current man
 We have thus implemented a statistical test as to whether the mutation profile from the high-confidence mutations differs significantly from the low-confidence mutations.
 If this test detects a difference, BATCAVE warns the user and outputs both profiles, so the user can assess the degree of difference and follow-up on any potential biological implications.
 
-When we reanalyzed our test data using this new approach, we did detect a profile shift in the AML data.
-Nevertheless, BATCAVE still performed extremely well.
+When we reanalyzed our test data using this new approach, we did detect a profile shift in the AML data (Fig.~S3).
+Nevertheless, BATCAVE still performed extremely well (Table~1). 
 \end{response}
 
 Related to this, there is probably a minimum number of high-confidence mutations that are required by BATCAVE to produce reliable results. As with the previous point, ideally the batcaver should address or warn the user if the assumptions are violated.
 \begin{response}
-Our simulation studies suggest that a few hundred high-confidence mutations are enough to reliably infer even a sharply peaked mutation profile (Fig. 3).
+Our simulation studies suggest that a few hundred high-confidence mutations are enough to reliably infer even a sharply peaked mutation profile (Fig.~3).
 We have modified \texttt{batcaver} so that it now emits a warning if there are fewer than 500 high-confidence mutations in a sample.
 \end{response}
 
@@ -64,8 +64,8 @@ We have thus added a \texttt{--tumor\_purity} option to \texttt{batcaver}.
 When this is enabled, the estimated allele frequencies will be appropriately adjusted before applying Eq.~11.
 See new text in Methods for details.
 
-We also reanalyzed our real data examples, using purity estimates from the original publications.
-Accounting for tumor purity changed the quantitative results only slightly, and did not change the qualitative conclusions.
+We also reanalyzed our real data examples, using purity estimates from the original publications (text and Table~S1).
+Accounting for tumor purity changed the quantitative results slightly but did not change the qualitative conclusions.
 We have updated the text, Table~1, and Fig.~4E\&F to reflect these new results.
  
 \end{response}
@@ -78,18 +78,18 @@ Mannakee and Gutenkunst present BATCAVE, an algorithm that first estimates the t
 Still, the 500x whole exome case does indicate that BATCAVE is better at identifying low frequency variants and thus can better reveal intratumoral heterogeneity, an important area of inquiry in cancer. Interestingly, the AUROC values for both MuTect and BATCAVE have room for improvement for the 500x whole exome case (Table 1). I suggest the authors further investigate how to improve the AUROC values. For example, in equation 4, it is unclear why the authors assume $\nu$ be uniformly distributed. Although this is also an assumption of MuTect, the BATCAVE approach inherently distinguishes mutations by allele frequency – since log-likelihood is closely associated to AF.  Perhaps a model in which $\nu$ follows a decreasing distribution vs. AF (e.g. in concordance with a model of a growing tumor) would yield better AUROC values.  
 \begin{response}
 A uniform prior over $\nu$ is appropriate when the goal is to make the best possible call at each potential variant site.
-Conceptually, before examining the read data we have no information about the allele frequency at any individual site.
+Conceptually, before examining the read data we have no information about the allele frequency at any individual site, hence a uniform prior.
 Practically, a nonuniform prior would favor low-frequency and thus typically low-evidence sites, increasing the false positive rate.
 If our goal were to best estimate the distribution of variant allele frequencies in the tumor, then a nonuniform $\nu$ would indeed be important.
 
 We discuss this issue in a new paragraph in Discussion.
 \end{response}
 
-In Rubanova et al ( https://www.biorxiv.org/content/10.1101/260471v4.full), it is argued that there are changes in mutational signatures over time in cancers. While Mannakee and Gutenkunst mention this work, they should further comment on whether such changes in mutational signatures over time are small enough to be explained by the BATCAVER concept of re-evaluating mutations based on p-value.
+In Rubanova et al (https://www.biorxiv.org/content/10.1101/260471v4.full), it is argued that there are changes in mutational signatures over time in cancers. While Mannakee and Gutenkunst mention this work, they should further comment on whether such changes in mutational signatures over time are small enough to be explained by the BATCAVER concept of re-evaluating mutations based on p-value.
 \begin{response}
 We cannot comment generally on the magnitude of mutation profile changes, because this is an developing area of research.
-But to protect users, we have implemented a new statistical test to detect changes in mutation profiles between high- and low-confidence mutations.
-See our response to the Associate Editor for more details.
+But to protect users, we have implemented and applied a new statistical test to detect changes in mutation profiles between high- and low-confidence mutations.
+See our response to the Associate Editor for details.
 \end{response}
 
 Minor
@@ -103,7 +103,7 @@ Equation 11: This equation is not correct if there is subclonal copy number evol
 The reviewer is correct, although a large number of copy number changes would be necessary to substantially bias the estimated mutation rate.
 Potential future work could incorporate external copy number calls to improve the estimate of the point mutation rate.
 
-We discuss this issue in a new paragraph in Discussion.
+We discuss now this issue in a new paragraph in Discussion.
 \end{response}
 
 \section*{Reviewer 2}
@@ -132,10 +132,10 @@ We have added a new paragraph in Discussion regarding multi-region samples, to a
 
 3. Do the mutation signatures (example smoking signatures in lung cancer or UV signatures in melanoma) still appear in the more stringent BATCAVE set of mutations?
 \begin{response}
-In our real and simulated test cases, the mutational profile changes little between high- and low-confidence sets of mutations.
-In fact, we have added a statistical test for profile change, in response to other review comments.
+In response to this and other review comments, we have added a statistical test as to whether the mutation profile changes between high- and low-confidence sets of mutations.
+And in the AML data, we do see such a change (Fig.~S3).
 
-Approaches such as deconstructSigs can decompose an individual sample's mutational profile into a set of mutation signatures corresponding to different processes.
+Approaches such as deconstructSigs can decompose an individual sample's mutational profile into a set of mutation signatures corresponding to different processes.\footnote{Rosenthal et al. (2016) \emph{Genome Biology} 17:31}
 In practice, however, we have found these approaches to be relatively unstable.
 Therefore, we do not believe it will be illuminating to apply them in the present manuscript.
 \end{response}
