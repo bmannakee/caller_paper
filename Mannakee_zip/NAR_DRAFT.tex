@@ -83,7 +83,7 @@ Broad adoption of our approach will enable more confident study of low allelic f
 
 \begin{figure}
 \centering
-  \includegraphics{real_signatures_only.pdf}
+  \includegraphics{real_signatures_only}
   \caption{Real tumor mutation profiles.
   In each panel, the x-axis corresponds to each of the 96 possible mutation types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} The observed mutation profile of an acute myeloid leukemia used in our real data analysis \cite{Griffith2015}.
@@ -234,7 +234,7 @@ If the two profiles differ at a significance threshold of $\alpha=0.05$, \texttt
 
 \begin{figure}
 \centering
-  \includegraphics{sim_signatures_only.pdf}
+  \includegraphics{sim_signatures_only}
   \caption{Simulated tumor mutation profiles.
 As in Fig.~\ref{NAR-realsigfig}, in each panel the x-axis corresponds to each of the 96 possible mutation types, and the y-axis is the proportion of total mutations of each type.
   \textbf{(A)} A mutation profile used for simulating tumors, made up of equal proportions of COSMIC mutation signatures 1, 7, \& 11.
@@ -301,7 +301,7 @@ Because our focus is on evaluating the statistical calling model, we computed al
 
 \begin{figure}
 \centering
-  \includegraphics{kl_only.pdf}
+  \includegraphics{kl_only}
   \caption{Convergence of the mutational prior to the data generating distribution. Plotted is the Kullback-Leibler divergence between the simulated and estimated profiles versus number of incorporated mutations for whole exomes. Convergence for whole genomes is similar.
   }
 \label{NAR-kl_fig}
@@ -319,7 +319,7 @@ For comparison, in our simulated data sets the number of high-confidence mutatio
 
   \begin{figure*}
 \centering
-    \includegraphics{fig_wes.pdf}
+    \includegraphics{fig_wes}
     \caption{Variant-calling performance on  simulated and real data. Throughout, MuTect results are plotted with gray lines and BATCAVE results with black lines.
     \textbf{(A)} Precision-recall curves and \textbf{(B)} receiver operating characteristic curves for different mutation profiles.
     \textbf{(C)} and \textbf{(D)} Calibration plots. Shaded regions show distributions of posterior probabilities for true positive variants, and smooth lines show loess-smoothed relationships, from which the Integrated Calibration Index is calculated. For a perfectly calibrated caller, those curves would match the dashed y=x line. 
@@ -382,7 +382,7 @@ As with the other metrics, the advantage of BATCAVE increases with the concentra
 
 \begin{figure}
 \centering
-  \includegraphics{ppv_wes.pdf}
+  \includegraphics{ppv_wes}
   \caption{Posterior probability calibration for realistic calling thresholds, for 500X exomes.
   Plotted is precision and recall for variants identified using various realistic posterior probability thresholds.
 At these thresholds, the precision of BATCAVE is much closer to the given threshold than MuTect, no matter the concentration of the mutation profile.
